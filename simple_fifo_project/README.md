@@ -1,0 +1,1 @@
+Run `make` inside the `sim/` directory to simulate the FIFO and dump waveform.vcd.
