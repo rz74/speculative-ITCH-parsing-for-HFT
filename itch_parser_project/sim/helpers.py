@@ -15,14 +15,19 @@ async def send_header(dut, msg_type, msg_len):
     dut.rx_valid.value = 0
     await RisingEdge(dut.clk)
 
+from cocotb.triggers import Edge
+
 async def wait_for_new_msg(dut, timeout=10):
-    """Wait for new_msg to go high within a timeout in clock cycles."""
+    """Wait for new_msg to go high within timeout cycles."""
     for _ in range(timeout):
-        await RisingEdge(dut.clk)
-        await ReadOnly()  # Wait for signal stabilization
+        if dut.new_msg.value == 1:
+            return
+        await Edge(dut.new_msg)
         if dut.new_msg.value == 1:
             return
     raise AssertionError("Timed out waiting for new_msg == 1")
+
+
 
 def check_header(dut, expected_type, expected_len):
     """Assert the output header fields."""

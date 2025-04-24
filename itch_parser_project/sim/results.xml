@@ -1,17 +1,9 @@
 <testsuites name="results">
   <testsuite name="all" package="all">
-    <property name="random_seed" value="1745525557" />
-    <testcase name="test_basic_header" classname="test_itch_parser" file="/mnt/c/Users/4510181/Downloads/Git/AX7050_Shared_Folder/itch_parser_project/sim/test_itch_parser.py" lineno="7" time="0.007876396179199219" sim_time_ns="150.001" ratio_time="19044.36960600557">
-      <failure message="Test failed with RANDOM_SEED=1745525557" />
-    </testcase>
-    <testcase name="test_multiple_headers" classname="test_itch_parser" file="/mnt/c/Users/4510181/Downloads/Git/AX7050_Shared_Folder/itch_parser_project/sim/test_itch_parser.py" lineno="22" time="0.0030715465545654297" sim_time_ns="150.001" ratio_time="48835.65895397035">
-      <failure message="Test failed with RANDOM_SEED=1745525557" />
-    </testcase>
-    <testcase name="test_random_headers" classname="test_itch_parser" file="/mnt/c/Users/4510181/Downloads/Git/AX7050_Shared_Folder/itch_parser_project/sim/test_itch_parser.py" lineno="38" time="0.0019943714141845703" sim_time_ns="150.00099999999998" ratio_time="75212.1690739988">
-      <failure message="Test failed with RANDOM_SEED=1745525557" />
-    </testcase>
-    <testcase name="test_reset_midstream" classname="test_itch_parser" file="/mnt/c/Users/4510181/Downloads/Git/AX7050_Shared_Folder/itch_parser_project/sim/test_itch_parser.py" lineno="55" time="0.0019183158874511719" sim_time_ns="170.00100000000003" ratio_time="88619.91974944073">
-      <failure message="Test failed with RANDOM_SEED=1745525557" />
-    </testcase>
+    <property name="random_seed" value="1745525897" />
+    <testcase name="test_basic_header" classname="test_itch_parser" file="/mnt/c/Users/4510181/Downloads/Git/AX7050_Shared_Folder/itch_parser_project/sim/test_itch_parser.py" lineno="7" time="0.006372690200805664" sim_time_ns="50.001" ratio_time="7846.136941299712" />
+    <testcase name="test_multiple_headers" classname="test_itch_parser" file="/mnt/c/Users/4510181/Downloads/Git/AX7050_Shared_Folder/itch_parser_project/sim/test_itch_parser.py" lineno="22" time="0.001965761184692383" sim_time_ns="90.001" ratio_time="45784.300097513646" />
+    <testcase name="test_random_headers" classname="test_itch_parser" file="/mnt/c/Users/4510181/Downloads/Git/AX7050_Shared_Folder/itch_parser_project/sim/test_itch_parser.py" lineno="38" time="0.004937648773193359" sim_time_ns="210.00099999999998" ratio_time="42530.56660086914" />
+    <testcase name="test_reset_midstream" classname="test_itch_parser" file="/mnt/c/Users/4510181/Downloads/Git/AX7050_Shared_Folder/itch_parser_project/sim/test_itch_parser.py" lineno="55" time="0.0009627342224121094" sim_time_ns="70.00100000000003" ratio_time="72710.61770777617" />
   </testsuite>
 </testsuites>
