@@ -1,128 +1,86 @@
-// -----------------------------------------------------------------------------
-// itch_parser.v (Updated with Alternative Optimized Version)
-// -----------------------------------------------------------------------------
-// This Verilog module extracts the header from an ITCH protocol message,
-// consisting of a 1-byte message type and a 2-byte message length.
-//
-// The active design is simple and reliable, taking 4 clock cycles to process a
-// full header. Below the active logic is an alternative 3-cycle version,
-// which reacts faster but carries more risk in case of signal glitches.
-// -----------------------------------------------------------------------------
-
 module itch_parser (
     input wire clk,               // System clock
     input wire rst,               // Active-high synchronous reset
-    input wire [7:0] rx_data,     // Incoming byte stream
-    input wire rx_valid,          // Byte valid signal
+    input wire [7:0] rx_data,     // Incoming byte (from ITCH stream)
+    input wire rx_valid,          // Indicates rx_data is valid
 
-    output reg [7:0] msg_type,    // Output: message type
-    output reg [15:0] msg_len,    // Output: message length
-    output reg new_msg            // Output: pulse high for 1 cycle when header is ready
+    output reg [7:0] msg_type,    // Parsed message type (1st byte of header)
+    output reg [15:0] msg_len,    // Parsed message length (2nd & 3rd bytes)
+    output reg new_msg            // High for 1 cycle when a full header is parsed
 );
 
+    // Define FSM states using a typedef enum
     typedef enum logic [2:0] {
-        IDLE = 3'd0,
-        READ_MSG_LEN1 = 3'd1,
-        READ_MSG_LEN2 = 3'd2,
-        DONE = 3'd3
+        IDLE = 3'd0,              // Waiting for start of new message
+        READ_MSG_LEN1 = 3'd1,     // Received msg_type, waiting for length byte 1
+        READ_MSG_LEN2 = 3'd2,     // Received length byte 1, waiting for length byte 2
+        DONE = 3'd3               // Full header received
     } state_t;
 
+    // FSM state registers
     state_t state, next_state;
+
+    // Temporary storage for the first byte of length field
     reg [7:0] len_byte1;
 
-    // State update
+    // State register logic: update current state on rising edge of clk
     always @(posedge clk) begin
-        if (rst) begin
-            state <= IDLE;
-        end else begin
-            state <= next_state;
-        end
+        if (rst)
+            state <= IDLE;        // Reset to IDLE state
+        else
+            state <= next_state;  // Transition to computed next state
     end
 
-    // Output and logic behavior
+    // Combinational block: defines the FSM's next state based on inputs and current state
+    always @(*) begin
+        next_state = state;       // Default is to stay in current state
+        case (state)
+            IDLE: if (rx_valid) next_state = READ_MSG_LEN1;
+            READ_MSG_LEN1: if (rx_valid) next_state = READ_MSG_LEN2;
+            READ_MSG_LEN2: if (rx_valid) next_state = DONE;
+            DONE: next_state = IDLE;
+        endcase
+    end
+
+    // Output and behavior logic (sequential)
     always @(posedge clk) begin
         if (rst) begin
-            msg_type <= 8'd0;
+            msg_type <= 8'd0;         // Clear outputs on reset
             msg_len <= 16'd0;
             len_byte1 <= 8'd0;
             new_msg <= 1'b0;
         end else begin
-            new_msg <= 1'b0;
+            new_msg <= 1'b0;          // Default: no new message
 
             case (state)
                 IDLE: begin
-                    if (rx_valid) begin
-                        msg_type <= rx_data;
-                        next_state <= READ_MSG_LEN1;
-                    end else begin
-                        next_state <= IDLE;
-                    end
+                    if (rx_valid)
+                        msg_type <= rx_data;  // Capture message type
                 end
 
                 READ_MSG_LEN1: begin
-                    if (rx_valid) begin
-                        len_byte1 <= rx_data;
-                        next_state <= READ_MSG_LEN2;
-                    end else begin
-                        next_state <= READ_MSG_LEN1;
-                    end
+                    if (rx_valid)
+                        len_byte1 <= rx_data; // Capture high byte of msg_len
                 end
 
                 READ_MSG_LEN2: begin
-                    if (rx_valid) begin
-                        msg_len <= {len_byte1, rx_data};
-                        next_state <= DONE;
-                    end else begin
-                        next_state <= READ_MSG_LEN2;
-                    end
+                    if (rx_valid)
+                        msg_len <= {len_byte1, rx_data}; // Combine to form msg_len
                 end
 
                 DONE: begin
-                    new_msg <= 1'b1;
-                    next_state <= IDLE;
-                end
-
-                default: begin
-                    next_state <= IDLE;
+                    new_msg <= 1'b1;   // Signal that a full header was parsed
                 end
             endcase
         end
     end
 
-/*
-    // -------------------------------------------------------------------------
-    // ALTERNATIVE: Optimized 3-Cycle Version (Lower Latency, More Risk)
-    // -------------------------------------------------------------------------
-    // This implementation removes the DONE state and emits `new_msg` in the
-    // same cycle the last length byte arrives. Use with caution — ensure
-    // downstream logic doesn't miss the single-cycle `new_msg` pulse.
-
-    reg [2:0] byte_count;
-    reg [23:0] header_shift;
-
-    always @(posedge clk) begin
-        if (rst) begin
-            byte_count <= 0;
-            header_shift <= 24'd0;
-            msg_type <= 8'd0;
-            msg_len <= 16'd0;
-            new_msg <= 1'b0;
-        end else if (rx_valid) begin
-            header_shift <= {header_shift[15:0], rx_data};
-            byte_count <= byte_count + 1;
-
-            if (byte_count == 2) begin
-                msg_type <= header_shift[23:16];
-                msg_len <= {header_shift[15:8], header_shift[7:0]};
-                new_msg <= 1'b1;
-                byte_count <= 0;
-            end else begin
-                new_msg <= 1'b0;
-            end
-        end else begin
-            new_msg <= 1'b0;
-        end
+    // Waveform dumping block for simulation only (ignored in synthesis)
+    `ifdef COCOTB_SIM
+    initial begin
+        $dumpfile("dump.vcd");         // Output VCD file name
+        $dumpvars(0, itch_parser);     // Dump all signals in this module
     end
-*/
+    `endif
 
 endmodule

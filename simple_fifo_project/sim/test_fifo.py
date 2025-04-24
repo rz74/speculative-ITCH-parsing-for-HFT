@@ -2,7 +2,6 @@ import cocotb
 from cocotb.triggers import RisingEdge
 from cocotb.clock import Clock
 
-
 @cocotb.test()
 async def fifo_basic_test(dut):
     clock = Clock(dut.clk, 10, units="ns")
@@ -15,14 +14,15 @@ async def fifo_basic_test(dut):
     await RisingEdge(dut.clk)
     dut.rst.value = 0
 
-    # Write some data
+    # Write values
     for i in range(3):
         dut.din.value = i + 1
         dut.wr_en.value = 1
         await RisingEdge(dut.clk)
     dut.wr_en.value = 0
+    await RisingEdge(dut.clk)
 
-    # Read back data
+    # Read values
     for i in range(3):
         dut.rd_en.value = 1
         await RisingEdge(dut.clk)

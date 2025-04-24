@@ -22,6 +22,7 @@ module fifo #(
             count <= 0;
             full <= 0;
             empty <= 1;
+            dout <= 0;
         end else begin
             if (wr_en && !full) begin
                 mem[wr_ptr] <= din;
@@ -30,9 +31,12 @@ module fifo #(
             end
 
             if (rd_en && !empty) begin
-                dout <= mem[rd_ptr];
                 rd_ptr <= rd_ptr + 1;
                 count <= count - 1;
+            end
+
+            if (!empty) begin
+                dout <= mem[rd_ptr];
             end
 
             full <= (count == DEPTH);
@@ -40,11 +44,11 @@ module fifo #(
         end
     end
 
-`ifdef COCOTB_SIM
-initial begin
-    $dumpfile("waveform.vcd");
-    $dumpvars(0, fifo);
-end
-`endif
+    `ifdef COCOTB_SIM
+    initial begin
+        $dumpfile("dump.vcd");
+        $dumpvars(0, fifo);
+    end
+    `endif
 
 endmodule

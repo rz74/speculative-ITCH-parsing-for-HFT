@@ -1,1 +1,1 @@
-Run `make` inside the `sim/` directory to simulate the FIFO and dump waveform.vcd.
+To run: cd into sim/, then just run `make` — waveform is dumped to dump.vcd via dump.v.

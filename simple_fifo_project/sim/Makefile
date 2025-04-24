@@ -1,11 +1,8 @@
-TOPLEVEL_LANG = verilog
-MODULE = test_fifo
-SIM = icarus
+SIM ?= icarus
+TOPLEVEL_LANG ?= verilog
 
+VERILOG_SOURCES = ../rtl/fifo.v dump.v
 TOPLEVEL = fifo
-
-VERILOG_SOURCES = ../rtl/fifo.v
-DUMPFILE = waveform.vcd
-COMPILE_ARGS += -DCOCOTB_SIM=1
-
+MODULE = test_fifo
+WAVES = 1
 include $(shell cocotb-config --makefiles)/Makefile.sim
