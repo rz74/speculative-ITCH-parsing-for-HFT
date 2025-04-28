@@ -1,16 +1,19 @@
-
+// =============================================
+// top.v
+// =============================================
+//
+// Description: Top-level wrapper for cocotb simulation, handles VCD dumping.
+// Author: RZ
+// Start Date: 04172025
+// Version: 0.1
+//
 // Changelog
 // =============================================
+// [20250427-1] RZ: Updated VCD dumping to allow dynamic filename selection via DUMPFILE macro.
+// [20250428-1] RZ: Standardized dumpfile to "dump.vcd" for all simulation targets.
+// =============================================
 
-// [04272025] RZ: Updated VCD dumping to allow dynamic filename selection via DUMPFILE macro.
-//              Made this change to make debugging different modules easier
-//==============================================
-
-// ===============================
-// top.v
-// ===============================
 `timescale 1ns/1ps
-
 
 
 module top (

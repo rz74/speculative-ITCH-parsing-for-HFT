@@ -1,3 +1,18 @@
+# =============================================
+# payload_injection_helpers.py
+# =============================================
+
+# Description: Helper utilities for injecting random, incomplete, wrong, and multiple payloads for cocotb testing.
+# Author: RZ
+# Start Date: 04172025
+# Version: 0.1
+
+# Changelog
+# =============================================
+# [20250427-1] RZ: Initial version for payload injection helpers (random, incomplete, wrong type, multiple).
+# [20250428-1] RZ: Added mid-payload reset test for robustness.
+# =============================================
+
 import cocotb
 from cocotb.triggers import RisingEdge
 import random

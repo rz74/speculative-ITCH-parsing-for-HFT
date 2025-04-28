@@ -1,3 +1,17 @@
+// =============================================
+// cancel_order_decoder.v
+// =============================================
+//
+// Description: Module to decode Cancel Order ('X') messages from ITCH payloads.
+// Author: RZ
+// Start Date: 04172025
+// Version: 0.1
+//
+// Changelog
+// =============================================
+// [20250427-1] RZ: Initial version created for Cancel Order payload decoding.
+// =============================================
+
 module cancel_order_decoder (
     input  wire        clk,
     input  wire        rst_n,

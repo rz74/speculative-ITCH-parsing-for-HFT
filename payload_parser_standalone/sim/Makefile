@@ -2,25 +2,21 @@
 # Makefile
 # =============================================
 
-# Makefile for cocotb simulation of the payload_parser module
+# Description: Makefile for cocotb simulation, VCD handling, and GTKWave automation.
 # Author: RZ
 # Start Date: 04172025
+# Version: 0.1
 
 # Changelog
 # =============================================
-# [04272025] RZ:
-# - Initial version of multi-target Makefile
-# - Added support for DUMPFILE macro
-# - Separate targets for add_order and cancel_order simulation
-# - Default VCD dump fallback
-# [042720252] RZ: Added auto-move of VCD files into vcd/ folder after simulation
-# [042720253] RZ: Added clean target to remove old build and VCD files
-# [042720254] RZ: Added support for GTKWave to open VCD files after simulation
-# [042720255] RZ: Added automatic timestamp-based VCD filenames for unique runs. Cleaned up compile vs simulation args separation
-# [04282025] RZ:
-# - Added dynamic timestamp generation per target (no overwrite)
-# - Added view_latest to quickly open latest VCD file in GTKWave
+# [20250427-1] RZ: Initial version of multi-target Makefile for payload_parser simulation.
+# [20250427-2] RZ: Added auto-move of VCD files into vcd/ folder after simulation.
+# [20250427-3] RZ: Added cleanall target to remove old builds and VCDs.
+# [20250427-4] RZ: Added GTKWave auto-open after simulation.
+# [20250428-1] RZ: Added dynamic timestamp-based VCD renaming after simulation.
+# [20250428-2] RZ: Added killwave functionality to close old GTKWave windows before new simulation.
 # =============================================
+
 
 TOPLEVEL_LANG = verilog
 

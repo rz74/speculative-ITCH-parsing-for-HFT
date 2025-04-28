@@ -1,3 +1,18 @@
+# =============================================
+# test_payload_parser.py
+# =============================================
+
+# Description: Master cocotb testbench coordinating Add and Cancel Order tests together.
+# Author: RZ
+# Start Date: 04172025
+# Version: 0.1
+
+# Changelog
+# =============================================
+# [20250427-1] RZ: Initial version coordinating Add and Cancel test submodules.
+# [20250428-1] RZ: Improved modular testbench structure for clarity and scalability.
+# =============================================
+
 import cocotb
 from helpers.reset_utils import reset_dut, start_clock
 

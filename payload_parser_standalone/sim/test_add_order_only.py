@@ -1,3 +1,18 @@
+# =============================================
+# test_add_order_only.py
+# =============================================
+
+# Description: Cocotb testbench for validating Add Order ('A') decoding only.
+# Author: RZ
+# Start Date: 04172025
+# Version: 0.1
+
+# Changelog
+# =============================================
+# [20250427-1] RZ: Initial version created for Add Order only testing.
+# [20250428-1] RZ: Integrated with modular payload_parser project structure.
+# =============================================
+
 import cocotb
 from helpers.reset_utils import start_clock, reset_dut
 

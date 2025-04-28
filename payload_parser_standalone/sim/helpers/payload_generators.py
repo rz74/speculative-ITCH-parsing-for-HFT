@@ -1,3 +1,18 @@
+# =============================================
+# payload_generators.py
+# =============================================
+
+# Description: Helper utilities to generate ITCH protocol payloads for Add and Cancel Order messages.
+# Author: RZ
+# Start Date: 04172025
+# Version: 0.1
+
+# Changelog
+# =============================================
+# [20250427-1] RZ: Initial version for Add Order and Cancel Order payload generation.
+# [20250428-1] RZ: Improved payload structure padding and added random garbage generator.
+# =============================================
+
 def generate_add_order_payload(index):
     payload = bytearray(64)
     payload[0] = ord('A')

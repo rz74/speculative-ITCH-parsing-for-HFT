@@ -1,3 +1,18 @@
+// =============================================
+// add_order_decoder.v
+// =============================================
+//
+// Description: Module to decode Add Order ('A') messages from ITCH payloads.
+// Author: RZ
+// Start Date: 04172025
+// Version: 0.1
+//
+// Changelog
+// =============================================
+// [20250427-1] RZ: Initial version created for Add Order payload decoding.
+// [20250428-1] RZ: Added stock symbol extraction and minor optimizations.
+// =============================================
+
 module add_order_decoder (
     input  wire        clk,
     input  wire        rst_n,

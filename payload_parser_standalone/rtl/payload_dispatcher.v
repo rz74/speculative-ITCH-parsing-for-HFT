@@ -1,13 +1,17 @@
 // =============================================
+// payload_dispatcher.v
+// =============================================
+//
+// Description: Dispatcher module to route ITCH payloads based on message type.
+// Author: RZ
+// Start Date: 04172025
+// Version: 0.1
+//
 // Changelog
 // =============================================
-// [04272025] RZ: Initial version for payload dispatcher.
-//              Supports Add Order ('A') and Cancel Order ('X') dispatching. 
+// [20250427-1] RZ: Initial version supporting Add Order ('A') and Cancel Order ('X') dispatching.
 // =============================================
 
-// ===============================
-// payload_dispatcher.v
-// ===============================
 
 module payload_dispatcher #(
     parameter PAYLOAD_WIDTH = 512
