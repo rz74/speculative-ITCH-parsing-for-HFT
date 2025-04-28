@@ -1,3 +1,15 @@
+
+// Changelog
+// =============================================
+
+// [04272025] RZ: Updated VCD dumping to allow dynamic filename selection via DUMPFILE macro.
+//              Made this change to make debugging different modules easier
+//==============================================
+
+// ===============================
+// top.v
+// ===============================
+
 module top (
     input  wire        clk,
     input  wire        rst_n,
@@ -11,11 +23,18 @@ module top (
     output wire        buy_sell,
     output wire [31:0] shares,
     output wire [31:0] price,
-    output wire [63:0] stock_symbol
+    output wire [63:0] stock_symbol,
+
+    output wire        cancel_order_decoded,
+    output wire [63:0] cancel_order_ref,
+    output wire [31:0] cancel_shares
 );
 
     wire        add_order_valid;
     wire [511:0] add_order_payload;
+
+    wire        cancel_order_valid;
+    wire [511:0] cancel_order_payload;
 
     payload_dispatcher dispatcher_inst (
         .clk(clk),
@@ -24,7 +43,9 @@ module top (
         .msg_type(msg_type),
         .payload(payload),
         .add_order_valid(add_order_valid),
-        .add_order_payload(add_order_payload)
+        .add_order_payload(add_order_payload),
+        .cancel_order_valid(cancel_order_valid),
+        .cancel_order_payload(cancel_order_payload)
     );
 
     add_order_decoder add_order_decoder_inst (
@@ -40,9 +61,23 @@ module top (
         .decoded(add_order_decoded)
     );
 
+    cancel_order_decoder cancel_order_decoder_inst (
+        .clk(clk),
+        .rst_n(rst_n),
+        .valid(cancel_order_valid),
+        .payload(cancel_order_payload),
+        .order_ref(cancel_order_ref),
+        .cancel_shares(cancel_shares),
+        .decoded(cancel_order_decoded)
+    );
+
 `ifdef COCOTB_SIM
     initial begin
-        $dumpfile("dump.vcd");
+        `ifdef DUMPFILE
+            $dumpfile(`DUMPFILE);
+        `else
+            $dumpfile("default_dump.vcd");
+        `endif
         $dumpvars(0, top);
     end
 `endif
