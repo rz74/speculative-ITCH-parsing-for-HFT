@@ -15,8 +15,8 @@
 # [042720252] RZ: Added auto-move of VCD files into vcd/ folder after simulation
 # [042720253] RZ: Added clean target to remove old build and VCD files
 # [042720254] RZ: Added support for GTKWave to open VCD files after simulation
+# [042720255] RZ: Added automatic timestamp-based VCD filenames for unique runs. Cleaned up compile vs simulation args separation
 # =============================================
-
 TOPLEVEL_LANG = verilog
 
 VERILOG_SOURCES = ../rtl/payload_dispatcher.v ../rtl/add_order_decoder.v ../rtl/cancel_order_decoder.v ../synth/top.v
@@ -27,41 +27,43 @@ SIM = icarus
 COMPILE_ARGS += -g2012 -DCOCOTB_SIM
 EXTRA_ARGS ?=
 
-# Include cocotb makefile
 include $(shell cocotb-config --makefiles)/Makefile.sim
 
-# Hook: after running the simulation
-SIM_BUILD_POST_CMD = mkdir -p vcd && mv *.vcd vcd/
+# =============================================
+# Utility: Get timestamp (MMDDYYYY_HHMMSS)
+TIMESTAMP := $(shell date +%m%d%Y_%H%M%S)
 
 # =============================================
 # Targets
 # =============================================
+
 # Add Order tests
 add_order:
-	$(MAKE) EXTRA_ARGS="-DDUMPFILE=\\\"add_order_dump.vcd\\\"" MODULE=test_payload_parser
-	mv add_order_dump.vcd vcd/add_order_dump.vcd
-	gtkwave vcd/add_order_dump.vcd &
+	$(MAKE) COMPILE_ARGS="-g2012 -DCOCOTB_SIM -DDUMPFILE=\\\"add_order_dump_$(TIMESTAMP).vcd\\\"" MODULE=test_payload_parser
+	mkdir -p vcd
+	mv add_order_dump_$(TIMESTAMP).vcd vcd/add_order_dump_$(TIMESTAMP).vcd
+	gtkwave vcd/add_order_dump_$(TIMESTAMP).vcd &
 
 # Cancel Order tests
 cancel_order:
-	$(MAKE) EXTRA_ARGS="-DDUMPFILE=\\\"cancel_order_dump.vcd\\\"" MODULE=test_payload_parser
-	mv cancel_order_dump.vcd vcd/cancel_order_dump.vcd
-	gtkwave vcd/cancel_order_dump.vcd &
+	$(MAKE) COMPILE_ARGS="-g2012 -DCOCOTB_SIM -DDUMPFILE=\\\"cancel_order_dump_$(TIMESTAMP).vcd\\\"" MODULE=test_payload_parser
+	mkdir -p vcd
+	mv cancel_order_dump_$(TIMESTAMP).vcd vcd/cancel_order_dump_$(TIMESTAMP).vcd
+	gtkwave vcd/cancel_order_dump_$(TIMESTAMP).vcd &
 
-# Default (full run)
+# Default run
 default:
-	$(MAKE) EXTRA_ARGS="" MODULE=test_payload_parser
-	mv default_dump.vcd vcd/default_dump.vcd
-	gtkwave vcd/default_dump.vcd &
-
+	$(MAKE) COMPILE_ARGS="-g2012 -DCOCOTB_SIM" MODULE=test_payload_parser
+	mkdir -p vcd
+	mv dump.vcd vcd/default_dump_$(TIMESTAMP).vcd
+	gtkwave vcd/default_dump_$(TIMESTAMP).vcd &
 
 # =============================================
-# Cleanup targets
+# Cleanup Target
 # =============================================
 
 cleanall:
+	find vcd/ -name "*.vcd" -type f -mtime +1 -delete
 	rm -rf sim_build
-	rm -rf results.xml
-	rm -rf vcd/*.vcd
-	@echo "Cleaned old build and VCD files."
-
+	rm -f results.xml
+	@echo "Cleaned sim build and VCD files older than 1 day."

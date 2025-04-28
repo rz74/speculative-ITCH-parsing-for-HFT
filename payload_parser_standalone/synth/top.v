@@ -9,6 +9,9 @@
 // ===============================
 // top.v
 // ===============================
+`timescale 1ns/1ps
+
+
 
 module top (
     input  wire        clk,
@@ -72,14 +75,19 @@ module top (
     );
 
 `ifdef COCOTB_SIM
+    `ifdef DUMPFILE
+        `define DUMPFILE_STRING `DUMPFILE
+    `else
+        `define DUMPFILE_STRING "default_dump.vcd"
+    `endif
+
     initial begin
-        `ifdef DUMPFILE
-            $dumpfile(`DUMPFILE);
-        `else
-            $dumpfile("default_dump.vcd");
-        `endif
+        $dumpfile(`DUMPFILE_STRING);
         $dumpvars(0, top);
     end
 `endif
+
+
+
 
 endmodule

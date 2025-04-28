@@ -1,4 +1,6 @@
 import cocotb
+from cocotb.triggers import RisingEdge
+
 from helpers.reset_utils import reset_dut, start_clock
 from helpers.payload_injection import (
     inject_random_payload,
@@ -14,16 +16,26 @@ async def run_add_order_basic_test(dut):
     await reset_dut(dut)
 
     payload = generate_add_order_payload(0)
+    from helpers.payload_generators import generate_cancel_order_payload
+
+async def run_cancel_order_basic_test(dut):
+    """Test for basic Cancel Order decoding."""
+    payload = generate_cancel_order_payload(0)
+
+    # Drive top-level input ports
     dut.in_valid.value = 1
-    dut.msg_type.value = payload[0]
+    dut.msg_type.value = payload[0]  # 'X' for Cancel Order
     dut.payload.value = int.from_bytes(payload.ljust(64, b'\x00'), byteorder='big')
+
     await RisingEdge(dut.clk)
     dut.in_valid.value = 0
 
     for _ in range(5):
         await RisingEdge(dut.clk)
 
-    cocotb.log.info("Add Order basic decode test passed.")
+    cocotb.log.info("Cancel Order basic decode test passed.")
+
+
 
 async def run_garbage_payload_test(dut):
     await inject_random_payload(dut, dut.add_order_decoded)
