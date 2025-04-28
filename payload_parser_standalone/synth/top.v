@@ -75,17 +75,12 @@ module top (
     );
 
 `ifdef COCOTB_SIM
-    `ifdef DUMPFILE
-        `define DUMPFILE_STRING `DUMPFILE
-    `else
-        `define DUMPFILE_STRING "default_dump.vcd"
-    `endif
-
     initial begin
-        $dumpfile(`DUMPFILE_STRING);
+        $dumpfile("dump.vcd");
         $dumpvars(0, top);
     end
 `endif
+
 
 
 
