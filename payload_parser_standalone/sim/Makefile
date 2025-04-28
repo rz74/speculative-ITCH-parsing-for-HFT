@@ -2,8 +2,9 @@
 # Makefile
 # =============================================
 
-
 # Makefile for cocotb simulation of the payload_parser module
+# Author: RZ
+# Start Date: 04172025
 
 # Changelog
 # =============================================
@@ -19,16 +20,6 @@
 # [04282025] RZ:
 # - Added dynamic timestamp generation per target (no overwrite)
 # - Added view_latest to quickly open latest VCD file in GTKWave
-# =============================================
-
-# =============================================
-# Changelog
-# =============================================
-# [04272025] RZ:
-# - Initial version of multi-target Makefile
-# [04282025] RZ:
-# - Added dynamic timestamp after sim
-# - Added auto-gtkwave window cleanup before launching new GTKWave
 # =============================================
 
 TOPLEVEL_LANG = verilog
