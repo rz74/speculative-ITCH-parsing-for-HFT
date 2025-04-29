@@ -15,12 +15,15 @@
 # [20250427-4] RZ: Added GTKWave auto-open after simulation.
 # [20250428-1] RZ: Added dynamic timestamp-based VCD renaming after simulation.
 # [20250428-2] RZ: Added killwave functionality to close old GTKWave windows before new simulation.
+# [20250428-3] RZ: Added del module
 # =============================================
 
 
 TOPLEVEL_LANG = verilog
 
-VERILOG_SOURCES = ../rtl/payload_dispatcher.v ../rtl/add_order_decoder.v ../rtl/cancel_order_decoder.v ../synth/top.v
+VERILOG_SOURCES = ../rtl/payload_dispatcher.v ../rtl/add_order_decoder.v ../rtl/cancel_order_decoder.v ../rtl/delete_order_decoder.v ../rtl/replace_order_decoder.v ../synth/top.v
+
+
 TOPLEVEL = top
 SIM = icarus
 
@@ -50,6 +53,21 @@ cancel_order: killwave
 	TIMESTAMP=$$(date +%m%d%Y_%H%M%S); \
 	mv dump.vcd vcd/cancel_order_dump_$${TIMESTAMP}.vcd; \
 	gtkwave vcd/cancel_order_dump_$${TIMESTAMP}.vcd &
+
+delete_order: killwave
+	$(MAKE) COMPILE_ARGS="-g2012 -DCOCOTB_SIM" MODULE=test_delete_order_only
+	mkdir -p vcd
+	TIMESTAMP=$$(date +%Y%m%d_%H%M%S); \
+	mv dump.vcd vcd/delete_order_dump_$${TIMESTAMP}.vcd; \
+	gtkwave vcd/delete_order_dump_$${TIMESTAMP}.vcd &
+
+replace_order: killwave
+	$(MAKE) COMPILE_ARGS="-g2012 -DCOCOTB_SIM" MODULE=test_replace_order_only
+	mkdir -p vcd
+	TIMESTAMP=$$(date +%Y%m%d_%H%M%S); \
+	mv dump.vcd vcd/replace_order_dump_$${TIMESTAMP}.vcd; \
+	gtkwave vcd/replace_order_dump_$${TIMESTAMP}.vcd &
+
 
 default: killwave
 	$(MAKE) COMPILE_ARGS="-g2012 -DCOCOTB_SIM" MODULE=test_payload_parser

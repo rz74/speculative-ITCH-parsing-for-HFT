@@ -74,6 +74,7 @@ async def reset_mid_payload(dut, payload_generator, decoded_signal):
     dut.rst_n.value = 0
     await RisingEdge(dut.clk)
     dut.rst_n.value = 1
+    dut.in_valid.value = 0 # Clear in_valid to avoid triggering decode. mimic system behavior.
     await RisingEdge(dut.clk)
 
     dut.in_valid.value = 0
