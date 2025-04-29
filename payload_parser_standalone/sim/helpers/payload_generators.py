@@ -53,3 +53,8 @@ def generate_replace_order_payload(seed=0):
     payload[9:17] = random.getrandbits(64).to_bytes(8, 'big')  # New Order Ref
     payload[17:21] = random.getrandbits(32).to_bytes(4, 'big')  # Shares
     return payload
+
+def generate_dummy_payload(seed=0):
+    payload = bytearray(64)
+    payload[0] = ord('Z')  # 'Z' = non-matching msg_type
+    return payload
