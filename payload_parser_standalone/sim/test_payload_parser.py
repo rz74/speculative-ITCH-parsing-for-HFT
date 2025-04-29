@@ -42,6 +42,12 @@ async def test_payload_parser(dut):
 
     # Add Order
     await run_add_order_basic_test(dut)
+
+    while not dut.add_order_decoded.value:
+        await RisingEdge(dut.clk)
+    cocotb.log.info(f"[LOG] Add Order valid_flag (validator): {int(dut.add_order_valid_flag.value)}")
+
+
     await inject_random_payload(dut, dut.add_order_decoded)
     await inject_incomplete_payload(dut, dut.add_order_decoded)
     await inject_wrong_msg_type(dut, dut.add_order_decoded)
