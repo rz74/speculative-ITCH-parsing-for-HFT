@@ -17,7 +17,7 @@
 
 import cocotb
 from helpers.reset_utils import start_clock, reset_dut
-
+from cocotb.triggers import RisingEdge
 from test_cancel_order import (
     run_cancel_order_basic_test,
     run_garbage_payload_test as run_cancel_garbage_payload_test,
@@ -34,7 +34,9 @@ async def test_cancel_order_only(dut):
     await reset_dut(dut)
 
     await run_cancel_order_basic_test(dut)
-    cocotb.log.info(f"[LOG] Cancel Order valid_flag: {dut.cancel_order_valid_flag.value}")
+    # await RisingEdge(dut.clk) 
+    # await RisingEdge(dut.clk) 
+    # cocotb.log.info(f"[LOG] Cancel Order valid_flag: {dut.cancel_order_valid_flag.value}")
 
 
     await run_cancel_garbage_payload_test(dut)

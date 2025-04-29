@@ -35,7 +35,8 @@ async def test_delete_order_only(dut):
 
     # Basic decode
     await run_delete_order_basic_test(dut)
-    cocotb.log.info(f"[LOG] Delete Order valid_flag: {dut.delete_order_valid_flag.value}")
+    # await RisingEdge(dut.clk) 
+    # cocotb.log.info(f"[LOG] Delete Order valid_flag: {dut.delete_order_valid_flag.value}")
 
 
     # Random garbage

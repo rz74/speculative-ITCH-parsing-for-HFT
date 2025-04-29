@@ -28,7 +28,7 @@ async def test_replace_order_only(dut):
     await reset_dut(dut)
 
     await run_replace_order_basic_test(dut)
-    cocotb.log.info(f"[LOG] Replace Order valid_flag: {dut.replace_order_valid_flag.value}")
+    # cocotb.log.info(f"[LOG] Replace Order valid_flag: {dut.replace_order_valid_flag.value}")
 
     await inject_random_payload(dut, dut.replace_order_decoded)
     await inject_wrong_msg_type(dut, dut.replace_order_decoded)

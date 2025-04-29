@@ -34,7 +34,8 @@ async def test_add_order_only(dut):
 
     # Basic decode
     await run_add_order_basic_test(dut)
-    cocotb.log.info(f"[LOG] Add Order valid_flag: {dut.add_order_valid_flag.value}")
+    # await RisingEdge(dut.clk) 
+    # cocotb.log.info(f"[LOG] Add Order valid_flag: {dut.add_order_valid_flag.value}")
 
 
     # Random garbage
