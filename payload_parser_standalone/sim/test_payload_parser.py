@@ -11,6 +11,7 @@
 # =============================================
 # [20250427-1] RZ: Initial master testbench for add/cancel/delete
 # [20250428-1] RZ: Integrated Replace Order into master system test
+# [20250428-2] RZ: updated reset testing logic to call two functions for each payload type immediately after rst
 # =============================================
 
 import cocotb
