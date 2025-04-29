@@ -14,6 +14,7 @@
 // [20250428-2] RZ: Updated dispatcher instantiation to match new decoded signal structure.
 // [20250428-3] RZ: Added Replace Order decoder instantiation and connections.
 // [20250428-4] RZ: Fixed syntax errors in module instantiation and signal connections.
+// [20250428-5] RZ: wired valid flags from modules
 // =============================================
 
 `timescale 1ns/1ps
@@ -43,7 +44,13 @@ module top (
     output wire        replace_order_decoded,
     output wire [63:0] original_ref,
     output wire [63:0] new_ref,
-    output wire [31:0] replace_order_shares
+    output wire [31:0] replace_order_shares,
+
+    output wire add_order_valid_flag,
+    output wire cancel_order_valid_flag,
+    output wire delete_order_valid_flag,
+    output wire replace_order_valid_flag
+
 );
 
 payload_dispatcher dispatcher_inst (
@@ -70,7 +77,14 @@ payload_dispatcher dispatcher_inst (
     .replace_order_decoded(replace_order_decoded),
     .original_ref(original_ref),
     .new_ref(new_ref),
-    .shares_replace(replace_order_shares)
+    .shares_replace(replace_order_shares),
+
+    
+    .add_order_valid_flag(add_order_valid_flag),
+    .cancel_order_valid_flag(cancel_order_valid_flag),
+    .delete_order_valid_flag(delete_order_valid_flag),
+    .replace_order_valid_flag(replace_order_valid_flag)
+
 );
 
 `ifdef COCOTB_SIM
