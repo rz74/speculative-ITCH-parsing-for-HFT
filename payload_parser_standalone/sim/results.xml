@@ -1,6 +1,6 @@
 <testsuites name="results">
   <testsuite name="all" package="all">
-    <property name="random_seed" value="1745899618" />
-    <testcase name="test_payload_parser" classname="test_payload_parser" file="/mnt/c/Users/HYRui/Downloads/Git/AX7050_Shared_Folder/payload_parser_standalone/sim/test_payload_parser.py" lineno="37" time="0.06021547317504883" sim_time_ns="1180.001" ratio_time="19596.30868580388" />
+    <property name="random_seed" value="1745900785" />
+    <testcase name="test_payload_parser" classname="test_payload_parser" file="/mnt/c/Users/HYRui/Downloads/Git/AX7050_Shared_Folder/payload_parser_standalone/sim/test_payload_parser.py" lineno="37" time="0.08038759231567383" sim_time_ns="1180.001" ratio_time="14678.894665314232" />
   </testsuite>
 </testsuites>

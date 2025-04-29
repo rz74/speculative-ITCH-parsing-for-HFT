@@ -9,6 +9,7 @@
 // Changelog
 // =============================================
 // [20250428-1] RZ: Initial Replace Order decoder implementation.
+// [20250428-2] RZ: Added valid_flag signal
 // =============================================
 
 `timescale 1ns/1ps
@@ -22,10 +23,13 @@ module replace_order_decoder (
     output reg         replace_order_decoded,
     output reg [63:0]  original_ref,
     output reg [63:0]  new_ref,
-    output reg [31:0]  shares
+    output reg [31:0]  shares,
+    output wire        valid_flag
 );
 
 wire [7:0] msg_type = payload[511:504];
+
+assign valid_flag = 1'b1;  // Always valid initially, later overwritten by length validator
 
 always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
