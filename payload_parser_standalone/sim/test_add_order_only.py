@@ -12,6 +12,7 @@
 # [20250427-1] RZ: Initial version created for Add Order only testing.
 # [20250428-1] RZ: Integrated with modular payload_parser project structure.
 # [20250428-2] RZ: Removed incomplete payload testing from module-level testbench for clean modularity.
+# [20250428-3] RZ: Added valid flag log
 # =============================================
 
 import cocotb
@@ -33,6 +34,8 @@ async def test_add_order_only(dut):
 
     # Basic decode
     await run_add_order_basic_test(dut)
+    cocotb.log.info(f"[LOG] Add Order valid_flag: {dut.add_order_valid_flag.value}")
+
 
     # Random garbage
     await inject_random_payload(dut, dut.add_order_decoded)

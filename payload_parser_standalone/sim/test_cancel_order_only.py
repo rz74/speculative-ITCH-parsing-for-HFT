@@ -11,6 +11,8 @@
 # =============================================
 # [20250427-1] RZ: Initial version created for Cancel Order only testing.
 # [20250428-1] RZ: Integrated with modular payload_parser project structure.
+# [20250428-2] RZ: Removed incomplete payload testing from module-level testbench for clean modularity.
+# [20250428-3] RZ: Added valid flag log
 # =============================================
 
 import cocotb
@@ -32,6 +34,9 @@ async def test_cancel_order_only(dut):
     await reset_dut(dut)
 
     await run_cancel_order_basic_test(dut)
+    cocotb.log.info(f"[LOG] Cancel Order valid_flag: {dut.cancel_order_valid_flag.value}")
+
+
     await run_cancel_garbage_payload_test(dut)
     await run_cancel_incomplete_payload_test(dut)
     await run_cancel_wrong_msg_type_test(dut)
