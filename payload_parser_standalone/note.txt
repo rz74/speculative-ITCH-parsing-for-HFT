@@ -1,0 +1,30 @@
+1. Latency Hiding
+Starting decoding immediately allows the system to perform useful work in parallel with length parsing. 
+By the time the valid_flag is asserted, the parsed data is already available and ready for use. 
+This avoids delays in downstream logic. 
+In contrast, a non-speculative design would wait for the length to be validated before starting the decode, 
+introducing extra latency.
+
+2. Constant Throughput and High Clock Utilization
+In a non-speculative system, each message introduces an additional delay of several cycles before decoding 
+begins. A speculative pipeline, however, keeps all stages active simultaneously—decoding, validating, 
+and committing in parallel. This enables consistent throughput of one message per N cycles, 
+rather than N plus additional latency.
+
+3. Pipeline Compatibility
+Speculative decoding fits well with deep pipelined FPGA architectures. 
+Typical pipeline stages include the parser, length validator, commit stage, 
+and downstream logic such as an order book or trading engine. Each stage remains fully utilized, 
+eliminating pipeline bubbles and ensuring efficient area usage and deterministic timing.
+
+4. Decoder Simplicity
+The decoder only concerns itself with field extraction based on message type 
+and does not need to track message length. This separation of parsing and validation simplifies decoder logic, 
+improves testability, and supports modular development. The validator becomes reusable, 
+and the commit stage can be adapted independently.
+
+5. Parallel Early Filtering
+Certain decoded fields—such as symbol or quantity—can be routed to early filtering or monitoring logic, 
+even before full validation is complete. This allows for prefetching, early routing, or triggering alerts, 
+which can reduce overall system latency. If validation later fails, 
+the operation can be retracted or discarded without impacting correctness.
