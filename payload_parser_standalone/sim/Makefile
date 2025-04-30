@@ -5,7 +5,7 @@
 # Description: Makefile for cocotb simulation, VCD handling, and GTKWave automation.
 # Author: RZ
 # Start Date: 04172025
-# Version: 0.1
+# Version: 0.3
 
 # Changelog
 # =============================================
@@ -16,15 +16,24 @@
 # [20250428-1] RZ: Added dynamic timestamp-based VCD renaming after simulation.
 # [20250428-2] RZ: Added killwave functionality to close old GTKWave windows before new simulation.
 # [20250428-3] RZ: Added del module
+# [20250429-1] RZ: Added replace module
+# [20250429-2] RZ: Added header_parser module with top_test.v support
+# [20250429-3] RZ: Migrated all module testbenches to use top_test.v by default
 # =============================================
-
 
 TOPLEVEL_LANG = verilog
 
-VERILOG_SOURCES = ../rtl/payload_dispatcher.v ../rtl/add_order_decoder.v ../rtl/cancel_order_decoder.v ../rtl/delete_order_decoder.v ../rtl/replace_order_decoder.v ../synth/top.v
+VERILOG_SOURCES = \
+    ../rtl/header_parser.v \
+    ../sim/top_test.v \
+    ../rtl/payload_dispatcher.v \
+    ../rtl/add_order_decoder.v \
+    ../rtl/cancel_order_decoder.v \
+    ../rtl/delete_order_decoder.v \
+    ../rtl/replace_order_decoder.v \
+    ../rtl/length_validator.v
 
-
-TOPLEVEL = top
+TOPLEVEL = top_test
 SIM = icarus
 
 COMPILE_ARGS += -g2012 -DCOCOTB_SIM
@@ -41,36 +50,42 @@ killwave:
 # =============================================
 
 add_order: killwave
-	$(MAKE) COMPILE_ARGS="-g2012 -DCOCOTB_SIM" MODULE=test_add_order_only
+	$(MAKE) COMPILE_ARGS="-g2012 -DCOCOTB_SIM -DTEST_ADD_ORDER" MODULE=test_add_order_only
 	mkdir -p vcd
 	TIMESTAMP=$$(date +%m%d%Y_%H%M%S); \
 	mv dump.vcd vcd/add_order_dump_$${TIMESTAMP}.vcd; \
 	gtkwave vcd/add_order_dump_$${TIMESTAMP}.vcd &
 
 cancel_order: killwave
-	$(MAKE) COMPILE_ARGS="-g2012 -DCOCOTB_SIM" MODULE=test_cancel_order_only
+	$(MAKE) COMPILE_ARGS="-g2012 -DCOCOTB_SIM -DTEST_CANCEL_ORDER" MODULE=test_cancel_order_only
 	mkdir -p vcd
 	TIMESTAMP=$$(date +%m%d%Y_%H%M%S); \
 	mv dump.vcd vcd/cancel_order_dump_$${TIMESTAMP}.vcd; \
 	gtkwave vcd/cancel_order_dump_$${TIMESTAMP}.vcd &
 
 delete_order: killwave
-	$(MAKE) COMPILE_ARGS="-g2012 -DCOCOTB_SIM" MODULE=test_delete_order_only
+	$(MAKE) COMPILE_ARGS="-g2012 -DCOCOTB_SIM -DTEST_DELETE_ORDER" MODULE=test_delete_order_only
 	mkdir -p vcd
 	TIMESTAMP=$$(date +%Y%m%d_%H%M%S); \
 	mv dump.vcd vcd/delete_order_dump_$${TIMESTAMP}.vcd; \
 	gtkwave vcd/delete_order_dump_$${TIMESTAMP}.vcd &
 
 replace_order: killwave
-	$(MAKE) COMPILE_ARGS="-g2012 -DCOCOTB_SIM" MODULE=test_replace_order_only
+	$(MAKE) COMPILE_ARGS="-g2012 -DCOCOTB_SIM -DTEST_REPLACE_ORDER" MODULE=test_replace_order_only
 	mkdir -p vcd
 	TIMESTAMP=$$(date +%Y%m%d_%H%M%S); \
 	mv dump.vcd vcd/replace_order_dump_$${TIMESTAMP}.vcd; \
 	gtkwave vcd/replace_order_dump_$${TIMESTAMP}.vcd &
 
+header_parser: killwave
+	$(MAKE) COMPILE_ARGS="-g2012 -DCOCOTB_SIM -DTEST_HEADER_PARSER" MODULE=test_header_parser
+	mkdir -p vcd
+	TIMESTAMP=$$(date +%Y%m%d_%H%M%S); \
+	mv dump.vcd vcd/header_parser_dump_$${TIMESTAMP}.vcd; \
+	gtkwave vcd/header_parser_dump_$${TIMESTAMP}.vcd &
 
 default: killwave
-	$(MAKE) COMPILE_ARGS="-g2012 -DCOCOTB_SIM" MODULE=test_payload_parser
+	$(MAKE) COMPILE_ARGS="-g2012 -DCOCOTB_SIM -DTEST_FULL_SYSTEM" MODULE=test_payload_parser
 	mkdir -p vcd
 	TIMESTAMP=$$(date +%m%d%Y_%H%M%S); \
 	mv dump.vcd vcd/full_test_dump_$${TIMESTAMP}.vcd; \
@@ -85,7 +100,6 @@ cleanall:
 	rm -rf sim_build
 	rm -f results.xml
 	@echo "Cleaned sim build and old VCD files."
-
 
 # View the most recent VCD
 view_latest:

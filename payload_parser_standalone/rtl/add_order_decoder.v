@@ -12,6 +12,7 @@
 // [20250427-1] RZ: Initial version created for Add Order payload decoding.
 // [20250428-1] RZ: Updated ports and internal signals for dispatcher integration.
 // [20250428-2] RZ: Added valid_flag signal
+// [20250429-1] RZ: wired to length_validator module
 // =============================================
 
 `timescale 1ns/1ps
@@ -34,7 +35,7 @@ module add_order_decoder (
 // Internal parsing
 wire [7:0] msg_type;
 assign msg_type = payload[511:504];
-assign valid_flag = 1'b1;  // Always valid initially, later overwritten by length validator
+//assign valid_flag = 1'b1;  // placeholder for testing                    
 
 
 always @(posedge clk or negedge rst_n) begin
@@ -53,6 +54,9 @@ always @(posedge clk or negedge rst_n) begin
             shares <= payload[431:400];
             stock_symbol <= payload[399:336];
             price <= payload[335:304];
+
+            
+            
         end else begin
             add_order_decoded <= 1'b0;
         end
@@ -61,5 +65,15 @@ always @(posedge clk or negedge rst_n) begin
         
     end
 end
+
+length_validator validator_inst (
+    .clk(clk),
+    .rst_n(rst_n),
+    .start(valid),
+    .expected_len(16'd36),
+    .byte_valid(valid),
+    .valid_flag(valid_flag),
+    .length_error() // unused for now
+);
 
 endmodule
