@@ -1,8 +1,0 @@
-<testsuites name="results">
-  <testsuite name="all" package="all">
-    <property name="random_seed" value="1745516514" />
-    <testcase name="fifo_basic_test" classname="test_fifo" file="/mnt/c/Users/4510181/Downloads/Git/AX7050_Shared_Folder/simple_fifo_project/sim/test_fifo.py" lineno="5" time="0.019639015197753906" sim_time_ns="60.001" ratio_time="3055.193928810761">
-      <failure message="Test failed with RANDOM_SEED=1745516514" />
-    </testcase>
-  </testsuite>
-</testsuites>

@@ -1,1 +1,0 @@
-To run: cd into sim/, then just run `make` — waveform is dumped to dump.vcd via dump.v.
