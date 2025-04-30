@@ -18,7 +18,16 @@
 import random
 
 def generate_add_order_payload(index=0):
-    return bytes([0x41]) + index.to_bytes(8, 'big') + b'B' + (100).to_bytes(4, 'big') + b'ABCDE123' + (1234500).to_bytes(4, 'big')
+    # return bytes([0x41]) + index.to_bytes(8, 'big') + b'B' + (100).to_bytes(4, 'big') + b'ABCDE123' + (1234500).to_bytes(4, 'big')
+    payload = bytearray(64)
+    payload[0] = ord('A')  # msg_type
+    payload[1:9] = (0x1234567800000000 + index).to_bytes(8, 'big')  # order_ref
+    payload[9] = ord('B')  # buy/sell
+    payload[10:14] = (1000 + index).to_bytes(4, 'big')  # shares
+    payload[14:22] = b"GOOG    "  # stock symbol
+    payload[22:26] = (100000 + index*10).to_bytes(4, 'big')  # price
+    return payload
+
 
 def generate_cancel_order_payload(index=0):
     return bytes([0x58]) + index.to_bytes(8, 'big') + (50).to_bytes(4, 'big')

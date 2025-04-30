@@ -50,11 +50,12 @@ killwave:
 # =============================================
 
 add_order: killwave
-	$(MAKE) COMPILE_ARGS="-g2012 -DCOCOTB_SIM -DTEST_ADD_ORDER" MODULE=test_add_order_only
+	$(MAKE) COMPILE_ARGS="-g2012 -DCOCOTB_SIM -DTEST_ADD_ORDER_DECODER" MODULE=test_add_order_only TOPLEVEL=top_test
 	mkdir -p vcd
 	TIMESTAMP=$$(date +%m%d%Y_%H%M%S); \
 	mv dump.vcd vcd/add_order_dump_$${TIMESTAMP}.vcd; \
 	gtkwave vcd/add_order_dump_$${TIMESTAMP}.vcd &
+
 
 cancel_order: killwave
 	$(MAKE) COMPILE_ARGS="-g2012 -DCOCOTB_SIM -DTEST_CANCEL_ORDER" MODULE=test_cancel_order_only

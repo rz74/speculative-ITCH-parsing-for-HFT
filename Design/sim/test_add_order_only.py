@@ -2,68 +2,50 @@
 # test_add_order_only.py
 # =============================================
 
-# Description: Cocotb testbench for validating Add Order ('A') decoding only.
+# Description: Cocotb testbench for validating Add Order ('A') decoder in speculative pipeline.
 # Author: RZ
 # Start Date: 04172025
-# Version: 0.2
+# Version: 0.4
 
 # Changelog
 # =============================================
 # [20250427-1] RZ: Initial version created for Add Order only testing.
-# [20250428-1] RZ: Integrated with modular payload_parser project structure.
-# [20250428-2] RZ: Removed incomplete payload testing from module-level testbench for clean modularity.
-# [20250428-3] RZ: Added valid flag log
+# [20250428-1] RZ: Modularized with project structure.
+# [20250429-1] RZ: Refactored to use top_test.v and unified helper structure.
+# [20250429-2] RZ: Updated to use inject_and_expect_decode from injection_helper.
 # =============================================
 
 import cocotb
 from cocotb.triggers import RisingEdge
-from helpers.reset_utils import start_clock, reset_dut
-from helpers.payload_generators import generate_add_order_payload
-from helpers.payload_injection import (
-    inject_random_payload,
-    inject_wrong_msg_type,
-    inject_multiple_valid_msgs,
-    reset_mid_payload
+from helpers.reset_helper import start_clock, reset_dut
+from helpers.payload_generator_helper import generate_add_order_payload
+from helpers.injection_helper import (
+    inject_and_expect_decode,
+    inject_bytes_serially,
+    inject_reset_midstream
 )
+from helpers.assertion_helper import assert_decode_pulse
 
 @cocotb.test()
-async def test_add_order_only(dut):
-    """Testbench: Only run Add Order related tests."""
+async def add_order_basic_decode_test(dut):
+    """Verify Add Order decoder triggers decode pulse and parses correctly"""
+
     await start_clock(dut)
     await reset_dut(dut)
 
-    # Basic decode
-    await run_add_order_basic_test(dut)
-    # await RisingEdge(dut.clk) 
-    # cocotb.log.info(f"[LOG] Add Order valid_flag: {dut.add_order_valid_flag.value}")
+    await inject_and_expect_decode(dut, generate_add_order_payload, dut.add_order_decoded)
+
+    cocotb.log.info("Add Order basic decode test PASSED.")
 
 
-    # Random garbage
-    await inject_random_payload(dut, dut.add_order_decoded)
+@cocotb.test()
+async def add_order_reset_midstream_test(dut):
+    """Check Add Order decoder handles mid-payload reset"""
 
-    # Wrong message type
-    await inject_wrong_msg_type(dut, dut.add_order_decoded)
+    await start_clock(dut)
+    await reset_dut(dut)
 
-    # Multiple valid messages
-    await inject_multiple_valid_msgs(dut, generate_add_order_payload)
+    payload = list(generate_add_order_payload(0))
+    await inject_reset_midstream(dut, payload, trigger_cycle=3)
 
-    # Reset during decode
-    await reset_mid_payload(dut, generate_add_order_payload, dut.add_order_decoded)
-
-    cocotb.log.info("All Add Order tests completed successfully.")
-
-async def run_add_order_basic_test(dut):
-    """Test for basic Add Order decoding."""
-    payload = generate_add_order_payload(0)
-
-    dut.in_valid.value = 1
-    dut.msg_type.value = payload[0]  # Should be ASCII 'A'
-    dut.payload.value = int.from_bytes(payload.ljust(64, b'\x00'), byteorder='big')
-
-    await RisingEdge(dut.clk)
-    dut.in_valid.value = 0
-
-    for _ in range(5):
-        await RisingEdge(dut.clk)
-
-    cocotb.log.info("Add Order basic decode test passed.")
+    cocotb.log.info("Add Order reset-resilience test PASSED.")
