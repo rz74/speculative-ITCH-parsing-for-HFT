@@ -33,7 +33,10 @@ module top_test (
     output wire        buy_sell,
     output wire [31:0] shares,
     output wire [63:0] stock_symbol,
-    output wire [31:0] price
+    output wire [31:0] price,
+    input wire        length_valid,
+    input wire [5:0]  expected_length
+
 );
 
 // ======================= DUT Selection Blocks =======================
@@ -72,7 +75,10 @@ module top_test (
         .buy_sell(buy_sell),
         .shares(shares),
         .stock_symbol(stock_symbol),
-        .price(price)
+        .price(price),
+        .length_valid(length_valid),
+        .expected_length(expected_length)
+
     );
 `endif
 

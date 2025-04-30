@@ -1,9 +1,9 @@
 <testsuites name="results">
   <testsuite name="all" package="all">
-    <property name="random_seed" value="1745989772" />
-    <testcase name="add_order_basic_decode_test" classname="test_add_order_only" file="/mnt/c/Users/HYRui/Downloads/Git/speculative-ITCH-parsing-for-HFT/Design/sim/test_add_order_only.py" lineno="29" time="0.032444000244140625" sim_time_ns="710.001" ratio_time="21883.89208042328">
-      <failure message="Test failed with RANDOM_SEED=1745989772" />
+    <property name="random_seed" value="1746017595" />
+    <testcase name="add_order_basic_decode_test" classname="test_add_order_only" file="/mnt/c/Users/HYRui/Downloads/Git/speculative-ITCH-parsing-for-HFT/Design/sim/test_add_order_only.py" lineno="29" time="0.025452375411987305" sim_time_ns="730.001" ratio_time="28681.0558222472">
+      <failure message="Test failed with RANDOM_SEED=1746017595" />
     </testcase>
-    <testcase name="add_order_reset_midstream_test" classname="test_add_order_only" file="/mnt/c/Users/HYRui/Downloads/Git/speculative-ITCH-parsing-for-HFT/Design/sim/test_add_order_only.py" lineno="41" time="0.06319808959960938" sim_time_ns="1310.001" ratio_time="20728.49050184101" />
+    <testcase name="add_order_reset_midstream_test" classname="test_add_order_only" file="/mnt/c/Users/HYRui/Downloads/Git/speculative-ITCH-parsing-for-HFT/Design/sim/test_add_order_only.py" lineno="69" time="0.030749797821044922" sim_time_ns="1310.001" ratio_time="42601.93864115248" />
   </testsuite>
 </testsuites>

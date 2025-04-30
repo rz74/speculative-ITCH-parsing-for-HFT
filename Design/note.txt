@@ -1,3 +1,175 @@
+ITCH Parser Specification (Low-Latency, Speculative Architecture)
+=================================================================
+
+Overview:
+---------
+This module implements a fully speculative, ultra-low-latency ITCH parser
+designed for real-time high-frequency trading (HFT) systems on FPGA.
+It receives a raw byte stream of ITCH messages, speculatively decodes
+them using parallel modules, and outputs structured data suitable for
+direct consumption by downstream modules such as order books or trading logic cores.
+
+Architecture Style:
+-------------------
+Fully speculative parallel decoder architecture.
+There is no centralized "header parser" module.
+
+Instead:
+- All message-type-specific decoder modules receive the byte stream in parallel.
+- On cycle 0 (first byte), each decoder compares the message type.
+- If the type matches, that decoder continues parsing the payload.
+- Non-matching decoders self-disable after 1 cycle.
+- Length validation and message type verification are performed in parallel.
+- A watchdog/arbitration unit selects the correct decoder output at the end
+  of the message and drives the final output signals.
+
+Decoder Early Exit Behavior:
+----------------------------
+- On cycle 0, all decoders receive the first byte of the message (byte[0]).
+- Each decoder compares the incoming message type (byte_in) to its assigned type.
+- If the message type matches, the decoder sets an internal `active` flag and begins parsing.
+- If the type does not match, the decoder self-disables immediately on cycle 1.
+- In the case of an unsupported or invalid message type (i.e., no decoder matches), all decoders will self-disable on cycle 1.
+- No parsed output is produced in that case, and the watchdog will withhold parsed_valid.
+
+Pipeline Behavior:
+------------------
+Cycle 0:
+  - byte[0] (message type) received.
+  - All decoders activated speculatively.
+  - Length validator starts lookup for expected length.
+
+Cycle 1:
+  - byte[1] (length MSB) received.
+  - Non-matching decoders self-disable.
+
+Cycle 2:
+  - byte[2] (length LSB) received.
+  - Length validator compares declared vs expected length.
+
+Cycle 3 to N:
+  - Remaining payload bytes streamed into the active decoder.
+  - Internal byte counter increments on each valid_in.
+
+Final Cycle (N = packet_length - 1):
+  - Last byte received.
+  - Length validator confirms match.
+  - Watchdog checks decoder outputs.
+  - If one decoder asserts internal_valid, its output is selected.
+
+Next Cycle:
+  - Output is presented on the parsed data bus.
+  - parsed_valid is pulsed for one cycle.
+
+Input Format (Upstream → Parser)
+--------------------------------
+Description:
+  The parser receives a continuous stream of raw ITCH bytes from an upstream
+  module (e.g., TCP offload engine, MicroBlaze, or direct MAC).
+
+Signals:
+  clk         : input 1-bit     // system clock
+  rst         : input 1-bit     // synchronous reset
+  byte_in     : input [7:0]     // incoming byte (1 per clock cycle)
+  valid_in    : input 1-bit     // high when byte_in is valid
+
+Timing Behavior:
+  - Each ITCH message begins with:
+      byte[0] : message_type (1 byte)
+      byte[1] : length MSB
+      byte[2] : length LSB
+  - Remaining bytes: payload (length - 3 bytes)
+  - One byte per clock, valid when valid_in = 1
+  - Parser internally determines message boundaries using length
+
+Assumptions:
+  - Byte-aligned input (no framing errors)
+  - No backpressure on input; valid_in drives stream timing
+  - Data source ensures message alignment
+
+Output Format (Parser → Downstream)
+-----------------------------------
+Description:
+  The parser outputs one fully decoded message per clock cycle,
+  presented as a wide, structured bundle of fixed-width fields.
+  The downstream consumer (e.g., order book or trading logic)
+  receives these messages synchronously.
+
+Signals:
+  parsed_valid    : output 1-bit      // high for 1 cycle when parsed_data is valid
+  parsed_type     : output [3:0]      // message type ID (see encoding below)
+  order_ref       : output [63:0]     // order reference number
+  side            : output 1-bit      // 0 = buy, 1 = sell
+  shares          : output [31:0]     // number of shares
+  price           : output [63:0]     // price (fixed-point format)
+  new_order_ref   : output [63:0]     // new order ref for replace messages
+  timestamp       : output [31:0]     // ITCH timestamp
+  misc_data       : output [63:0]     // optional field (symbol, match ID, etc.)
+
+Message Type Encoding:
+  parsed_type = 4'd1 : Add Order ('A')          — 36 bytes
+  parsed_type = 4'd2 : Cancel Order ('X')       — 23 bytes
+  parsed_type = 4'd3 : Delete Order ('D')       — 19 bytes
+  parsed_type = 4'd4 : Replace Order ('U')      — 35 bytes
+  parsed_type = 4'd5 : Executed Order ('E')     — 31 bytes
+  parsed_type = 4'd6 : Trade ('P')              — 44 bytes
+  parsed_type = 4'd15: Unknown / Reserved
+
+Notes:
+  - All fields are fixed-width and always driven.
+  - Unused fields in a given message type are zeroed.
+  - Only one parsed_valid pulse per message.
+  - Output should be registered and optionally connected to FIFO or dispatcher.
+
+Decoder Modules to Be Implemented
+---------------------------------
+  - add_order_decoder         // for 'A', 36 bytes
+  - cancel_order_decoder      // for 'X', 23 bytes
+  - delete_order_decoder      // for 'D', 19 bytes
+  - replace_order_decoder     // for 'U', 35 bytes
+  - executed_order_decoder    // for 'E', 31 bytes
+  - trade_decoder             // for 'P', 44 bytes
+
+Each decoder is hardcoded with its expected message length and field structure.
+
+Decoder Module Interface (Corrected)
+------------------------------------
+
+Inputs:
+  clk            : input 1-bit         // clock
+  rst            : input 1-bit         // synchronous reset
+  byte_in        : input [7:0]         // incoming data byte
+  valid_in       : input 1-bit         // high when byte_in is valid
+
+Outputs:
+  internal_valid : output 1-bit        // asserted when decoding is complete and valid
+  packet_invalid : output 1-bit        // asserted if stream ends early or corrupt
+  parsed_data    : output struct       // message-specific parsed fields (see Output Format)
+
+Decoder Behavior:
+-----------------
+- On cycle 0, when valid_in is high, byte_in is compared against the expected message type.
+- If matched, the decoder sets an internal active flag and begins parsing.
+- An internal byte counter is incremented for each valid byte.
+- If the number of valid cycles is less than expected before end-of-stream, packet_invalid is raised.
+- On the last expected byte (based on known message length), decoder asserts internal_valid.
+- Only the decoder matching the message type should complete execution; all others exit after cycle 0.
+
+Length Expectations (Based on Message Type)
+-------------------------------------------
+- 'A'  Add Order                → 36 bytes
+- 'X'  Cancel Order             → 23 bytes
+- 'D'  Delete Order             → 19 bytes
+- 'U'  Replace Order            → 35 bytes
+- 'E'  Executed Order           → 31 bytes
+- 'P'  Trade                    → 44 bytes
+
+Only these types are supported in the current low-latency hardware parser.
+All other message types (e.g., 'F', 'R', 'H', 'Y') are not implemented.
+
+
+==================================================================================================
+
 1. Latency Hiding
 Starting decoding immediately allows the system to perform useful work in parallel with length parsing. 
 By the time the valid_flag is asserted, the parsed data is already available and ready for use. 
