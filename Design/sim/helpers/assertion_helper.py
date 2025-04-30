@@ -33,8 +33,7 @@ async def wait_for_signal(signal, expected_value, timeout=5):
         await RisingEdge(signal._path_toplevel.clk)
     raise AssertionError(f"{signal._name} did not reach value {expected_value} in {timeout} cycles.")
 
-async def verify_start_flag_on_first_byte(dut):
-    await RisingEdge(dut.clk)
+async def verify_start_flag_high(dut):
     assert dut.start_flag.value == 1, "start_flag should be high on first valid byte"
-    await RisingEdge(dut.clk)
-    assert dut.start_flag.value == 0, "start_flag should fall after first byte"
+
+

@@ -1,6 +1,8 @@
 <testsuites name="results">
   <testsuite name="all" package="all">
-    <property name="random_seed" value="1745959748" />
-    <testcase name="header_parser_basic_test" classname="test_header_parser" file="/mnt/c/Users/HYRui/Downloads/Git/AX7050_Shared_Folder/payload_parser_standalone/sim/test_header_parser.py" lineno="22" time="0.007699489593505859" sim_time_ns="100.001" ratio_time="12988.003787205054" />
+    <property name="random_seed" value="1745979427" />
+    <testcase name="header_parser_basic_test" classname="test_header_parser" file="/mnt/c/Users/HYRui/Downloads/Git/speculative-ITCH-parsing-for-HFT/Design/sim/test_header_parser.py" lineno="36" time="0.020592927932739258" sim_time_ns="150.001" ratio_time="7284.102605027034" />
+    <testcase name="header_parser_invalid_header_test" classname="test_header_parser" file="/mnt/c/Users/HYRui/Downloads/Git/speculative-ITCH-parsing-for-HFT/Design/sim/test_header_parser.py" lineno="72" time="0.009418725967407227" sim_time_ns="120.001" ratio_time="12740.682807340843" />
+    <testcase name="header_parser_random_header_test" classname="test_header_parser" file="/mnt/c/Users/HYRui/Downloads/Git/speculative-ITCH-parsing-for-HFT/Design/sim/test_header_parser.py" lineno="104" time="0.013741731643676758" sim_time_ns="200.00099999999998" ratio_time="14554.279270329822" />
   </testsuite>
 </testsuites>
