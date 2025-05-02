@@ -75,8 +75,10 @@ module executed_order_decoder (
     logic [5:0] byte_index;
     logic       is_executed_order;
 
-    always_ff @(posedge clk) begin
-        if (rst) begin
+    always_ff @(posedge clk) 
+    begin
+        if (rst) 
+        begin
             byte_index            <= 0;
             is_executed_order     <= 0;
             exec_internal_valid   <= 0;
@@ -85,14 +87,17 @@ module executed_order_decoder (
             exec_shares           <= 0;
             exec_match_id         <= 0;
             exec_timestamp        <= 0;
-        end else if (valid_in) begin
+        end 
+        else if (valid_in) 
+        begin
             exec_internal_valid <= 0;
             exec_packet_invalid <= 0;
 
             if (byte_index == 0)
                 is_executed_order <= (byte_in == MSG_TYPE);
 
-            if (is_executed_order) begin
+            if (is_executed_order) 
+            begin
                 case (byte_index)
                     // Order Reference Number
                     1:  exec_order_ref[63:56] <= byte_in;
@@ -138,6 +143,24 @@ module executed_order_decoder (
             if (byte_index >= MSG_LENGTH && is_executed_order)
                 exec_packet_invalid <= 1;
         end
+
+        if (is_executed_order && (
+                (valid_in == 0 && byte_index > 0 && byte_index < MSG_LENGTH) ||
+                (byte_index >= MSG_LENGTH)
+            ))
+            exec_packet_invalid <= 1;
+
+        if (byte_index == MSG_LENGTH) begin
+            exec_internal_valid  <= 0;
+            exec_packet_invalid  <= 0;
+            exec_order_ref       <= 0;
+            exec_shares          <= 0;
+            exec_match_id        <= 0;
+            exec_timestamp       <= 0;
+            is_executed_order    <= 0;
+            byte_index           <= 0;
+        end
+
     end
 
 endmodule

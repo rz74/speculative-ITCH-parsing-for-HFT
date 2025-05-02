@@ -78,8 +78,10 @@ module replace_order_decoder (
     logic [5:0] byte_index;
     logic       is_replace_order;
 
-    always_ff @(posedge clk) begin
-        if (rst) begin
+    always_ff @(posedge clk) 
+    begin
+        if (rst) 
+        begin
             byte_index              <= 0;
             is_replace_order        <= 0;
             replace_internal_valid  <= 0;
@@ -88,14 +90,17 @@ module replace_order_decoder (
             replace_new_order_ref   <= 0;
             replace_shares          <= 0;
             replace_price           <= 0;
-        end else if (valid_in) begin
+        end 
+        else if (valid_in) 
+        begin
             replace_internal_valid <= 0;
             replace_packet_invalid <= 0;
 
             if (byte_index == 0)
                 is_replace_order <= (byte_in == MSG_TYPE);
 
-            if (is_replace_order) begin
+            if (is_replace_order) 
+            begin
                 case (byte_index)
                     // Old Order Ref
                     1:  replace_old_order_ref[63:56] <= byte_in;
@@ -139,6 +144,25 @@ module replace_order_decoder (
             if (byte_index >= MSG_LENGTH && is_replace_order)
                 replace_packet_invalid <= 1;
         end
+
+        if (is_replace_order && (
+        (valid_in == 0 && byte_index > 0 && byte_index < MSG_LENGTH) ||
+        (byte_index >= MSG_LENGTH)
+        ))
+        replace_packet_invalid <= 1;
+
+        if (byte_index == MSG_LENGTH) 
+        begin
+            replace_internal_valid   <= 0;
+            replace_packet_invalid   <= 0;
+            replace_old_order_ref    <= 0;
+            replace_new_order_ref    <= 0;
+            replace_shares           <= 0;
+            replace_price            <= 0;
+            is_replace_order         <= 0;
+            byte_index               <= 0;
+        end
+
     end
 
 endmodule

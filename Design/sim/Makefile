@@ -45,7 +45,9 @@ VERILOG_SOURCES = \
     ../rtl/delete_order_decoder.v \
     ../rtl/replace_order_decoder.v \
 	../rtl/executed_order_decoder.v \
-	../rtl/trade_decoder.v
+	../rtl/trade_decoder.v \
+	../rtl/decoder_watchdog.v \
+	../rtl/itch_parser.v
 
 TOPLEVEL = top_test
 SIM = icarus
@@ -108,15 +110,22 @@ trade: killwave
 	mv dump.vcd vcd/trade_dump_$${TIMESTAMP}.vcd; \
 	gtkwave vcd/trade_dump_$${TIMESTAMP}.vcd &
 
-
-
-
-default: killwave
+watchdog: killwave
 	@mkdir -p vcd
 	TIMESTAMP=$$(date +%m%d%Y_%H%M%S); \
-	$(MAKE) MODULE=test_payload_parser COMPILE_ARGS="$(COMPILE_ARGS) -DTEST_FULL_SYSTEM"; \
-	mv dump.vcd vcd/full_test_dump_$${TIMESTAMP}.vcd; \
-	gtkwave vcd/full_test_dump_$${TIMESTAMP}.vcd &
+	$(MAKE) MODULE=test_decoder_watchdog TOPLEVEL=decoder_watchdog COMPILE_ARGS="$(COMPILE_ARGS)"; \
+	mv dump.vcd vcd/watchdog_dump_$${TIMESTAMP}.vcd; \
+	gtkwave vcd/watchdog_dump_$${TIMESTAMP}.vcd &
+
+
+itch_parser: killwave
+	@mkdir -p vcd
+	TIMESTAMP=$$(date +%m%d%Y_%H%M%S); \
+	$(MAKE) MODULE=test_itch_parser TOPLEVEL=itch_parser COMPILE_ARGS="$(COMPILE_ARGS) -DTEST_ITCH_PARSER"; \
+	mv dump.vcd vcd/itch_parser_dump_$${TIMESTAMP}.vcd; \
+	gtkwave vcd/itch_parser_dump_$${TIMESTAMP}.vcd &
+
+
 
 # =============================================
 # Cleanup

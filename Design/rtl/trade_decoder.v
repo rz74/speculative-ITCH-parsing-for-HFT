@@ -80,8 +80,11 @@ module trade_decoder (
     logic [5:0] byte_index;
     logic       is_trade;
 
-    always_ff @(posedge clk) begin
-        if (rst) begin
+    always_ff @(posedge clk) 
+    begin
+        if (rst) 
+        
+        begin
             byte_index            <= 0;
             is_trade              <= 0;
             trade_internal_valid  <= 0;
@@ -92,14 +95,17 @@ module trade_decoder (
             trade_stock_symbol    <= 0;
             trade_price           <= 0;
             trade_timestamp       <= 0;
-        end else if (valid_in) begin
+        end 
+        else if (valid_in) 
+        begin
             trade_internal_valid <= 0;
             trade_packet_invalid <= 0;
 
             if (byte_index == 0)
                 is_trade <= (byte_in == MSG_TYPE);
 
-            if (is_trade) begin
+            if (is_trade) 
+            begin
                 case (byte_index)
                     // Order Ref
                     1:  trade_order_ref[63:56] <= byte_in;
@@ -161,6 +167,28 @@ module trade_decoder (
             if (byte_index >= MSG_LENGTH && is_trade)
                 trade_packet_invalid <= 1;
         end
+
+        if (is_trade && (
+        (valid_in == 0 && byte_index > 0 && byte_index < MSG_LENGTH) ||
+        (byte_index >= MSG_LENGTH)
+            ))
+            trade_packet_invalid <= 1;
+
+        if (byte_index == MSG_LENGTH) begin
+            trade_internal_valid  <= 0;
+            trade_packet_invalid  <= 0;
+            trade_order_ref       <= 0;
+            trade_shares          <= 0;
+            trade_match_id        <= 0;
+            trade_stock_symbol    <= 0;
+            trade_price           <= 0;
+            trade_timestamp       <= 0;
+            is_trade              <= 0;
+            byte_index            <= 0;
+        end
+
+
+
     end
 
 endmodule

@@ -13,6 +13,9 @@
 // [20250428-1] RZ: Initial scaffold of Delete Order payload decoder module.
 // [20250428-2] RZ: Updated ports and internal signals for valid_flag
 // [20250501-1] RZ: Initial implementation based on new arch.
+// [20250501-2] RZ: Self zeroing of signals after message parsing completion.
+// [20250501-3] RZ: Added packet invalidation logic for underlength and overlength messages.
+// [20250501-4] RZ: Added comments and cleaned up code for clarity.
 // =============================================
 // ------------------------------------------------------------------------------------------------
 // Protocol Version Note:
@@ -48,17 +51,18 @@
 
 `timescale 1ns/1ps
 
-module delete_order_decoder (
-    input  logic        clk,
-    input  logic        rst,
-    input  logic [7:0]  byte_in,
-    input  logic        valid_in,
+module delete_order_decoder 
+    (
+        input  logic        clk,
+        input  logic        rst,
+        input  logic [7:0]  byte_in,
+        input  logic        valid_in,
 
-    output logic        delete_internal_valid,
-    output logic        delete_packet_invalid,
+        output logic        delete_internal_valid,
+        output logic        delete_packet_invalid,
 
-    output logic [63:0] delete_order_ref
-);
+        output logic [63:0] delete_order_ref
+    );
 
     parameter MSG_TYPE   = 8'h44;   // ASCII 'D'
     parameter MSG_LENGTH = 9;
@@ -66,21 +70,28 @@ module delete_order_decoder (
     logic [5:0] byte_index;
     logic       is_delete_order;
 
-    always_ff @(posedge clk) begin
-        if (rst) begin
+    always_ff @(posedge clk) 
+    begin
+
+        if (rst) 
+        begin
             byte_index             <= 0;
             is_delete_order        <= 0;
             delete_internal_valid  <= 0;
             delete_packet_invalid  <= 0;
             delete_order_ref       <= 0;
-        end else if (valid_in) begin
+        end 
+        else if (valid_in) 
+        begin
+
             delete_internal_valid <= 0;
-            delete_packet_invalid <= 0;
+            delete_packet_invalid <= 0;     
 
             if (byte_index == 0)
                 is_delete_order <= (byte_in == MSG_TYPE);
 
-            if (is_delete_order) begin
+            if (is_delete_order) 
+            begin
                 case (byte_index)
                     1: delete_order_ref[63:56] <= byte_in;
                     2: delete_order_ref[55:48] <= byte_in;
@@ -91,15 +102,35 @@ module delete_order_decoder (
                     7: delete_order_ref[15:8]  <= byte_in;
                     8: delete_order_ref[7:0]   <= byte_in;
                 endcase
-
                 if (byte_index == MSG_LENGTH - 1)
                     delete_internal_valid <= 1;
+                
             end
 
             byte_index <= byte_index + 1;
 
             if (byte_index >= MSG_LENGTH && is_delete_order)
                 delete_packet_invalid <= 1;
+        
+        end
+
+        // Detect packet invalidity: either too long OR prematurely stopped
+        if (is_delete_order && (
+                (valid_in == 0 && byte_index > 0 && byte_index < MSG_LENGTH) ||  // underlength
+                (byte_index >= MSG_LENGTH)                                       // overlength
+            )) 
+            begin
+                delete_packet_invalid <= 1;
+            end
+
+
+        if (byte_index == MSG_LENGTH) 
+        begin
+            delete_internal_valid   <= 0;
+            delete_packet_invalid   <= 0;
+            delete_order_ref        <= 0;
+            is_delete_order         <= 0;  
+            byte_index              <= 0;
         end
     end
 

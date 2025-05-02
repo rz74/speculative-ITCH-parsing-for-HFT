@@ -72,8 +72,10 @@ module add_order_decoder (
     logic [5:0] byte_index;
     logic       is_add_order;
 
-    always_ff @(posedge clk) begin
-        if (rst) begin
+    always_ff @(posedge clk) 
+    begin
+        if (rst) 
+        begin
             byte_index        <= 0;
             is_add_order      <= 0;
             add_internal_valid<= 0;
@@ -83,14 +85,17 @@ module add_order_decoder (
             add_shares        <= 0;
             add_price         <= 0;
             add_stock_symbol  <= 0;
-        end else if (valid_in) begin
+        end 
+        else if (valid_in) 
+        begin
             add_internal_valid <= 0;
             add_packet_invalid <= 0;
 
             if (byte_index == 0)
                 is_add_order <= (byte_in == MSG_TYPE);
 
-            if (is_add_order) begin
+            if (is_add_order) 
+            begin
                 case (byte_index)
                     1:  add_order_ref[63:56]     <= byte_in;
                     2:  add_order_ref[55:48]     <= byte_in;
@@ -128,6 +133,27 @@ module add_order_decoder (
             if (byte_index >= MSG_LENGTH && is_add_order)
                 add_packet_invalid <= 1;
         end
+
+        if (is_add_order && (
+        (valid_in == 0 && byte_index > 0 && byte_index < MSG_LENGTH) ||
+        (byte_index >= MSG_LENGTH)
+        ))
+        add_packet_invalid <= 1;
+
+    if (byte_index == MSG_LENGTH) begin
+        add_internal_valid <= 0;
+        add_packet_invalid <= 0;
+        add_order_ref      <= 0;
+        add_side           <= 0;
+        add_shares         <= 0;
+        add_price          <= 0;
+        add_stock_symbol   <= 0;
+        is_add_order       <= 0;
+        byte_index         <= 0;
+    end
+
+
+
     end
 
 endmodule

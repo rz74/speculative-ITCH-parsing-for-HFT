@@ -51,7 +51,6 @@ async def inject_and_expect_decode(dut, payload_generator, decoded_signal):
     assert decoded_signal.value == 1, f"Decode signal {decoded_signal._name} was not asserted."
 
 
-
 async def inject_reset_midstream(dut, payload, trigger_cycle=2):
     for i, byte in enumerate(payload):
         if i == trigger_cycle:
@@ -63,3 +62,16 @@ async def inject_reset_midstream(dut, payload, trigger_cycle=2):
             dut.rst_n.value = 1
         await RisingEdge(dut.clk)
     dut.tcp_byte_valid_in.value = 0
+
+
+async def inject_payload_and_wait(dut, payload: bytes, idle_cycles_after=3):
+    """Injects a payload and waits for N idle cycles after transmission."""
+    for b in payload:
+        dut.byte_in.value = b
+        dut.valid_in.value = 1
+        await RisingEdge(dut.clk)
+
+    dut.valid_in.value = 0
+    for _ in range(idle_cycles_after):
+        await RisingEdge(dut.clk)
+

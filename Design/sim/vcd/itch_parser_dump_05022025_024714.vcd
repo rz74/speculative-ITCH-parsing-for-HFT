@@ -1,0 +1,863 @@
+$date
+	Fri May  2 02:47:22 2025
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1ps
+$end
+$scope module itch_parser $end
+$var wire 8 ! byte_in [7:0] $end
+$var wire 1 " clk $end
+$var wire 1 # rst $end
+$var wire 1 $ valid_in $end
+$var wire 32 % trade_timestamp [31:0] $end
+$var wire 64 & trade_stock_symbol [63:0] $end
+$var wire 32 ' trade_shares [31:0] $end
+$var wire 32 ( trade_price [31:0] $end
+$var wire 64 ) trade_order_ref [63:0] $end
+$var wire 64 * trade_match_id [63:0] $end
+$var wire 1 + trade_internal_valid $end
+$var wire 32 , replace_shares [31:0] $end
+$var wire 32 - replace_price [31:0] $end
+$var wire 64 . replace_old_order_ref [63:0] $end
+$var wire 64 / replace_new_order_ref [63:0] $end
+$var wire 1 0 replace_internal_valid $end
+$var wire 32 1 exec_timestamp [31:0] $end
+$var wire 32 2 exec_shares [31:0] $end
+$var wire 64 3 exec_order_ref [63:0] $end
+$var wire 64 4 exec_match_id [63:0] $end
+$var wire 1 5 exec_internal_valid $end
+$var wire 64 6 delete_order_ref [63:0] $end
+$var wire 1 7 delete_internal_valid $end
+$var wire 64 8 cancel_order_ref [63:0] $end
+$var wire 1 9 cancel_internal_valid $end
+$var wire 32 : cancel_canceled_shares [31:0] $end
+$var wire 64 ; add_stock_symbol [63:0] $end
+$var wire 1 < add_side $end
+$var wire 32 = add_shares [31:0] $end
+$var wire 32 > add_price [31:0] $end
+$var wire 64 ? add_order_ref [63:0] $end
+$var wire 1 @ add_internal_valid $end
+$var reg 64 A match_id [63:0] $end
+$var reg 64 B new_order_ref [63:0] $end
+$var reg 64 C order_ref [63:0] $end
+$var reg 4 D parsed_type [3:0] $end
+$var reg 1 E parsed_valid $end
+$var reg 32 F price [31:0] $end
+$var reg 32 G shares [31:0] $end
+$var reg 1 H side $end
+$var reg 64 I stock_symbol [63:0] $end
+$var reg 32 J timestamp [31:0] $end
+$scope module u_add_order_decoder $end
+$var wire 8 K byte_in [7:0] $end
+$var wire 1 " clk $end
+$var wire 1 # rst $end
+$var wire 1 $ valid_in $end
+$var reg 1 @ add_internal_valid $end
+$var reg 64 L add_order_ref [63:0] $end
+$var reg 1 M add_packet_invalid $end
+$var reg 32 N add_price [31:0] $end
+$var reg 32 O add_shares [31:0] $end
+$var reg 1 < add_side $end
+$var reg 64 P add_stock_symbol [63:0] $end
+$var reg 6 Q byte_index [5:0] $end
+$var reg 1 R is_add_order $end
+$upscope $end
+$scope module u_cancel_order_decoder $end
+$var wire 8 S byte_in [7:0] $end
+$var wire 1 " clk $end
+$var wire 1 # rst $end
+$var wire 1 $ valid_in $end
+$var reg 6 T byte_index [5:0] $end
+$var reg 32 U cancel_canceled_shares [31:0] $end
+$var reg 1 9 cancel_internal_valid $end
+$var reg 64 V cancel_order_ref [63:0] $end
+$var reg 1 W cancel_packet_invalid $end
+$var reg 1 X is_cancel_order $end
+$upscope $end
+$scope module u_delete_order_decoder $end
+$var wire 8 Y byte_in [7:0] $end
+$var wire 1 " clk $end
+$var wire 1 # rst $end
+$var wire 1 $ valid_in $end
+$var reg 6 Z byte_index [5:0] $end
+$var reg 1 7 delete_internal_valid $end
+$var reg 64 [ delete_order_ref [63:0] $end
+$var reg 1 \ delete_packet_invalid $end
+$var reg 1 ] is_delete_order $end
+$upscope $end
+$scope module u_executed_order_decoder $end
+$var wire 8 ^ byte_in [7:0] $end
+$var wire 1 " clk $end
+$var wire 1 # rst $end
+$var wire 1 $ valid_in $end
+$var reg 6 _ byte_index [5:0] $end
+$var reg 1 5 exec_internal_valid $end
+$var reg 64 ` exec_match_id [63:0] $end
+$var reg 64 a exec_order_ref [63:0] $end
+$var reg 1 b exec_packet_invalid $end
+$var reg 32 c exec_shares [31:0] $end
+$var reg 32 d exec_timestamp [31:0] $end
+$var reg 1 e is_executed_order $end
+$upscope $end
+$scope module u_replace_order_decoder $end
+$var wire 8 f byte_in [7:0] $end
+$var wire 1 " clk $end
+$var wire 1 # rst $end
+$var wire 1 $ valid_in $end
+$var reg 6 g byte_index [5:0] $end
+$var reg 1 h is_replace_order $end
+$var reg 1 0 replace_internal_valid $end
+$var reg 64 i replace_new_order_ref [63:0] $end
+$var reg 64 j replace_old_order_ref [63:0] $end
+$var reg 1 k replace_packet_invalid $end
+$var reg 32 l replace_price [31:0] $end
+$var reg 32 m replace_shares [31:0] $end
+$upscope $end
+$scope module u_trade_decoder $end
+$var wire 8 n byte_in [7:0] $end
+$var wire 1 " clk $end
+$var wire 1 # rst $end
+$var wire 1 $ valid_in $end
+$var reg 6 o byte_index [5:0] $end
+$var reg 1 p is_trade $end
+$var reg 1 + trade_internal_valid $end
+$var reg 64 q trade_match_id [63:0] $end
+$var reg 64 r trade_order_ref [63:0] $end
+$var reg 1 s trade_packet_invalid $end
+$var reg 32 t trade_price [31:0] $end
+$var reg 32 u trade_shares [31:0] $end
+$var reg 64 v trade_stock_symbol [63:0] $end
+$var reg 32 w trade_timestamp [31:0] $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+#0
+$dumpvars
+b0 w
+b0 v
+b0 u
+b0 t
+0s
+b0 r
+b0 q
+0p
+b0 o
+b0 n
+b0 m
+b0 l
+0k
+b0 j
+b0 i
+0h
+b0 g
+b0 f
+0e
+b0 d
+b0 c
+0b
+b0 a
+b0 `
+b0 _
+b0 ^
+0]
+0\
+b0 [
+b0 Z
+b0 Y
+0X
+0W
+b0 V
+b0 U
+b0 T
+b0 S
+0R
+b0 Q
+b0 P
+b0 O
+b0 N
+0M
+b0 L
+b0 K
+b0 J
+b0 I
+0H
+b0 G
+b0 F
+0E
+b1111 D
+b0 C
+b0 B
+b0 A
+0@
+b0 ?
+b0 >
+b0 =
+0<
+b0 ;
+b0 :
+09
+b0 8
+07
+b0 6
+05
+b0 4
+b0 3
+b0 2
+b0 1
+00
+b0 /
+b0 .
+b0 -
+b0 ,
+0+
+b0 *
+b0 )
+b0 (
+b0 '
+b0 &
+b0 %
+0$
+1#
+1"
+b0 !
+$end
+#5000
+0"
+#10000
+1"
+#15000
+0"
+#20000
+1$
+b1000001 !
+b1000001 K
+b1000001 S
+b1000001 Y
+b1000001 ^
+b1000001 f
+b1000001 n
+0#
+1"
+#25000
+0"
+#30000
+b10010 !
+b10010 K
+b10010 S
+b10010 Y
+b10010 ^
+b10010 f
+b10010 n
+b1 o
+b1 _
+b1 g
+b1 Z
+b1 T
+b1 Q
+1R
+1"
+#35000
+0"
+#40000
+b110100 !
+b110100 K
+b110100 S
+b110100 Y
+b110100 ^
+b110100 f
+b110100 n
+b10 Q
+b1001000000000000000000000000000000000000000000000000000000000 ?
+b1001000000000000000000000000000000000000000000000000000000000 L
+b10 T
+b10 Z
+b10 g
+b10 _
+b10 o
+1"
+#45000
+0"
+#50000
+b1010110 !
+b1010110 K
+b1010110 S
+b1010110 Y
+b1010110 ^
+b1010110 f
+b1010110 n
+b11 o
+b11 _
+b11 g
+b11 Z
+b11 T
+b11 Q
+b1001000110100000000000000000000000000000000000000000000000000 ?
+b1001000110100000000000000000000000000000000000000000000000000 L
+1"
+#55000
+0"
+#60000
+b1111000 !
+b1111000 K
+b1111000 S
+b1111000 Y
+b1111000 ^
+b1111000 f
+b1111000 n
+b100 Q
+b1001000110100010101100000000000000000000000000000000000000000 ?
+b1001000110100010101100000000000000000000000000000000000000000 L
+b100 T
+b100 Z
+b100 g
+b100 _
+b100 o
+1"
+#65000
+0"
+#70000
+b0 !
+b0 K
+b0 S
+b0 Y
+b0 ^
+b0 f
+b0 n
+b101 o
+b101 _
+b101 g
+b101 Z
+b101 T
+b101 Q
+b1001000110100010101100111100000000000000000000000000000000000 ?
+b1001000110100010101100111100000000000000000000000000000000000 L
+1"
+#75000
+0"
+#80000
+b110 Q
+b110 T
+b110 Z
+b110 g
+b110 _
+b110 o
+1"
+#85000
+0"
+#90000
+b111 o
+b111 _
+b111 g
+b111 Z
+b111 T
+b111 Q
+1"
+#95000
+0"
+#100000
+b1 !
+b1 K
+b1 S
+b1 Y
+b1 ^
+b1 f
+b1 n
+b1000 Q
+b1000 T
+b1000 Z
+b1000 g
+b1000 _
+b1000 o
+1"
+#105000
+0"
+#110000
+b1010011 !
+b1010011 K
+b1010011 S
+b1010011 Y
+b1010011 ^
+b1010011 f
+b1010011 n
+b1001 o
+b1001 _
+b1001 g
+b1001 Z
+b1001 T
+b1001 Q
+b1001000110100010101100111100000000000000000000000000000000001 ?
+b1001000110100010101100111100000000000000000000000000000000001 L
+1"
+#115000
+0"
+#120000
+b0 !
+b0 K
+b0 S
+b0 Y
+b0 ^
+b0 f
+b0 n
+b1010 Q
+1<
+b1010 T
+b0 Z
+b1010 g
+b1010 _
+b1010 o
+1"
+#125000
+0"
+#130000
+b1011 o
+b1011 _
+b1011 g
+b1 Z
+b1011 T
+b1011 Q
+1"
+#135000
+0"
+#140000
+b11 !
+b11 K
+b11 S
+b11 Y
+b11 ^
+b11 f
+b11 n
+b1100 Q
+b1100 T
+b10 Z
+b1100 g
+b1100 _
+b1100 o
+1"
+#145000
+0"
+#150000
+b11101001 !
+b11101001 K
+b11101001 S
+b11101001 Y
+b11101001 ^
+b11101001 f
+b11101001 n
+b1101 o
+b1101 _
+b1101 g
+b11 Z
+b1101 T
+b1101 Q
+b1100000000 =
+b1100000000 O
+1"
+#155000
+0"
+#160000
+b1010011 !
+b1010011 K
+b1010011 S
+b1010011 Y
+b1010011 ^
+b1010011 f
+b1010011 n
+b1110 Q
+b1111101001 =
+b1111101001 O
+b1110 T
+b100 Z
+b1110 g
+b1110 _
+b1110 o
+1"
+#165000
+0"
+#170000
+b1010100 !
+b1010100 K
+b1010100 S
+b1010100 Y
+b1010100 ^
+b1010100 f
+b1010100 n
+b1111 o
+b1111 _
+b1111 g
+b101 Z
+b1111 T
+b1111 Q
+b101001100000000000000000000000000000000000000000000000000000000 ;
+b101001100000000000000000000000000000000000000000000000000000000 P
+1"
+#175000
+0"
+#180000
+b1001011 !
+b1001011 K
+b1001011 S
+b1001011 Y
+b1001011 ^
+b1001011 f
+b1001011 n
+b10000 Q
+b101001101010100000000000000000000000000000000000000000000000000 ;
+b101001101010100000000000000000000000000000000000000000000000000 P
+b10000 T
+b110 Z
+b10000 g
+b10000 _
+b10000 o
+1"
+#185000
+0"
+#190000
+b110001 !
+b110001 K
+b110001 S
+b110001 Y
+b110001 ^
+b110001 f
+b110001 n
+b10001 o
+b10001 _
+b10001 g
+b111 Z
+b10001 T
+b10001 Q
+b101001101010100010010110000000000000000000000000000000000000000 ;
+b101001101010100010010110000000000000000000000000000000000000000 P
+1"
+#195000
+0"
+#200000
+b100000 !
+b100000 K
+b100000 S
+b100000 Y
+b100000 ^
+b100000 f
+b100000 n
+b10010 Q
+b101001101010100010010110011000100000000000000000000000000000000 ;
+b101001101010100010010110011000100000000000000000000000000000000 P
+b10010 T
+b1000 Z
+b10010 g
+b10010 _
+b10010 o
+1"
+#205000
+0"
+#210000
+b10011 o
+b10011 _
+b10011 g
+b1001 Z
+b10011 T
+b10011 Q
+b101001101010100010010110011000100100000000000000000000000000000 ;
+b101001101010100010010110011000100100000000000000000000000000000 P
+1"
+#215000
+0"
+#220000
+b10100 Q
+b101001101010100010010110011000100100000001000000000000000000000 ;
+b101001101010100010010110011000100100000001000000000000000000000 P
+b10100 T
+b0 Z
+b10100 g
+b10100 _
+b10100 o
+1"
+#225000
+0"
+#230000
+b10101 o
+b10101 _
+b10101 g
+b1 Z
+b10101 T
+b10101 Q
+b101001101010100010010110011000100100000001000000010000000000000 ;
+b101001101010100010010110011000100100000001000000010000000000000 P
+1"
+#235000
+0"
+#240000
+b0 !
+b0 K
+b0 S
+b0 Y
+b0 ^
+b0 f
+b0 n
+b10110 Q
+b101001101010100010010110011000100100000001000000010000000100000 ;
+b101001101010100010010110011000100100000001000000010000000100000 P
+b10110 T
+b10 Z
+b10110 g
+b10110 _
+b10110 o
+1"
+#245000
+0"
+#250000
+b10010 !
+b10010 K
+b10010 S
+b10010 Y
+b10010 ^
+b10010 f
+b10010 n
+b10111 o
+b10111 _
+b10111 g
+b11 Z
+b10111 T
+b10111 Q
+1"
+#255000
+0"
+#260000
+b11010110 !
+b11010110 K
+b11010110 S
+b11010110 Y
+b11010110 ^
+b11010110 f
+b11010110 n
+b11000 Q
+b100100000000000000000 >
+b100100000000000000000 N
+b0 T
+b100 Z
+b11000 g
+b11000 _
+b11000 o
+1"
+#265000
+0"
+#270000
+b1001110 !
+b1001110 K
+b1001110 S
+b1001110 Y
+b1001110 ^
+b1001110 f
+b1001110 n
+b11001 o
+b11001 _
+b11001 g
+b101 Z
+b1 T
+b11001 Q
+b100101101011000000000 >
+b100101101011000000000 N
+1"
+#275000
+0"
+#280000
+b0 !
+b0 K
+b0 S
+b0 Y
+b0 ^
+b0 f
+b0 n
+b11010 Q
+b100101101011001001110 >
+b100101101011001001110 N
+b10 T
+b110 Z
+b0 g
+b11010 _
+b11010 o
+1"
+#285000
+0"
+#290000
+b11011 o
+b11011 _
+b1 g
+b111 Z
+b11 T
+b11011 Q
+1"
+#295000
+0"
+#300000
+b11100 Q
+b100 T
+b1000 Z
+b10 g
+b11100 _
+b11100 o
+1"
+#305000
+0"
+#310000
+b11101 o
+b11101 _
+b11 g
+b1001 Z
+b101 T
+b11101 Q
+1"
+#315000
+0"
+#320000
+b11110 Q
+b110 T
+b0 Z
+b100 g
+b11110 _
+b11110 o
+1"
+#325000
+0"
+#330000
+b11111 o
+b11111 _
+b101 g
+b1 Z
+b111 T
+b11111 Q
+1"
+#335000
+0"
+#340000
+b100000 Q
+b1000 T
+b10 Z
+b110 g
+b0 _
+b100000 o
+1"
+#345000
+0"
+#350000
+b100001 o
+b1 _
+b111 g
+b11 Z
+b1001 T
+b100001 Q
+1"
+#355000
+0"
+#360000
+b100010 Q
+b1010 T
+b100 Z
+b1000 g
+b10 _
+b100010 o
+1"
+#365000
+0"
+#370000
+b100011 o
+b11 _
+b1001 g
+b101 Z
+b1011 T
+b100011 Q
+1"
+#375000
+0"
+#380000
+0$
+b101001101010100010010110011000100100000001000000010000000100000 I
+b100101101011001001110 F
+b1111101001 G
+1H
+b1001000110100010101100111100000000000000000000000000000000001 C
+b1 D
+1E
+b100100 Q
+1@
+b1100 T
+b110 Z
+b1010 g
+b100 _
+b100100 o
+1"
+#385000
+0"
+#390000
+b0 I
+b0 F
+b0 G
+0H
+b0 C
+b1111 D
+0E
+b0 Q
+0R
+b0 ;
+b0 P
+b0 >
+b0 N
+b0 =
+b0 O
+0<
+b0 ?
+b0 L
+0@
+0M
+1"
+#395000
+0"
+#400000
+1"
+#405000
+0"
+#410000
+1"
+#415000
+0"
+#420000
+1"
+#425000
+0"
+#430000
+1"
+#435000
+0"
+#440000
+1"
+#445000
+0"
+#450000
+1"
+#455000
+0"
+#460000
+1"
+#465000
+0"
+#470000
+1"
+#475000
+0"
+#480000
+1"
+#485000
+0"
+#490000
+1"
+#495000
+0"
+#500000
+1"
+#505000
+0"
+#510000
+1"
+#510001
