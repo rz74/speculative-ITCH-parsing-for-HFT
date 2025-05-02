@@ -1,0 +1,255 @@
+$date
+	Fri May  2 11:53:59 2025
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1ps
+$end
+$scope module itch_parser $end
+$var wire 8 ! byte_in [7:0] $end
+$var wire 1 " clk $end
+$var wire 1 # rst $end
+$var wire 1 $ valid_in $end
+$var wire 32 % trade_timestamp [31:0] $end
+$var wire 64 & trade_stock_symbol [63:0] $end
+$var wire 32 ' trade_shares [31:0] $end
+$var wire 32 ( trade_price [31:0] $end
+$var wire 64 ) trade_order_ref [63:0] $end
+$var wire 64 * trade_match_id [63:0] $end
+$var wire 1 + trade_internal_valid $end
+$var wire 32 , replace_shares [31:0] $end
+$var wire 32 - replace_price [31:0] $end
+$var wire 64 . replace_old_order_ref [63:0] $end
+$var wire 64 / replace_new_order_ref [63:0] $end
+$var wire 1 0 replace_internal_valid $end
+$var wire 32 1 exec_timestamp [31:0] $end
+$var wire 32 2 exec_shares [31:0] $end
+$var wire 64 3 exec_order_ref [63:0] $end
+$var wire 64 4 exec_match_id [63:0] $end
+$var wire 1 5 exec_internal_valid $end
+$var wire 64 6 delete_order_ref [63:0] $end
+$var wire 1 7 delete_internal_valid $end
+$var wire 64 8 cancel_order_ref [63:0] $end
+$var wire 1 9 cancel_internal_valid $end
+$var wire 32 : cancel_canceled_shares [31:0] $end
+$var wire 64 ; add_stock_symbol [63:0] $end
+$var wire 1 < add_side $end
+$var wire 32 = add_shares [31:0] $end
+$var wire 32 > add_price [31:0] $end
+$var wire 64 ? add_order_ref [63:0] $end
+$var wire 1 @ add_internal_valid $end
+$var reg 64 A match_id [63:0] $end
+$var reg 64 B new_order_ref [63:0] $end
+$var reg 64 C order_ref [63:0] $end
+$var reg 4 D parsed_type [3:0] $end
+$var reg 1 E parsed_valid $end
+$var reg 32 F price [31:0] $end
+$var reg 32 G shares [31:0] $end
+$var reg 1 H side $end
+$var reg 64 I stock_symbol [63:0] $end
+$var reg 32 J timestamp [31:0] $end
+$scope module u_add_order_decoder $end
+$var wire 8 K byte_in [7:0] $end
+$var wire 1 " clk $end
+$var wire 1 # rst $end
+$var wire 1 $ valid_in $end
+$var reg 1 @ add_internal_valid $end
+$var reg 64 L add_order_ref [63:0] $end
+$var reg 1 M add_packet_invalid $end
+$var reg 32 N add_price [31:0] $end
+$var reg 32 O add_shares [31:0] $end
+$var reg 1 < add_side $end
+$var reg 64 P add_stock_symbol [63:0] $end
+$var reg 6 Q byte_index [5:0] $end
+$var reg 1 R is_add_order $end
+$upscope $end
+$scope module u_cancel_order_decoder $end
+$var wire 8 S byte_in [7:0] $end
+$var wire 1 " clk $end
+$var wire 1 # rst $end
+$var wire 1 $ valid_in $end
+$var reg 6 T byte_index [5:0] $end
+$var reg 32 U cancel_canceled_shares [31:0] $end
+$var reg 1 9 cancel_internal_valid $end
+$var reg 64 V cancel_order_ref [63:0] $end
+$var reg 1 W cancel_packet_invalid $end
+$var reg 1 X is_cancel_order $end
+$upscope $end
+$scope module u_delete_order_decoder $end
+$var wire 8 Y byte_in [7:0] $end
+$var wire 1 " clk $end
+$var wire 1 # rst $end
+$var wire 1 $ valid_in $end
+$var reg 6 Z byte_index [5:0] $end
+$var reg 1 7 delete_internal_valid $end
+$var reg 64 [ delete_order_ref [63:0] $end
+$var reg 1 \ delete_packet_invalid $end
+$var reg 1 ] is_delete_order $end
+$upscope $end
+$scope module u_executed_order_decoder $end
+$var wire 8 ^ byte_in [7:0] $end
+$var wire 1 " clk $end
+$var wire 1 # rst $end
+$var wire 1 $ valid_in $end
+$var reg 6 _ byte_index [5:0] $end
+$var reg 1 5 exec_internal_valid $end
+$var reg 64 ` exec_match_id [63:0] $end
+$var reg 64 a exec_order_ref [63:0] $end
+$var reg 1 b exec_packet_invalid $end
+$var reg 32 c exec_shares [31:0] $end
+$var reg 32 d exec_timestamp [31:0] $end
+$var reg 1 e is_executed_order $end
+$upscope $end
+$scope module u_replace_order_decoder $end
+$var wire 8 f byte_in [7:0] $end
+$var wire 1 " clk $end
+$var wire 1 # rst $end
+$var wire 1 $ valid_in $end
+$var reg 6 g byte_index [5:0] $end
+$var reg 1 h is_replace_order $end
+$var reg 1 0 replace_internal_valid $end
+$var reg 64 i replace_new_order_ref [63:0] $end
+$var reg 64 j replace_old_order_ref [63:0] $end
+$var reg 1 k replace_packet_invalid $end
+$var reg 32 l replace_price [31:0] $end
+$var reg 32 m replace_shares [31:0] $end
+$upscope $end
+$scope module u_trade_decoder $end
+$var wire 8 n byte_in [7:0] $end
+$var wire 1 " clk $end
+$var wire 1 # rst $end
+$var wire 1 $ valid_in $end
+$var reg 6 o byte_index [5:0] $end
+$var reg 1 p is_trade $end
+$var reg 1 + trade_internal_valid $end
+$var reg 64 q trade_match_id [63:0] $end
+$var reg 64 r trade_order_ref [63:0] $end
+$var reg 1 s trade_packet_invalid $end
+$var reg 32 t trade_price [31:0] $end
+$var reg 32 u trade_shares [31:0] $end
+$var reg 64 v trade_stock_symbol [63:0] $end
+$var reg 32 w trade_timestamp [31:0] $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+#0
+$dumpvars
+b0 w
+b0 v
+b0 u
+b0 t
+0s
+b0 r
+b0 q
+0p
+b0 o
+b0 n
+b0 m
+b0 l
+0k
+b0 j
+b0 i
+0h
+b0 g
+b0 f
+0e
+b0 d
+b0 c
+0b
+b0 a
+b0 `
+b0 _
+b0 ^
+0]
+0\
+b0 [
+b0 Z
+b0 Y
+0X
+0W
+b0 V
+b0 U
+b0 T
+b0 S
+0R
+b0 Q
+b0 P
+b0 O
+b0 N
+0M
+b0 L
+b0 K
+b0 J
+b0 I
+0H
+b0 G
+b0 F
+0E
+b1111 D
+b0 C
+b0 B
+b0 A
+0@
+b0 ?
+b0 >
+b0 =
+0<
+b0 ;
+b0 :
+09
+b0 8
+07
+b0 6
+05
+b0 4
+b0 3
+b0 2
+b0 1
+00
+b0 /
+b0 .
+b0 -
+b0 ,
+0+
+b0 *
+b0 )
+b0 (
+b0 '
+b0 &
+b0 %
+0$
+1#
+1"
+b0 !
+$end
+#5000
+0"
+#10000
+1"
+#15000
+0"
+#20000
+1$
+b1000001 !
+b1000001 K
+b1000001 S
+b1000001 Y
+b1000001 ^
+b1000001 f
+b1000001 n
+0#
+1"
+#25000
+0"
+#30000
+b1 o
+b1 _
+b1 g
+b1 Z
+b1 T
+b1 Q
+1R
+1"
+#30001

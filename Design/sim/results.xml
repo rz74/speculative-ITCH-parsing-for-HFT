@@ -1,8 +1,6 @@
 <testsuites name="results">
   <testsuite name="all" package="all">
-    <property name="random_seed" value="1746168442" />
-    <testcase name="test_itch_parser_add_then_cancel" classname="test_itch_parser" file="/mnt/c/Users/HYRui/Downloads/Git/speculative-ITCH-parsing-for-HFT/Design/sim/test_itch_parser.py" lineno="8" time="0.03277468681335449" sim_time_ns="510.001" ratio_time="15560.81993717765">
-      <failure message="Test failed with RANDOM_SEED=1746168442" />
-    </testcase>
+    <property name="random_seed" value="1746208032" />
+    <testcase name="parser_obs" classname="parser_obs" file="/mnt/c/Users/HYRui/Downloads/Git/speculative-ITCH-parsing-for-HFT/Design/sim/parser_obs.py" lineno="15" time="0.11392760276794434" sim_time_ns="2040.001" ratio_time="17906.117134363092" />
   </testsuite>
 </testsuites>

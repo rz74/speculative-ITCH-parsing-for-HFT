@@ -40,6 +40,7 @@ TOPLEVEL_LANG = verilog
 
 VERILOG_SOURCES = \
     ../sim/top_test.v \
+	../sim/parser_obs_top.v \
     ../rtl/add_order_decoder.v \
     ../rtl/cancel_order_decoder.v \
     ../rtl/delete_order_decoder.v \
@@ -124,6 +125,13 @@ itch_parser: killwave
 	$(MAKE) MODULE=test_itch_parser TOPLEVEL=itch_parser COMPILE_ARGS="$(COMPILE_ARGS) -DTEST_ITCH_PARSER"; \
 	mv dump.vcd vcd/itch_parser_dump_$${TIMESTAMP}.vcd; \
 	gtkwave vcd/itch_parser_dump_$${TIMESTAMP}.vcd &
+
+parser_obs: killwave
+	@mkdir -p vcd
+	TIMESTAMP=$$(date +%m%d%Y_%H%M%S); \
+	$(MAKE) MODULE=parser_obs TOPLEVEL=parser_obs_top COMPILE_ARGS="$(COMPILE_ARGS)"; \
+	mv dump.vcd vcd/parser_obs_dump_$${TIMESTAMP}.vcd; \
+	gtkwave vcd/parser_obs_dump_$${TIMESTAMP}.vcd &
 
 
 
