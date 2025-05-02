@@ -23,7 +23,10 @@
 // [20250501-6] RZ: Added delete_order_decoder module for delete order messages.
 // =============================================
 `timescale 1ns/1ps
+
 module top_test (
+
+    // System Signals
     input  logic        clk,
     input  logic        rst,
     input  logic [7:0]  byte_in,
@@ -47,9 +50,21 @@ module top_test (
     // Delete Order Decoder Outputs
     output logic        delete_internal_valid,
     output logic        delete_packet_invalid,
-    output logic [63:0] delete_order_ref
+    output logic [63:0] delete_order_ref,
+
+    // Replace Order Decoder Outputs
+    output logic        replace_internal_valid,
+    output logic        replace_packet_invalid,
+    output logic [63:0] replace_old_order_ref,
+    output logic [63:0] replace_new_order_ref,
+    output logic [31:0] replace_shares,
+    output logic [31:0] replace_price
+
 
 );
+// =============================================
+// Module Instantiation
+// =============================================
 
     `ifdef TEST_ADD_ORDER_DECODER
         add_order_decoder u_add_order_decoder (
@@ -95,22 +110,45 @@ module top_test (
     `endif
 
     `ifdef TEST_DELETE_ORDER_DECODER
-    delete_order_decoder u_delete_order_decoder (
-        .clk                  (clk),
-        .rst                  (rst),
-        .byte_in              (byte_in),
-        .valid_in             (valid_in),
-        .delete_internal_valid(delete_internal_valid),
-        .delete_packet_invalid(delete_packet_invalid),
-        .delete_order_ref     (delete_order_ref)
+        delete_order_decoder u_delete_order_decoder (
+            .clk                  (clk),
+            .rst                  (rst),
+            .byte_in              (byte_in),
+            .valid_in             (valid_in),
+            .delete_internal_valid(delete_internal_valid),
+            .delete_packet_invalid(delete_packet_invalid),
+            .delete_order_ref     (delete_order_ref)
+        );
+            // ======================= Waveform Dump =======================
+            `ifdef COCOTB_SIM
+            initial begin
+                $dumpfile("dump.vcd");
+                $dumpvars(0, u_delete_order_decoder);
+            end
+            `endif
+    `endif
+
+    `ifdef TEST_REPLACE_ORDER_DECODER
+    replace_order_decoder u_replace_order_decoder (
+        .clk                   (clk),
+        .rst                   (rst),
+        .byte_in               (byte_in),
+        .valid_in              (valid_in),
+        .replace_internal_valid(replace_internal_valid),
+        .replace_packet_invalid(replace_packet_invalid),
+        .replace_old_order_ref (replace_old_order_ref),
+        .replace_new_order_ref (replace_new_order_ref),
+        .replace_shares        (replace_shares),
+        .replace_price         (replace_price)
     );
-        `ifdef COCOTB_SIM
+    `ifdef COCOTB_SIM
         initial begin
             $dumpfile("dump.vcd");
-            $dumpvars(0, u_delete_order_decoder);
+            $dumpvars(0, u_replace_order_decoder);
         end
         `endif
     `endif
+
 
 
     // // ======================= Waveform Dump =======================

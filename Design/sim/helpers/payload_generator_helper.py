@@ -15,6 +15,7 @@
 # [20250429-2] RZ: Added random_valid_payload() for randomized test cases.
 # [20250501-1] RZ: updated cancel_order_payload to provide unused bytes for testing for real applications
 # [20250501-2] RZ: updated delete_order_payload.
+# [20250501-3] RZ: updated replace_order_payload.
 # =============================================
 
 import random
@@ -62,9 +63,16 @@ def generate_delete_order_payload(index=0):
     payload[1:9] = (0x1234567800000000 + index).to_bytes(8, 'big')  # Order Ref
     return payload
 
-
 def generate_replace_order_payload(index=0):
-    return bytes([0x55]) + index.to_bytes(8, 'big') + (index+1).to_bytes(8, 'big') + (200).to_bytes(4, 'big') + (1250000).to_bytes(4, 'big')
+    """Generate a valid 25-byte Replace Order ('U') ITCH packet"""
+    payload = bytearray(25)
+    payload[0] = ord('U')  # Message Type
+    payload[1:9] = (0xAAAABBBB00000000 + index).to_bytes(8, 'big')   # Old Order Ref
+    payload[9:17] = (0xCCCCDDDD00000000 + index).to_bytes(8, 'big')  # New Order Ref
+    payload[17:21] = (1000 + index).to_bytes(4, 'big')               # Shares
+    payload[21:25] = (1234500 + index * 10).to_bytes(4, 'big')       # Price
+    return payload
+
 
 def generate_dummy_payload(index=0):
     return bytes([0x5A]) + index.to_bytes(8, 'big') + b'BADINPUT'
