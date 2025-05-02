@@ -1,7 +1,7 @@
 <testsuites name="results">
   <testsuite name="all" package="all">
-    <property name="random_seed" value="1746149523" />
-    <testcase name="test_executed_order_basic" classname="test_executed_order" file="/mnt/c/Users/HYRui/Downloads/Git/speculative-ITCH-parsing-for-HFT/Design/sim/test_executed_order.py" lineno="21" time="0.01752758026123047" sim_time_ns="340.001" ratio_time="19398.056944121006" />
-    <testcase name="test_exec_decoder_ignores_non_exec" classname="test_executed_order" file="/mnt/c/Users/HYRui/Downloads/Git/speculative-ITCH-parsing-for-HFT/Design/sim/test_executed_order.py" lineno="57" time="0.023041486740112305" sim_time_ns="490.001" ratio_time="21266.03224552218" />
+    <property name="random_seed" value="1746150515" />
+    <testcase name="test_trade_basic" classname="test_trade" file="/mnt/c/Users/HYRui/Downloads/Git/speculative-ITCH-parsing-for-HFT/Design/sim/test_trade.py" lineno="21" time="0.02372288703918457" sim_time_ns="470.001" ratio_time="19812.133288147856" />
+    <testcase name="test_trade_decoder_ignores_non_trade" classname="test_trade" file="/mnt/c/Users/HYRui/Downloads/Git/speculative-ITCH-parsing-for-HFT/Design/sim/test_trade.py" lineno="59" time="0.015107393264770508" sim_time_ns="490.001" ratio_time="32434.51675694784" />
   </testsuite>
 </testsuites>

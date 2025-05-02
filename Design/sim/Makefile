@@ -21,6 +21,7 @@
 # [20250429-3] RZ: Migrated all module testbenches to use top_test.v by default
 # [20250501-1] RZ: Removed obsolete header_parser.v from the list of sources.
 # [20250501-2] RZ: Added executed_order module and testbench.
+# [20250501-3] RZ: Added trade module and testbench.
 # 
 # =============================================
 # =============================================
@@ -43,7 +44,8 @@ VERILOG_SOURCES = \
     ../rtl/cancel_order_decoder.v \
     ../rtl/delete_order_decoder.v \
     ../rtl/replace_order_decoder.v \
-	../rtl/executed_order_decoder.v
+	../rtl/executed_order_decoder.v \
+	../rtl/trade_decoder.v
 
 TOPLEVEL = top_test
 SIM = icarus
@@ -98,6 +100,14 @@ executed_order: killwave
 	$(MAKE) MODULE=test_executed_order TOPLEVEL=top_test COMPILE_ARGS="$(COMPILE_ARGS) -DTEST_EXECUTED_ORDER_DECODER"; \
 	mv dump.vcd vcd/executed_order_dump_$${TIMESTAMP}.vcd; \
 	gtkwave vcd/executed_order_dump_$${TIMESTAMP}.vcd &
+
+trade: killwave
+	@mkdir -p vcd
+	TIMESTAMP=$$(date +%m%d%Y_%H%M%S); \
+	$(MAKE) MODULE=test_trade TOPLEVEL=top_test COMPILE_ARGS="$(COMPILE_ARGS) -DTEST_TRADE_DECODER"; \
+	mv dump.vcd vcd/trade_dump_$${TIMESTAMP}.vcd; \
+	gtkwave vcd/trade_dump_$${TIMESTAMP}.vcd &
+
 
 
 

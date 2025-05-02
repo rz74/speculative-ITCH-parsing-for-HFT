@@ -68,7 +68,18 @@ module top_test (
     output logic [63:0] exec_order_ref,
     output logic [31:0] exec_shares,
     output logic [63:0] exec_match_id,
-    output logic [31:0] exec_timestamp
+    output logic [31:0] exec_timestamp,
+
+    // Trade Decoder Outputs
+    output logic        trade_internal_valid,
+    output logic        trade_packet_invalid,
+    output logic [63:0] trade_order_ref,
+    output logic [31:0] trade_shares,
+    output logic [63:0] trade_match_id,
+    output logic [63:0] trade_stock_symbol,
+    output logic [31:0] trade_price,
+    output logic [31:0] trade_timestamp
+
 
 
 
@@ -180,6 +191,30 @@ module top_test (
             end
             `endif
     `endif
+
+    `ifdef TEST_TRADE_DECODER
+        trade_decoder u_trade_decoder (
+            .clk                  (clk),
+            .rst                  (rst),
+            .byte_in              (byte_in),
+            .valid_in             (valid_in),
+            .trade_internal_valid (trade_internal_valid),
+            .trade_packet_invalid (trade_packet_invalid),
+            .trade_order_ref      (trade_order_ref),
+            .trade_shares         (trade_shares),
+            .trade_match_id       (trade_match_id),
+            .trade_stock_symbol   (trade_stock_symbol),
+            .trade_price          (trade_price),
+            .trade_timestamp      (trade_timestamp)
+        );
+        `ifdef COCOTB_SIM
+            initial begin
+                $dumpfile("dump.vcd");
+                $dumpvars(0, u_trade_decoder);
+            end
+            `endif
+    `endif
+
 
 
 

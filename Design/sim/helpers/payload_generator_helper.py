@@ -5,7 +5,7 @@
 # Description: ITCH-compliant payload generators for valid test inputs.
 # Author: RZ
 # Start Date: 04172025
-# Version: 0.8
+# Version: 0.9
 
 # Changelog
 # =============================================
@@ -17,6 +17,7 @@
 # [20250501-2] RZ: updated delete_order_payload.
 # [20250501-3] RZ: updated replace_order_payload.
 # [20250501-4] RZ: updated executed_order_payload.
+# [20250501-5] RZ: updated trade_payload.
 # =============================================
 
 import random
@@ -42,8 +43,6 @@ def generate_add_order_payload(index=0):
     payload[22:26] = (1234500 + index * 10).to_bytes(4, 'big')
 
     return payload
-
-
 
 def generate_cancel_order_payload(index=0):
     payload = bytearray(23)
@@ -85,17 +84,17 @@ def generate_executed_order_payload(index=0):
     # [25:31] Reserved — leave as zeros
     return payload
 
+def generate_trade_payload(index=0):
+    """Generate a valid 44-byte Trade ('P') ITCH packet"""
+    payload = bytearray(44)
+    payload[0] = ord('P')  # Message Type
+    payload[1:9] = (0x9000000000000000 + index).to_bytes(8, 'big')       # Order Ref
+    payload[9:13] = (500 + index).to_bytes(4, 'big')                     # Shares
+    payload[13:21] = (0xABC0000000000000 + index).to_bytes(8, 'big')     # Match ID
+    payload[21:29] = b"TSLA    "                                         # Symbol (8 bytes, space-padded)
+    payload[29:33] = (100000 + index * 5).to_bytes(4, 'big')             # Price
+    payload[33:37] = (98765432 + index).to_bytes(4, 'big')               # Timestamp
+    # [37:44] Reserved — leave as 0
+    return payload
 
-def generate_dummy_payload(index=0):
-    return bytes([0x5A]) + index.to_bytes(8, 'big') + b'BADINPUT'
-
-def generate_random_valid_payload(index=0) -> bytes:
-    """Generate a valid payload for a random known ITCH message type."""
-    generators = [
-        generate_add_order_payload,
-        generate_cancel_order_payload,
-        generate_delete_order_payload,
-        generate_replace_order_payload
-    ]
-    return random.choice(generators)(index)
 
