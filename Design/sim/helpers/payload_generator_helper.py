@@ -5,7 +5,7 @@
 # Description: ITCH-compliant payload generators for valid test inputs.
 # Author: RZ
 # Start Date: 04172025
-# Version: 0.5
+# Version: 0.8
 
 # Changelog
 # =============================================
@@ -16,6 +16,7 @@
 # [20250501-1] RZ: updated cancel_order_payload to provide unused bytes for testing for real applications
 # [20250501-2] RZ: updated delete_order_payload.
 # [20250501-3] RZ: updated replace_order_payload.
+# [20250501-4] RZ: updated executed_order_payload.
 # =============================================
 
 import random
@@ -71,6 +72,17 @@ def generate_replace_order_payload(index=0):
     payload[9:17] = (0xCCCCDDDD00000000 + index).to_bytes(8, 'big')  # New Order Ref
     payload[17:21] = (1000 + index).to_bytes(4, 'big')               # Shares
     payload[21:25] = (1234500 + index * 10).to_bytes(4, 'big')       # Price
+    return payload
+
+def generate_executed_order_payload(index=0):
+    """Generate a valid 31-byte Executed Order ('E') ITCH packet"""
+    payload = bytearray(31)
+    payload[0] = ord('E')  # Message Type
+    payload[1:9] = (0x1000000000000000 + index).to_bytes(8, 'big')     # Order Ref
+    payload[9:13] = (100 + index).to_bytes(4, 'big')                   # Executed Shares
+    payload[13:21] = (0xABCDEF0000000000 + index).to_bytes(8, 'big')   # Match ID
+    payload[21:25] = (123456789 + index).to_bytes(4, 'big')           # Timestamp
+    # [25:31] Reserved — leave as zeros
     return payload
 
 

@@ -6,7 +6,7 @@
 //              Uses `ifdef` blocks to selectively instantiate a single DUT (e.g. header_parser).
 // Author: RZ
 // Start Date: 04292025
-// Version: 0.10
+// Version: 0.13
 //
 // Changelog
 // =============================================
@@ -21,6 +21,8 @@
 // [20250501-4] RZ: Added cancel_order_decoder module for cancel order messages.
 // [20250501-5] RZ: Gated dump under ifdef to avoid unnecessary waveform generation.
 // [20250501-6] RZ: Added delete_order_decoder module for delete order messages.
+// [20250501-7] RZ: Added replace_order_decoder module for replace order messages.
+// [20250501-8] RZ: Added executed_order_decoder module for executed order messages.
 // =============================================
 `timescale 1ns/1ps
 
@@ -58,7 +60,16 @@ module top_test (
     output logic [63:0] replace_old_order_ref,
     output logic [63:0] replace_new_order_ref,
     output logic [31:0] replace_shares,
-    output logic [31:0] replace_price
+    output logic [31:0] replace_price,
+
+    // Executed Order Decoder Outputs
+    output logic        exec_internal_valid,
+    output logic        exec_packet_invalid,
+    output logic [63:0] exec_order_ref,
+    output logic [31:0] exec_shares,
+    output logic [63:0] exec_match_id,
+    output logic [31:0] exec_timestamp
+
 
 
 );
@@ -129,25 +140,47 @@ module top_test (
     `endif
 
     `ifdef TEST_REPLACE_ORDER_DECODER
-    replace_order_decoder u_replace_order_decoder (
-        .clk                   (clk),
-        .rst                   (rst),
-        .byte_in               (byte_in),
-        .valid_in              (valid_in),
-        .replace_internal_valid(replace_internal_valid),
-        .replace_packet_invalid(replace_packet_invalid),
-        .replace_old_order_ref (replace_old_order_ref),
-        .replace_new_order_ref (replace_new_order_ref),
-        .replace_shares        (replace_shares),
-        .replace_price         (replace_price)
-    );
-    `ifdef COCOTB_SIM
-        initial begin
-            $dumpfile("dump.vcd");
-            $dumpvars(0, u_replace_order_decoder);
-        end
-        `endif
+        replace_order_decoder u_replace_order_decoder (
+            .clk                   (clk),
+            .rst                   (rst),
+            .byte_in               (byte_in),
+            .valid_in              (valid_in),
+            .replace_internal_valid(replace_internal_valid),
+            .replace_packet_invalid(replace_packet_invalid),
+            .replace_old_order_ref (replace_old_order_ref),
+            .replace_new_order_ref (replace_new_order_ref),
+            .replace_shares        (replace_shares),
+            .replace_price         (replace_price)
+        );
+        `ifdef COCOTB_SIM
+            initial begin
+                $dumpfile("dump.vcd");
+                $dumpvars(0, u_replace_order_decoder);
+            end
+            `endif
     `endif
+
+    `ifdef TEST_EXECUTED_ORDER_DECODER
+        executed_order_decoder u_executed_order_decoder (
+            .clk                 (clk),
+            .rst                 (rst),
+            .byte_in             (byte_in),
+            .valid_in            (valid_in),
+            .exec_internal_valid (exec_internal_valid),
+            .exec_packet_invalid (exec_packet_invalid),
+            .exec_order_ref      (exec_order_ref),
+            .exec_shares         (exec_shares),
+            .exec_match_id       (exec_match_id),
+            .exec_timestamp      (exec_timestamp)
+        );
+        `ifdef COCOTB_SIM
+            initial begin
+                $dumpfile("dump.vcd");
+                $dumpvars(0, u_executed_order_decoder);
+            end
+            `endif
+    `endif
+
 
 
 

@@ -19,6 +19,9 @@
 # [20250429-1] RZ: Added replace module
 # [20250429-2] RZ: Added header_parser module with top_test.v support
 # [20250429-3] RZ: Migrated all module testbenches to use top_test.v by default
+# [20250501-1] RZ: Removed obsolete header_parser.v from the list of sources.
+# [20250501-2] RZ: Added executed_order module and testbench.
+# 
 # =============================================
 # =============================================
 # Makefile (Patched)
@@ -39,7 +42,8 @@ VERILOG_SOURCES = \
     ../rtl/add_order_decoder.v \
     ../rtl/cancel_order_decoder.v \
     ../rtl/delete_order_decoder.v \
-    ../rtl/replace_order_decoder.v 
+    ../rtl/replace_order_decoder.v \
+	../rtl/executed_order_decoder.v
 
 TOPLEVEL = top_test
 SIM = icarus
@@ -87,6 +91,14 @@ replace_order: killwave
 	$(MAKE) MODULE=test_replace_order TOPLEVEL=top_test COMPILE_ARGS="$(COMPILE_ARGS) -DTEST_REPLACE_ORDER_DECODER"; \
 	mv dump.vcd vcd/replace_order_dump_$${TIMESTAMP}.vcd; \
 	gtkwave vcd/replace_order_dump_$${TIMESTAMP}.vcd &
+
+executed_order: killwave
+	@mkdir -p vcd
+	TIMESTAMP=$$(date +%m%d%Y_%H%M%S); \
+	$(MAKE) MODULE=test_executed_order TOPLEVEL=top_test COMPILE_ARGS="$(COMPILE_ARGS) -DTEST_EXECUTED_ORDER_DECODER"; \
+	mv dump.vcd vcd/executed_order_dump_$${TIMESTAMP}.vcd; \
+	gtkwave vcd/executed_order_dump_$${TIMESTAMP}.vcd &
+
 
 
 default: killwave
