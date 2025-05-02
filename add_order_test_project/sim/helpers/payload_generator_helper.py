@@ -5,7 +5,7 @@
 # Description: ITCH-compliant payload generators for valid test inputs.
 # Author: RZ
 # Start Date: 04172025
-# Version: 0.5
+# Version: 0.3
 
 # Changelog
 # =============================================
@@ -13,46 +13,24 @@
 # [20250428-2] RZ: Added Delete/Replace and dummy payload generators.
 # [20250429-1] RZ: Adopted into payload_generator_helper.py from payload_generators.py.
 # [20250429-2] RZ: Added random_valid_payload() for randomized test cases.
-# [20250501-1] RZ: updated cancel_order_payload to provide unused bytes for testing for real applications
 # =============================================
 
 import random
 
 def generate_add_order_payload(index=0):
-    payload = bytearray(36)
-    payload[0] = ord('A')  # Message Type
-
-    # Order Reference
-    payload[1:9] = (0x1234567800000000 + index).to_bytes(8, 'big')
-
-    # Buy/Sell Indicator
-    payload[9] = ord('S') if index % 2 else ord('B')
-
-    # Shares
-    payload[10:14] = (1000 + index).to_bytes(4, 'big')
-
-    # Stock Symbol (left-padded to 8 bytes)
-    symbol = f"STK{index}".ljust(8)
-    payload[14:22] = symbol.encode('ascii')
-
-    # Price (e.g. $123.45 → 1234500)
-    payload[22:26] = (1234500 + index * 10).to_bytes(4, 'big')
-
+    # return bytes([0x41]) + index.to_bytes(8, 'big') + b'B' + (100).to_bytes(4, 'big') + b'ABCDE123' + (1234500).to_bytes(4, 'big')
+    payload = bytearray(64)
+    payload[0] = ord('A')  # msg_type
+    payload[1:9] = (0x1234567800000000 + index).to_bytes(8, 'big')  # order_ref
+    payload[9] = ord('B')  # buy/sell
+    payload[10:14] = (1000 + index).to_bytes(4, 'big')  # shares
+    payload[14:22] = b"GOOG    "  # stock symbol
+    payload[22:26] = (100000 + index*10).to_bytes(4, 'big')  # price
     return payload
-
 
 
 def generate_cancel_order_payload(index=0):
-    payload = bytearray(23)
-    payload[0] = ord('X')  # Cancel Order
-
-    payload[1:9] = (0xABCDEF0000000000 + index).to_bytes(8, 'big')   # Order Ref
-    payload[9:13] = (500 + index).to_bytes(4, 'big')                 # Shares
-    # Fill unused 13–22 with junk
-    payload[13:23] = bytes([0xAA] * 10)   
-    # payload[13:] = b'\x00' * (23 - 13)                               # Reserved padding
-
-    return payload
+    return bytes([0x58]) + index.to_bytes(8, 'big') + (50).to_bytes(4, 'big')
 
 def generate_delete_order_payload(index=0):
     return bytes([0x44]) + index.to_bytes(8, 'big')

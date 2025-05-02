@@ -5,54 +5,105 @@
 // Description: Module to decode Cancel Order ('X') messages from ITCH payloads.
 // Author: RZ
 // Start Date: 04172025
-// Version: 0.1
-//
+// Version: 0.4
 // Changelog
 // =============================================
 // [20250427-1] RZ: Initial version created for Cancel Order payload decoding.
 // [20250428-1] RZ: Updated ports and internal signals for dispatcher integration.
 // [20250428-2] RZ: Added valid_flag signal 
+// [20250501-1] RZ: Initial implementation based on add_order_decoder structure with new arch.
+// 
 // =============================================
-
-`timescale 1ns/1ps
-
+// ------------------------------------------------------------------------------------------------
+// Architecture Notes:
+// ------------------------------------------------------------------------------------------------
+// The ITCH "Cancel Order" ('X') message has a fixed length of 23 bytes and is structured as:
+//   [0]      = Message Type (ASCII 'X')
+//   [1:8]    = Order Reference Number (64-bit)
+//   [9:12]   = Canceled Shares (32-bit)
+//   [13:22]  = Reserved bytes (ignored)
+//
+// This decoder consumes a byte-aligned, per-cycle stream of ITCH bytes and speculatively 
+// begins parsing at cycle 0. On cycle 0, it captures the message type and immediately decodes
+// byte 1 as `order_ref[63:56]`. Parallel validation confirms whether the message is of type 'X'.
+// The decoder asserts `internal_valid` after 23 valid cycles only if the type matches.
+//
+// Inputs:
+//   - clk            : system clock
+//   - rst            : synchronous reset
+//   - byte_in[7:0]   : ITCH byte stream (1 byte per cycle)
+//   - valid_in       : asserted high when byte_in is valid
+//
+// Outputs:
+//   - internal_valid : one-cycle pulse when a valid Cancel Order message is fully parsed
+//   - packet_invalid : asserted if message length overruns unexpectedly (optional use)
+//   - order_ref      : 64-bit parsed order reference number
+//   - canceled_shares: 32-bit parsed canceled share quantity
+// ------------------------------------------------------------------------------------------------
 module cancel_order_decoder (
-    input  wire        clk,
-    input  wire        rst_n,
-    input  wire        valid,
-    input  wire [511:0] payload,
+    input  logic        clk,
+    input  logic        rst,
+    input  logic [7:0]  byte_in,
+    input  logic        valid_in,
 
-    output reg         cancel_order_decoded,
-    output reg [63:0]  cancel_order_ref,
-    output reg [31:0]  cancel_shares,
-    output wire        valid_flag
-    
+    output logic        cancel_internal_valid,
+    output logic        cancel_packet_invalid,
 
+    output logic [63:0] cancel_order_ref,
+    output logic [31:0] cancel_canceled_shares
 );
 
-// Internal parsing
-wire [7:0] msg_type;
-assign msg_type = payload[511:504];
-assign valid_flag = 1'b1;  // Always valid initially, later overwritten by length validator
+    parameter MSG_TYPE   = 8'h58;   // ASCII 'X'
+    parameter MSG_LENGTH = 23;  // Total message length including unused trailing bytes
 
-always @(posedge clk or negedge rst_n) begin
-    
-    if (!rst_n) begin
-        cancel_order_decoded <= 1'b0;
-        cancel_order_ref <= 64'd0;
-        cancel_shares <= 32'd0;
-    end else if (valid) begin
-        if (msg_type == "X") begin
-            cancel_order_decoded <= 1'b1;
-            cancel_order_ref <= payload[503:440];
-            cancel_shares <= payload[439:408];
-        end else begin
-            cancel_order_decoded <= 1'b0;
+
+    logic [5:0] byte_index;
+    logic       is_cancel_order;
+
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            byte_index              <= 0;
+            is_cancel_order         <= 0;
+            cancel_internal_valid   <= 0;
+            cancel_packet_invalid   <= 0;
+            cancel_order_ref        <= 0;
+            cancel_canceled_shares  <= 0;
+        end else if (valid_in) begin
+            cancel_internal_valid <= 0;
+            cancel_packet_invalid <= 0;
+
+            if (byte_index == 0)
+                is_cancel_order <= (byte_in == MSG_TYPE);
+
+            if (is_cancel_order) begin
+                case (byte_index)
+                    1:  cancel_order_ref[63:56]      <= byte_in;
+                    2:  cancel_order_ref[55:48]      <= byte_in;
+                    3:  cancel_order_ref[47:40]      <= byte_in;
+                    4:  cancel_order_ref[39:32]      <= byte_in;
+                    5:  cancel_order_ref[31:24]      <= byte_in;
+                    6:  cancel_order_ref[23:16]      <= byte_in;
+                    7:  cancel_order_ref[15:8]       <= byte_in;
+                    8:  cancel_order_ref[7:0]        <= byte_in;
+                    9:  cancel_canceled_shares[31:24]<= byte_in;
+                    10: cancel_canceled_shares[23:16]<= byte_in;
+                    11: cancel_canceled_shares[15:8] <= byte_in;
+                    12: cancel_canceled_shares[7:0]  <= byte_in;
+                    // Bytes [13–22] are ignored per ITCH protocol; reserved/padding.
+                    // No action needed for these bytes.
+                    // decoder will continue to increment byte_index.
+
+                endcase
+
+                if (byte_index == MSG_LENGTH - 1)
+                    cancel_internal_valid <= 1;
+            end
+
+            byte_index <= byte_index + 1;
+
+            if (byte_index >= MSG_LENGTH && is_cancel_order)
+                cancel_packet_invalid <= 1;
         end
-    end else begin
-        cancel_order_decoded <= 1'b0;
-        
     end
-end
 
 endmodule

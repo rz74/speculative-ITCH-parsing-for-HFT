@@ -20,12 +20,13 @@ from cocotb.triggers import RisingEdge
 
 async def inject_bytes_serially(dut, payload: bytes):
     for b in payload:
-        dut.byte_in.value = b
-        dut.valid_in.value = 1
+        dut.tcp_payload_in.value = b
+        dut.tcp_byte_valid_in.value = 1
         await RisingEdge(dut.clk)
-    dut.valid_in.value = 0
+        await RisingEdge(dut.clk)
+    dut.tcp_byte_valid_in.value = 0
     await RisingEdge(dut.clk)
-
+    await RisingEdge(dut.clk)
 
 async def inject_and_expect_valid_flag(dut, payload: bytes, expected_valid=True):
     await inject_bytes_serially(dut, payload)
@@ -36,13 +37,17 @@ async def inject_and_expect_valid_flag(dut, payload: bytes, expected_valid=True)
 async def inject_and_expect_decode(dut, payload_generator, decoded_signal):
     payload = payload_generator(0)
 
-    for b in payload:
-        dut.byte_in.value = b
-        dut.valid_in.value = 1
+    for i, b in enumerate(payload):
+        dut.tcp_payload_in.value = b
+        dut.tcp_byte_valid_in.value = 1
+        dut.start_flag.value = 1 if i == 0 else 0
         await RisingEdge(dut.clk)
 
-    dut.valid_in.value = 0
+    # Deassert after stream ends
+    dut.tcp_byte_valid_in.value = 0
+    dut.start_flag.value = 0
 
+    # Wait a few cycles to catch decode pulse
     for _ in range(5):
         await RisingEdge(dut.clk)
         if decoded_signal.value == 1:
