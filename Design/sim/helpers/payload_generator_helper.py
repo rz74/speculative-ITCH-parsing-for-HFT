@@ -14,6 +14,7 @@
 # [20250429-1] RZ: Adopted into payload_generator_helper.py from payload_generators.py.
 # [20250429-2] RZ: Added random_valid_payload() for randomized test cases.
 # [20250501-1] RZ: updated cancel_order_payload to provide unused bytes for testing for real applications
+# [20250501-2] RZ: updated delete_order_payload.
 # =============================================
 
 import random
@@ -55,7 +56,12 @@ def generate_cancel_order_payload(index=0):
     return payload
 
 def generate_delete_order_payload(index=0):
-    return bytes([0x44]) + index.to_bytes(8, 'big')
+    """Generate a valid 9-byte Delete Order ('D') ITCH packet"""
+    payload = bytearray(9)
+    payload[0] = ord('D')  # Message Type
+    payload[1:9] = (0x1234567800000000 + index).to_bytes(8, 'big')  # Order Ref
+    return payload
+
 
 def generate_replace_order_payload(index=0):
     return bytes([0x55]) + index.to_bytes(8, 'big') + (index+1).to_bytes(8, 'big') + (200).to_bytes(4, 'big') + (1250000).to_bytes(4, 'big')

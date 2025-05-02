@@ -20,6 +20,7 @@
 // [20250501-3] RZ: Fully speculative decode without waiting for type match in add_order_decoder module.
 // [20250501-4] RZ: Added cancel_order_decoder module for cancel order messages.
 // [20250501-5] RZ: Gated dump under ifdef to avoid unnecessary waveform generation.
+// [20250501-6] RZ: Added delete_order_decoder module for delete order messages.
 // =============================================
 `timescale 1ns/1ps
 module top_test (
@@ -41,7 +42,13 @@ module top_test (
     output logic        cancel_internal_valid,
     output logic        cancel_packet_invalid,
     output logic [63:0] cancel_order_ref,
-    output logic [31:0] cancel_canceled_shares
+    output logic [31:0] cancel_canceled_shares,
+
+    // Delete Order Decoder Outputs
+    output logic        delete_internal_valid,
+    output logic        delete_packet_invalid,
+    output logic [63:0] delete_order_ref
+
 );
 
     `ifdef TEST_ADD_ORDER_DECODER
@@ -86,6 +93,25 @@ module top_test (
         end
         `endif
     `endif
+
+    `ifdef TEST_DELETE_ORDER_DECODER
+    delete_order_decoder u_delete_order_decoder (
+        .clk                  (clk),
+        .rst                  (rst),
+        .byte_in              (byte_in),
+        .valid_in             (valid_in),
+        .delete_internal_valid(delete_internal_valid),
+        .delete_packet_invalid(delete_packet_invalid),
+        .delete_order_ref     (delete_order_ref)
+    );
+        `ifdef COCOTB_SIM
+        initial begin
+            $dumpfile("dump.vcd");
+            $dumpvars(0, u_delete_order_decoder);
+        end
+        `endif
+    `endif
+
 
     // // ======================= Waveform Dump =======================
     // `ifdef COCOTB_SIM

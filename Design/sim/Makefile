@@ -75,10 +75,11 @@ cancel_order: killwave
 
 delete_order: killwave
 	@mkdir -p vcd
-	TIMESTAMP=$$(date +%Y%m%d_%H%M%S); \
-	$(MAKE) MODULE=test_delete_order_only COMPILE_ARGS="$(COMPILE_ARGS) -DTEST_DELETE_ORDER"; \
+	TIMESTAMP=$$(date +%m%d%Y_%H%M%S); \
+	$(MAKE) MODULE=test_delete_order TOPLEVEL=top_test COMPILE_ARGS="$(COMPILE_ARGS) -DTEST_DELETE_ORDER_DECODER"; \
 	mv dump.vcd vcd/delete_order_dump_$${TIMESTAMP}.vcd; \
 	gtkwave vcd/delete_order_dump_$${TIMESTAMP}.vcd &
+
 
 replace_order: killwave
 	@mkdir -p vcd
