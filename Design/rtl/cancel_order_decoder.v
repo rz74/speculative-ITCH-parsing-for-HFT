@@ -54,80 +54,113 @@ module cancel_order_decoder (
 );
 
     parameter MSG_TYPE   = 8'h58;   // ASCII 'X'
-    parameter MSG_LENGTH = 23;  // Total message length including unused trailing bytes
+    parameter MSG_LENGTH = 23;
 
+    // ITCH message length mapping
+    function automatic logic [5:0] itch_length(input logic [7:0] msg_type);
+        case (msg_type)
+            "A": return 36;
+            "X": return 23;
+            "U": return 27;
+            "D": return 9;
+            "E": return 30;
+            "P": return 44;
+            default: return 2;
+        endcase
+    endfunction
 
+    logic [5:0] suppress_count;
     logic [5:0] byte_index;
     logic       is_cancel_order;
 
-    always_ff @(posedge clk) 
-    begin
-        if (rst) 
-        begin
+    wire decoder_enabled = (suppress_count == 0);
+
+    // Suppression counter
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            suppress_count <= 0;
+        end else if (suppress_count != 0) begin
+            suppress_count <= suppress_count - 1;
+        end
+    end
+
+    always_ff @(posedge clk) begin
+        if (rst) begin
             byte_index              <= 0;
             is_cancel_order         <= 0;
             cancel_internal_valid   <= 0;
             cancel_packet_invalid   <= 0;
             cancel_order_ref        <= 0;
             cancel_canceled_shares  <= 0;
-        end 
-        else if (valid_in) 
-        begin
+        end else if (valid_in && decoder_enabled) begin
             cancel_internal_valid <= 0;
             cancel_packet_invalid <= 0;
 
-            if (byte_index == 0)
+            if (byte_index == 0) begin
                 is_cancel_order <= (byte_in == MSG_TYPE);
+                if (byte_in == MSG_TYPE)
+                    byte_index <= 1;
+                else begin
+                    suppress_count     <= itch_length(byte_in) - 2;
+                    is_cancel_order    <= 0;
+                    byte_index         <= 0;
+                end
+            end else begin
+                byte_index <= byte_index + 1;
+            end
 
-            if (is_cancel_order) 
-            begin
+            if (is_cancel_order) begin
                 case (byte_index)
-                    1:  cancel_order_ref[63:56]      <= byte_in;
-                    2:  cancel_order_ref[55:48]      <= byte_in;
-                    3:  cancel_order_ref[47:40]      <= byte_in;
-                    4:  cancel_order_ref[39:32]      <= byte_in;
-                    5:  cancel_order_ref[31:24]      <= byte_in;
-                    6:  cancel_order_ref[23:16]      <= byte_in;
-                    7:  cancel_order_ref[15:8]       <= byte_in;
-                    8:  cancel_order_ref[7:0]        <= byte_in;
-                    9:  cancel_canceled_shares[31:24]<= byte_in;
-                    10: cancel_canceled_shares[23:16]<= byte_in;
-                    11: cancel_canceled_shares[15:8] <= byte_in;
-                    12: cancel_canceled_shares[7:0]  <= byte_in;
-                    // Bytes [13–22] are ignored per ITCH protocol; reserved/padding.
-                    // No action needed for these bytes.
-                    // decoder will continue to increment byte_index.
-
+                    1:  cancel_order_ref[63:56]       <= byte_in;
+                    2:  cancel_order_ref[55:48]       <= byte_in;
+                    3:  cancel_order_ref[47:40]       <= byte_in;
+                    4:  cancel_order_ref[39:32]       <= byte_in;
+                    5:  cancel_order_ref[31:24]       <= byte_in;
+                    6:  cancel_order_ref[23:16]       <= byte_in;
+                    7:  cancel_order_ref[15:8]        <= byte_in;
+                    8:  cancel_order_ref[7:0]         <= byte_in;
+                    9:  cancel_canceled_shares[31:24] <= byte_in;
+                    10: cancel_canceled_shares[23:16] <= byte_in;
+                    11: cancel_canceled_shares[15:8]  <= byte_in;
+                    12: cancel_canceled_shares[7:0]   <= byte_in;
                 endcase
 
                 if (byte_index == MSG_LENGTH - 1)
                     cancel_internal_valid <= 1;
             end
 
-            byte_index <= byte_index + 1;
-
             if (byte_index >= MSG_LENGTH && is_cancel_order)
                 cancel_packet_invalid <= 1;
         end
 
-        // ---------- CANCEL ORDER ----------
+        // Defensive invalid packet catch
         if (is_cancel_order && (
-                (valid_in == 0 && byte_index > 0 && byte_index < MSG_LENGTH) ||
-                (byte_index >= MSG_LENGTH)
-            ))
+            (valid_in == 0 && byte_index > 0 && byte_index < MSG_LENGTH) ||
+            (byte_index >= MSG_LENGTH)
+        ))
             cancel_packet_invalid <= 1;
 
+        // --- Clear or prepare for next ---
         if (byte_index == MSG_LENGTH) begin
             cancel_internal_valid   <= 0;
             cancel_packet_invalid   <= 0;
             cancel_order_ref        <= 0;
             cancel_canceled_shares  <= 0;
-            is_cancel_order         <= 0;
-            byte_index              <= 0;
+
+            if (valid_in && byte_in == MSG_TYPE) begin
+                is_cancel_order <= 1;
+                byte_index      <= 1;
+            end else if (valid_in) begin
+                is_cancel_order <= 0;
+                byte_index      <= 0;
+                suppress_count  <= itch_length(byte_in) - 2;
+            end else begin
+                is_cancel_order <= 0;
+                byte_index      <= 0;
+            end
         end
-
-
-
     end
 
 endmodule
+
+

@@ -47,7 +47,9 @@ VERILOG_SOURCES = \
 	../rtl/executed_order_decoder.v \
 	../rtl/trade_decoder.v \
 	../rtl/decoder_watchdog.v \
-	../rtl/itch_parser.v
+	../rtl/itch_parser.v \
+	../rtl/integrated.v
+
 
 TOPLEVEL = top_test
 SIM = icarus
@@ -124,6 +126,13 @@ itch_parser: killwave
 	$(MAKE) MODULE=test_itch_parser TOPLEVEL=itch_parser COMPILE_ARGS="$(COMPILE_ARGS) -DTEST_ITCH_PARSER"; \
 	mv dump.vcd vcd/itch_parser_dump_$${TIMESTAMP}.vcd; \
 	gtkwave vcd/itch_parser_dump_$${TIMESTAMP}.vcd &
+
+integrated: killwave
+	@mkdir -p vcd
+	TIMESTAMP=$$(date +%m%d%Y_%H%M%S); \
+	$(MAKE) MODULE=test_integrated TOPLEVEL=integrated COMPILE_ARGS="$(COMPILE_ARGS)"; \
+	mv dump.vcd vcd/integrated_dump_$${TIMESTAMP}.vcd; \
+	gtkwave vcd/integrated_dump_$${TIMESTAMP}.vcd &
 
 
 

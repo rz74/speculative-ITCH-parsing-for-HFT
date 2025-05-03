@@ -15,6 +15,7 @@
 // [20250501-2] RZ: Fixed byte index off-by-one.
 // [20250501-3] RZ: Fully speculative decode without waiting for type match.
 // [20250501-4] RZ: Rebased order_ref to start at byte 1 (byte 0 is msg_type).
+// [20250502-1] RZ: Added self disable and zeroing of signals after message parsing completion.
 // =============================================
 
 // ------------------------------------------------------------------------------------------------
@@ -48,8 +49,6 @@
 //   - price         : 32-bit fixed-point price
 //   - stock_symbol  : 64-bit ASCII stock symbol (left-justified, space-padded)
 // ------------------------------------------------------------------------------------------------
-
-
 module add_order_decoder (
     input  logic        clk,
     input  logic        rst,
@@ -69,33 +68,63 @@ module add_order_decoder (
     parameter MSG_TYPE   = 8'h41;   // ASCII 'A'
     parameter MSG_LENGTH = 36;
 
+    function automatic logic [5:0] itch_length(input logic [7:0] msg_type);
+        case (msg_type)
+            "A": return 36;
+            "X": return 23;
+            "U": return 27;
+            "D": return 9;
+            "E": return 30;
+            "P": return 44;
+            default: return 2;
+        endcase
+    endfunction
+
+    logic [5:0] suppress_count;
     logic [5:0] byte_index;
     logic       is_add_order;
 
-    always_ff @(posedge clk) 
-    begin
-        if (rst) 
-        begin
-            byte_index        <= 0;
-            is_add_order      <= 0;
-            add_internal_valid<= 0;
-            add_packet_invalid<= 0;
-            add_order_ref     <= 0;
-            add_side          <= 0;
-            add_shares        <= 0;
-            add_price         <= 0;
-            add_stock_symbol  <= 0;
-        end 
-        else if (valid_in) 
-        begin
+    wire decoder_enabled = (suppress_count == 0);
+
+    // Suppression logic
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            suppress_count <= 0;
+        end else if (suppress_count != 0) begin
+            suppress_count <= suppress_count - 1;
+        end
+    end
+
+    // Main decode logic
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            byte_index         <= 0;
+            is_add_order       <= 0;
+            add_internal_valid <= 0;
+            add_packet_invalid <= 0;
+            add_order_ref      <= 0;
+            add_side           <= 0;
+            add_shares         <= 0;
+            add_price          <= 0;
+            add_stock_symbol   <= 0;
+        end else if (valid_in && decoder_enabled) begin
             add_internal_valid <= 0;
             add_packet_invalid <= 0;
 
-            if (byte_index == 0)
+            if (byte_index == 0) begin
                 is_add_order <= (byte_in == MSG_TYPE);
+                if (byte_in == MSG_TYPE)
+                    byte_index <= 1;
+                else begin
+                    suppress_count <= itch_length(byte_in) - 2;
+                    is_add_order   <= 0;
+                    byte_index     <= 0;
+                end
+            end else begin
+                byte_index <= byte_index + 1;
+            end
 
-            if (is_add_order) 
-            begin
+            if (is_add_order) begin
                 case (byte_index)
                     1:  add_order_ref[63:56]     <= byte_in;
                     2:  add_order_ref[55:48]     <= byte_in;
@@ -128,32 +157,38 @@ module add_order_decoder (
                     add_internal_valid <= 1;
             end
 
-            byte_index <= byte_index + 1;
-
             if (byte_index >= MSG_LENGTH && is_add_order)
                 add_packet_invalid <= 1;
         end
 
         if (is_add_order && (
-        (valid_in == 0 && byte_index > 0 && byte_index < MSG_LENGTH) ||
-        (byte_index >= MSG_LENGTH)
+            (valid_in == 0 && byte_index > 0 && byte_index < MSG_LENGTH) ||
+            (byte_index >= MSG_LENGTH)
         ))
-        add_packet_invalid <= 1;
+            add_packet_invalid <= 1;
 
-    if (byte_index == MSG_LENGTH) begin
-        add_internal_valid <= 0;
-        add_packet_invalid <= 0;
-        add_order_ref      <= 0;
-        add_side           <= 0;
-        add_shares         <= 0;
-        add_price          <= 0;
-        add_stock_symbol   <= 0;
-        is_add_order       <= 0;
-        byte_index         <= 0;
-    end
+        // --- Reset or prepare next ---
+        if (byte_index == MSG_LENGTH) begin
+            add_internal_valid <= 0;
+            add_packet_invalid <= 0;
+            add_order_ref      <= 0;
+            add_side           <= 0;
+            add_shares         <= 0;
+            add_price          <= 0;
+            add_stock_symbol   <= 0;
 
-
-
+            if (valid_in && byte_in == MSG_TYPE) begin
+                is_add_order <= 1;
+                byte_index   <= 1;
+            end else if (valid_in) begin
+                is_add_order   <= 0;
+                byte_index     <= 0;
+                suppress_count <= itch_length(byte_in) - 2;
+            end else begin
+                is_add_order <= 0;
+                byte_index   <= 0;
+            end
+        end
     end
 
 endmodule
