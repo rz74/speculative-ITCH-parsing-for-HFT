@@ -5,13 +5,14 @@
 // Description: Module to decode Cancel Order ('X') messages from ITCH payloads.
 // Author: RZ
 // Start Date: 04172025
-// Version: 0.4
+// Version: 0.5
 // Changelog
 // =============================================
 // [20250427-1] RZ: Initial version created for Cancel Order payload decoding.
 // [20250428-1] RZ: Updated ports and internal signals for dispatcher integration.
 // [20250428-2] RZ: Added valid_flag signal 
 // [20250501-1] RZ: Initial implementation based on add_order_decoder structure with new arch.
+// [20250502-1] RZ: Added self disable and zeroing of signals after message parsing completion.
 // 
 // =============================================
 // ------------------------------------------------------------------------------------------------

@@ -6,16 +6,14 @@
 //              Parses 9-byte ITCH 'D' messages from a raw byte stream.
 // Author: RZ
 // Start Date: 04172025
-// Version: 0.1
+// Version: 0.4
 //
 // Changelog
 // =============================================
 // [20250428-1] RZ: Initial scaffold of Delete Order payload decoder module.
 // [20250428-2] RZ: Updated ports and internal signals for valid_flag
 // [20250501-1] RZ: Initial implementation based on new arch.
-// [20250501-2] RZ: Self zeroing of signals after message parsing completion.
-// [20250501-3] RZ: Added packet invalidation logic for underlength and overlength messages.
-// [20250501-4] RZ: Added comments and cleaned up code for clarity.
+// [20250502-1] RZ: Added self disable and zeroing of signals after message parsing completion.
 // =============================================
 // ------------------------------------------------------------------------------------------------
 // Protocol Version Note:
@@ -49,49 +47,74 @@
 //   - order_ref         : 64-bit parsed order reference number
 // ------------------------------------------------------------------------------------------------
 
-`timescale 1ns/1ps
+module delete_order_decoder (
+    input  logic        clk,
+    input  logic        rst,
+    input  logic [7:0]  byte_in,
+    input  logic        valid_in,
 
-module delete_order_decoder 
-    (
-        input  logic        clk,
-        input  logic        rst,
-        input  logic [7:0]  byte_in,
-        input  logic        valid_in,
+    output logic        delete_internal_valid,
+    output logic        delete_packet_invalid,
 
-        output logic        delete_internal_valid,
-        output logic        delete_packet_invalid,
+    output logic [63:0] delete_order_ref
+);
 
-        output logic [63:0] delete_order_ref
-    );
-
-    parameter MSG_TYPE   = 8'h44;   // ASCII 'D'
+    parameter MSG_TYPE   = 8'h44;  // ASCII 'D'
     parameter MSG_LENGTH = 9;
 
+    function automatic logic [5:0] itch_length(input logic [7:0] msg_type);
+        case (msg_type)
+            "A": return 36;
+            "X": return 23;
+            "U": return 27;
+            "D": return 9;
+            "E": return 30;
+            "P": return 44;
+            default: return 2;
+        endcase
+    endfunction
+
+    logic [5:0] suppress_count;
     logic [5:0] byte_index;
     logic       is_delete_order;
 
-    always_ff @(posedge clk) 
-    begin
+    wire decoder_enabled = (suppress_count == 0);
 
-        if (rst) 
-        begin
-            byte_index             <= 0;
-            is_delete_order        <= 0;
-            delete_internal_valid  <= 0;
-            delete_packet_invalid  <= 0;
-            delete_order_ref       <= 0;
-        end 
-        else if (valid_in) 
-        begin
+    // Suppression logic
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            suppress_count <= 0;
+        end else if (suppress_count != 0) begin
+            suppress_count <= suppress_count - 1;
+        end
+    end
 
+    // Main decode logic
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            byte_index            <= 0;
+            is_delete_order       <= 0;
             delete_internal_valid <= 0;
-            delete_packet_invalid <= 0;     
+            delete_packet_invalid <= 0;
+            delete_order_ref      <= 0;
+        end else if (valid_in && decoder_enabled) begin
+            delete_internal_valid <= 0;
+            delete_packet_invalid <= 0;
 
-            if (byte_index == 0)
+            if (byte_index == 0) begin
                 is_delete_order <= (byte_in == MSG_TYPE);
+                if (byte_in == MSG_TYPE)
+                    byte_index <= 1;
+                else begin
+                    suppress_count <= itch_length(byte_in) - 2;
+                    is_delete_order <= 0;
+                    byte_index <= 0;
+                end
+            end else begin
+                byte_index <= byte_index + 1;
+            end
 
-            if (is_delete_order) 
-            begin
+            if (is_delete_order) begin
                 case (byte_index)
                     1: delete_order_ref[63:56] <= byte_in;
                     2: delete_order_ref[55:48] <= byte_in;
@@ -102,36 +125,39 @@ module delete_order_decoder
                     7: delete_order_ref[15:8]  <= byte_in;
                     8: delete_order_ref[7:0]   <= byte_in;
                 endcase
+
                 if (byte_index == MSG_LENGTH - 1)
                     delete_internal_valid <= 1;
-                
             end
-
-            byte_index <= byte_index + 1;
 
             if (byte_index >= MSG_LENGTH && is_delete_order)
                 delete_packet_invalid <= 1;
-        
         end
 
-        // Detect packet invalidity: either too long OR prematurely stopped
         if (is_delete_order && (
-                (valid_in == 0 && byte_index > 0 && byte_index < MSG_LENGTH) ||  // underlength
-                (byte_index >= MSG_LENGTH)                                       // overlength
-            )) 
-            begin
-                delete_packet_invalid <= 1;
+            (valid_in == 0 && byte_index > 0 && byte_index < MSG_LENGTH) ||
+            (byte_index >= MSG_LENGTH)
+        ))
+            delete_packet_invalid <= 1;
+
+        if (byte_index == MSG_LENGTH) begin
+            delete_internal_valid <= 0;
+            delete_packet_invalid <= 0;
+            delete_order_ref      <= 0;
+
+            if (valid_in && byte_in == MSG_TYPE) begin
+                is_delete_order <= 1;
+                byte_index <= 1;
+            end else if (valid_in) begin
+                is_delete_order <= 0;
+                byte_index <= 0;
+                suppress_count <= itch_length(byte_in) - 2;
+            end else begin
+                is_delete_order <= 0;
+                byte_index <= 0;
             end
-
-
-        if (byte_index == MSG_LENGTH) 
-        begin
-            delete_internal_valid   <= 0;
-            delete_packet_invalid   <= 0;
-            delete_order_ref        <= 0;
-            is_delete_order         <= 0;  
-            byte_index              <= 0;
         end
     end
 
 endmodule
+

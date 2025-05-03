@@ -1,0 +1,108 @@
+
+module *_decoder (
+    input  logic        clk,
+    input  logic        rst,
+    input  logic [7:0]  byte_in,
+    input  logic        valid_in,
+
+    output logic        *_internal_valid,
+    output logic        *_packet_invalid,
+
+    //other signals here
+);
+
+    parameter MSG_TYPE   = //letter here
+    parameter MSG_LENGTH = //length here
+
+    function automatic logic [5:0] itch_length(input logic [7:0] msg_type);
+        case (msg_type)
+            "A": return 36;
+            "X": return 23;
+            "U": return 27;
+            "D": return 9;
+            "E": return 30;
+            "P": return 44;
+            default: return 2;
+        endcase
+    endfunction
+
+    logic [5:0] suppress_count;
+    logic [5:0] byte_index;
+    logic       is_*_order;
+
+    wire decoder_enabled = (suppress_count == 0);
+
+    // Suppression logic
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            suppress_count <= 0;
+        end else if (suppress_count != 0) begin
+            suppress_count <= suppress_count - 1;
+        end
+    end
+
+    // Main decode logic
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            byte_index         <= 0;
+            is_*_order       <= 0;
+            *_internal_valid <= 0;
+            *_packet_invalid <= 0;
+            //other signals here
+        end else if (valid_in && decoder_enabled) begin
+            *_internal_valid <= 0;
+            *_packet_invalid <= 0;
+
+            if (byte_index == 0) begin
+                is_*_order <= (byte_in == MSG_TYPE);
+                if (byte_in == MSG_TYPE)
+                    byte_index <= 1;
+                else begin
+                    suppress_count <= itch_length(byte_in) - 2;
+                    is_*_order   <= 0;
+                    byte_index     <= 0;
+                end
+            end else begin
+                byte_index <= byte_index + 1;
+            end
+
+            if (is_*_order) begin
+                case (byte_index)
+                    //parse bytes here into the right fields
+                endcase
+
+                if (byte_index == MSG_LENGTH - 1)
+                    *_internal_valid <= 1;
+            end
+
+            if (byte_index >= MSG_LENGTH && is_*_order)
+                *_packet_invalid <= 1;
+        end
+
+        if (is_*_order && (
+            (valid_in == 0 && byte_index > 0 && byte_index < MSG_LENGTH) ||
+            (byte_index >= MSG_LENGTH)
+        ))
+            *_packet_invalid <= 1;
+
+        // --- Reset or prepare next ---
+        if (byte_index == MSG_LENGTH) begin
+            *_internal_valid <= 0;
+            *_packet_invalid <= 0;
+            //other output signals
+
+            if (valid_in && byte_in == MSG_TYPE) begin
+                is_*_order <= 1;
+                byte_index   <= 1;
+            end else if (valid_in) begin
+                is_*_order   <= 0;
+                byte_index     <= 0;
+                suppress_count <= itch_length(byte_in) - 2;
+            end else begin
+                is_*_order <= 0;
+                byte_index   <= 0;
+            end
+        end
+    end
+
+endmodule

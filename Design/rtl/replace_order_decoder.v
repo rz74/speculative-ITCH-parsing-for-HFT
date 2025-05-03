@@ -7,13 +7,14 @@
 //
 // Author: RZ
 // Start Date: 20250428
-// Version: 0.3
+// Version: 0.4
 //
 // Changelog
 // =============================================
 // [20250428-1] RZ: Initial Replace Order decoder implementation.
 // [20250428-2] RZ: Added valid_flag signal
 // [20250501-1] RZ: Initial implementation modeled after add_order_decoder module under new architecture.
+// [20250502-1] RZ: Added self disable and zeroing of signals after message parsing completion.
 // =============================================
 
 // ------------------------------------------------------------------------------------------------
@@ -54,9 +55,6 @@
 //   - replace_shares      : 32-bit updated shares
 //   - replace_price       : 32-bit updated price
 // ------------------------------------------------------------------------------------------------
-
-`timescale 1ns/1ps
-
 module replace_order_decoder (
     input  logic        clk,
     input  logic        rst,
@@ -73,15 +71,38 @@ module replace_order_decoder (
 );
 
     parameter MSG_TYPE   = 8'h55;  // ASCII 'U'
-    parameter MSG_LENGTH = 25;
+    parameter MSG_LENGTH = 27;
 
+    function automatic logic [5:0] itch_length(input logic [7:0] msg_type);
+        case (msg_type)
+            "A": return 36;
+            "X": return 23;
+            "U": return 27;
+            "D": return 9;
+            "E": return 30;
+            "P": return 44;
+            default: return 2;
+        endcase
+    endfunction
+
+    logic [5:0] suppress_count;
     logic [5:0] byte_index;
     logic       is_replace_order;
 
-    always_ff @(posedge clk) 
-    begin
-        if (rst) 
-        begin
+    wire decoder_enabled = (suppress_count == 0);
+
+    // Suppression logic
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            suppress_count <= 0;
+        end else if (suppress_count != 0) begin
+            suppress_count <= suppress_count - 1;
+        end
+    end
+
+    // Main decode logic
+    always_ff @(posedge clk) begin
+        if (rst) begin
             byte_index              <= 0;
             is_replace_order        <= 0;
             replace_internal_valid  <= 0;
@@ -90,19 +111,25 @@ module replace_order_decoder (
             replace_new_order_ref   <= 0;
             replace_shares          <= 0;
             replace_price           <= 0;
-        end 
-        else if (valid_in) 
-        begin
+        end else if (valid_in && decoder_enabled) begin
             replace_internal_valid <= 0;
             replace_packet_invalid <= 0;
 
-            if (byte_index == 0)
+            if (byte_index == 0) begin
                 is_replace_order <= (byte_in == MSG_TYPE);
+                if (byte_in == MSG_TYPE)
+                    byte_index <= 1;
+                else begin
+                    suppress_count <= itch_length(byte_in) - 2;
+                    is_replace_order <= 0;
+                    byte_index <= 0;
+                end
+            end else begin
+                byte_index <= byte_index + 1;
+            end
 
-            if (is_replace_order) 
-            begin
+            if (is_replace_order) begin
                 case (byte_index)
-                    // Old Order Ref
                     1:  replace_old_order_ref[63:56] <= byte_in;
                     2:  replace_old_order_ref[55:48] <= byte_in;
                     3:  replace_old_order_ref[47:40] <= byte_in;
@@ -111,8 +138,6 @@ module replace_order_decoder (
                     6:  replace_old_order_ref[23:16] <= byte_in;
                     7:  replace_old_order_ref[15:8]  <= byte_in;
                     8:  replace_old_order_ref[7:0]   <= byte_in;
-
-                    // New Order Ref
                     9:  replace_new_order_ref[63:56] <= byte_in;
                     10: replace_new_order_ref[55:48] <= byte_in;
                     11: replace_new_order_ref[47:40] <= byte_in;
@@ -121,14 +146,10 @@ module replace_order_decoder (
                     14: replace_new_order_ref[23:16] <= byte_in;
                     15: replace_new_order_ref[15:8]  <= byte_in;
                     16: replace_new_order_ref[7:0]   <= byte_in;
-
-                    // Shares
                     17: replace_shares[31:24] <= byte_in;
                     18: replace_shares[23:16] <= byte_in;
                     19: replace_shares[15:8]  <= byte_in;
                     20: replace_shares[7:0]   <= byte_in;
-
-                    // Price
                     21: replace_price[31:24] <= byte_in;
                     22: replace_price[23:16] <= byte_in;
                     23: replace_price[15:8]  <= byte_in;
@@ -139,31 +160,36 @@ module replace_order_decoder (
                     replace_internal_valid <= 1;
             end
 
-            byte_index <= byte_index + 1;
-
             if (byte_index >= MSG_LENGTH && is_replace_order)
                 replace_packet_invalid <= 1;
         end
 
         if (is_replace_order && (
-        (valid_in == 0 && byte_index > 0 && byte_index < MSG_LENGTH) ||
-        (byte_index >= MSG_LENGTH)
+            (valid_in == 0 && byte_index > 0 && byte_index < MSG_LENGTH) ||
+            (byte_index >= MSG_LENGTH)
         ))
-        replace_packet_invalid <= 1;
+            replace_packet_invalid <= 1;
 
-        if (byte_index == MSG_LENGTH) 
-        begin
-            replace_internal_valid   <= 0;
-            replace_packet_invalid   <= 0;
-            replace_old_order_ref    <= 0;
-            replace_new_order_ref    <= 0;
-            replace_shares           <= 0;
-            replace_price            <= 0;
-            is_replace_order         <= 0;
-            byte_index               <= 0;
+        if (byte_index == MSG_LENGTH) begin
+            replace_internal_valid  <= 0;
+            replace_packet_invalid  <= 0;
+            replace_old_order_ref   <= 0;
+            replace_new_order_ref   <= 0;
+            replace_shares          <= 0;
+            replace_price           <= 0;
+
+            if (valid_in && byte_in == MSG_TYPE) begin
+                is_replace_order <= 1;
+                byte_index       <= 1;
+            end else if (valid_in) begin
+                is_replace_order  <= 0;
+                byte_index        <= 0;
+                suppress_count    <= itch_length(byte_in) - 2;
+            end else begin
+                is_replace_order <= 0;
+                byte_index       <= 0;
+            end
         end
-
     end
 
 endmodule
-

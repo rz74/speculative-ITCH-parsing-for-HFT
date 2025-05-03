@@ -1,3 +1,175 @@
+=======================================================================
+
+Each ITCH decoder module (e.g. Add, Cancel, Trade) works in speculative, byte-streaming mode, meaning:
+
+From byte 0, the decoder tentatively assumes the message might be its target type (e.g. 'A' for Add Order) and starts parsing bytes immediately.
+
+In parallel, it checks whether the type actually matches its target.
+
+If the type is not a match, it suppresses itself using a suppress_count, which disables parsing for the expected length of that other message.
+
+If the type does match:
+
+It continues parsing the stream byte-by-byte into fields.
+
+At the final expected byte (MSG_LENGTH - 1), it raises a 1-cycle internal_valid pulse.
+
+It also checks the next byte: if it's not the same message type, it will suppress itself again for the next message.
+
+At the end of every message or when suppression is needed, it:
+
+Resets its state, including fields and internal flags.
+
+Optionally starts parsing the new byte if it’s of the correct type.
+
+This architecture allows zero wait cycles between packets and ensures that only the relevant decoder stays active, even in back-to-back or interleaved packet streams.
+
+arbitration logic in pseudo code
+
+
+module *_decoder (
+    input  logic        clk,
+    input  logic        rst,
+    input  logic [7:0]  byte_in,
+    input  logic        valid_in,
+
+    output logic        *_internal_valid,
+    output logic        *_packet_invalid,
+
+    // additional parsed outputs here
+);
+
+    parameter MSG_TYPE   = 8'hXX;  // ASCII message type letter
+    parameter MSG_LENGTH = NN;    // fixed message length
+
+    // ITCH message length lookup for suppression
+    function automatic logic [5:0] itch_length(input logic [7:0] msg_type);
+        case (msg_type)
+            "A": return 36;
+            "X": return 23;
+            "U": return 27;
+            "D": return 9;
+            "E": return 30;
+            "P": return 44;
+            default: return 2;
+        endcase
+    endfunction
+
+    logic [5:0] suppress_count;
+    logic [5:0] byte_index;
+    logic       is_*_order;
+
+    wire decoder_enabled = (suppress_count == 0);
+
+    // -----------------------
+    // Suppression Controller
+    // -----------------------
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            suppress_count <= 0;
+        end else if (suppress_count != 0) begin
+            suppress_count <= suppress_count - 1;
+        end
+    end
+
+    // -----------------------
+    // Main Decoder FSM
+    // -----------------------
+    always_ff @(posedge clk) begin
+        if (rst) begin
+            byte_index         <= 0;
+            is_*_order         <= 0;
+            *_internal_valid   <= 0;
+            *_packet_invalid   <= 0;
+            // reset parsed outputs here
+        end 
+        else if (valid_in && decoder_enabled) begin
+            *_internal_valid <= 0;
+            *_packet_invalid <= 0;
+
+            if (byte_index == 0) begin
+                is_*_order <= (byte_in == MSG_TYPE);
+                if (byte_in == MSG_TYPE)
+                    byte_index <= 1;
+                else begin
+                    suppress_count <= itch_length(byte_in) - 2;
+                    is_*_order     <= 0;
+                    byte_index     <= 0;
+                end
+            end else begin
+                byte_index <= byte_index + 1;
+            end
+
+            if (is_*_order) begin
+                case (byte_index)
+                    // decode fields here
+                endcase
+
+                if (byte_index == MSG_LENGTH - 1)
+                    *_internal_valid <= 1;
+            end
+
+            if (byte_index >= MSG_LENGTH && is_*_order)
+                *_packet_invalid <= 1;
+        end
+
+        // Defensive invalidation
+        if (is_*_order && (
+            (valid_in == 0 && byte_index > 0 && byte_index < MSG_LENGTH) ||
+            (byte_index >= MSG_LENGTH)
+        ))
+            *_packet_invalid <= 1;
+
+        // -----------------------
+        // Completion and Re-entry
+        // -----------------------
+        if (byte_index == MSG_LENGTH) begin
+            *_internal_valid <= 0;
+            *_packet_invalid <= 0;
+            // reset parsed outputs here
+
+            if (valid_in && byte_in == MSG_TYPE) begin
+                is_*_order <= 1;
+                byte_index <= 1;
+            end else if (valid_in) begin
+                is_*_order     <= 0;
+                byte_index     <= 0;
+                suppress_count <= itch_length(byte_in) - 2;
+            end else begin
+                is_*_order <= 0;
+                byte_index <= 0;
+            end
+        end
+    end
+
+endmodule
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ITCH Parser Specification (Low-Latency, Speculative Architecture)
 =================================================================
 
