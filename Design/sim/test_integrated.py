@@ -1,52 +1,67 @@
 import cocotb
-# from cocotb.clock import Clock
-# from cocotb.triggers import RisingEdge
-from cocotb.utils import get_sim_time
-
-# from helpers.payload_generator_helper import generate_add_payload, generate_cancel_payload
-# from helpers.injection_helper import inject_payload
-# from helpers.assertion_helper import (
-#     assert_add_valid_at_cycle,
-#     assert_cancel_valid_at_cycle,
-# )
-
-# from sim_config import SIM_CLK_PERIOD_NS
-# Global cycle counter
-# cycle_count = 0
-# removed to avoid circular dependency with helpers and use a cleaner approach
-# with sim config that sets period and all modules use sim time and period
-
-# Clock cycle tracking coroutine
-# async def count_clock_cycles(dut):
-#     global cycle_count
-#     cycle_count = 0  # Reset right here at coroutine start
-#     dut._log.info(f"[DEBUG] Entered count_clock_cycles at {get_sim_time('ns')}ns")
-#     while True:
-#         await RisingEdge(dut.clk)
-#         cycle_count += 1
-
-from cocotb import test
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge
-from helpers.handle_single_message import handle_single_message
-from sim_config import SIM_CLK_PERIOD_NS   
+from cocotb.utils import get_sim_time
 
-@test()
-async def test_add_then_cancel_no_pause(dut):
+from helpers.reset_helper import reset_dut
+from helpers.recorder import record_all_internal_valids, get_recorded_log
+from helpers.full_workload_helper import run_full_payload_workload
+from helpers.injection_helper import inject_payload
+from helpers.compare_helper import compare_against_expected, generate_expected_events_with_fields
+from sim_config import SIM_CLK_PERIOD_NS, SIM_HEADERS, MSG_SEQUENCE
+
+import csv
+
+
+
+@cocotb.test()
+async def test_full_add_cancel_workload(dut):
+    dut._log.info("Starting full workload test")
+
+    # Start the clock
     cocotb.start_soon(Clock(dut.clk, SIM_CLK_PERIOD_NS, units="ns").start())
 
-    # Reset
-    dut.rst.value = 1
-    dut.valid_in.value = 0
-    dut.byte_in.value = 0
-    for _ in range(3):
-        await RisingEdge(dut.clk)
-    dut.rst.value = 0
+    # Reset DUT
+    await reset_dut(dut)
 
-    # Unified message flow
-    await handle_single_message(dut, 'add', mode='set')
-    await handle_single_message(dut, 'cancel', mode='set')
-    await handle_single_message(dut, 'add', mode='set')
-    await handle_single_message(dut, 'add', mode='set')
-    await handle_single_message(dut, 'cancel', mode='set')
-    await handle_single_message(dut, 'cancel', mode='set')
+    # Generate message stream and expected outputs (includes parsed fields)
+    result = run_full_payload_workload(MSG_SEQUENCE)
+    full_stream = result["full_stream"]
+    expected_events = generate_expected_events_with_fields(MSG_SEQUENCE)
+
+    # Start recording before any injection
+    cocotb.start_soon(record_all_internal_valids(dut, total_cycles=300))
+
+    # Inject full byte stream serially
+    for byte in full_stream:
+        dut.valid_in.value = 1
+        dut.byte_in.value = byte
+        await RisingEdge(dut.clk)
+    dut.valid_in.value = 0
+
+    # Let the system run a bit after last injection
+    for _ in range(20):
+        await RisingEdge(dut.clk)
+
+    # Retrieve and compare recorded results
+    recorded_log = get_recorded_log()
+
+
+
+    # Write recorded log to CSV
+    with open("recorded_log.csv", "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=SIM_HEADERS)
+        writer.writeheader()
+        for cycle in sorted(recorded_log):
+            row = {"cycle": cycle}
+            row.update(recorded_log[cycle])
+            writer.writerow(row)
+
+    # Write expected events to CSV
+    with open("expected_events.csv", "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=SIM_HEADERS)
+        writer.writeheader()
+        for event in expected_events:
+            writer.writerow(event)
+
+    compare_against_expected(recorded_log, expected_events)

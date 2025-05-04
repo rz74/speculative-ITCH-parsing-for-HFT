@@ -23,12 +23,12 @@
 import random
 import string
 
-def generate_add_payload(mode='set'):
+def generate_add_order_payload(mode='set'):
     if mode == 'set':
         payload = [
             ord('A'),                              # Message Type
             *b'\x01\x23\x45\x67\x89\xAB\xCD\xEF',  # Order Ref (64-bit)
-            ord('B'),                              # Buy/Sell
+            ord('S'),                              # Buy/Sell
             *b'\x00\x00\x00\x64',                  # Shares = 100
             *b'ABCD1234',                          # Symbol (8 ASCII)
             *b'\x00\x00\x0F\xA0',                  # Price = 4000
@@ -48,7 +48,7 @@ def generate_add_payload(mode='set'):
     return payload
 
 
-def generate_cancel_payload(mode='set'):
+def generate_cancel_order_payload(mode='set'):
     if mode == 'set':
         payload = [
             ord('X'),                              # Message Type
@@ -68,9 +68,9 @@ def generate_cancel_payload(mode='set'):
 
 def generate_payload_by_type(msg_type, mode='set'):
     if msg_type == 'add':
-        return generate_add_payload(mode)
+        return generate_add_order_payload(mode)
     elif msg_type == 'cancel':
-        return generate_cancel_payload(mode)
+        return generate_cancel_order_payload(mode)
     else:
         raise ValueError(f"Unsupported message type: {msg_type}")
 

@@ -1,0 +1,6 @@
+cycle,add_internal_valid,cancel_internal_valid,add_order_ref,add_shares,add_price,add_side,cancel_order_ref,cancel_shares
+26,,1,,,,,0xfedcba9876543210,0x32
+62,1,,0x123456789abcdef,0x64,0xfa0,0x1,,
+98,1,,0x123456789abcdef,0x64,0xfa0,0x1,,
+121,,1,,,,,0xfedcba9876543210,0x32
+144,,1,,,,,0xfedcba9876543210,0x32
