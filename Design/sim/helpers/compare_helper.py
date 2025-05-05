@@ -7,10 +7,13 @@
 # updated with delete order
 
 # ==========================================================================
-from helpers.payload_generator_helper import generate_add_order_payload, generate_cancel_order_payload, generate_delete_order_payload, generate_replace_order_payload, generate_executed_order_payload, generate_trade_payload
+from helpers.payload_generator_helper import (
+    generate_add_order_payload, generate_cancel_order_payload, 
+    generate_delete_order_payload, generate_replace_order_payload, 
+    generate_executed_order_payload, generate_trade_payload)
 from helpers.full_workload_helper import MSG_LENGTHS
-from sim_config import RESET_CYCLES, SIM_CLK_PERIOD_NS, SIM_HEADERS
-
+from sim_config import RESET_CYCLES, SIM_CLK_PERIOD_NS
+from ITCH_config import SIM_HEADERS
 
 def compare_against_expected(recorded_log, expected_events):
     """

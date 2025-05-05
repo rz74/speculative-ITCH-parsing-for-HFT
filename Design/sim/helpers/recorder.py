@@ -11,7 +11,8 @@ import cocotb
 from cocotb.triggers import RisingEdge
 from cocotb.utils import get_sim_time
 
-from sim_config import SIM_CLK_PERIOD_NS, SIM_HEADERS
+from sim_config import SIM_CLK_PERIOD_NS
+from ITCH_config import SIM_HEADERS
 
 _recorded_log = {}  # Global dictionary to store cycle-indexed logs
 

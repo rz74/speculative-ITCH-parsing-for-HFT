@@ -1,6 +1,6 @@
 # helpers/full_workload_helper.py
-from sim_config import SIM_CLK_PERIOD_NS, MSG_LENGTHS, RESET_CYCLES, MSG_MODE
-
+from sim_config import SIM_CLK_PERIOD_NS, RESET_CYCLES, MSG_MODE
+from ITCH_config import SIM_HEADERS, MSG_LENGTHS
 
 from .payload_generator_helper import (
     generate_add_order_payload, 

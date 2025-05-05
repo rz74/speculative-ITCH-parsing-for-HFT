@@ -8,8 +8,8 @@ from helpers.recorder import record_all_internal_valids, get_recorded_log
 from helpers.full_workload_helper import run_full_payload_workload
 from helpers.injection_helper import inject_payload
 from helpers.compare_helper import compare_against_expected, generate_expected_events_with_fields, generate_expected_events_from_schedule
-from sim_config import SIM_CLK_PERIOD_NS, SIM_HEADERS, MSG_SEQUENCE, SIM_CYCLES, RESET_CYCLES
-
+from sim_config import SIM_CLK_PERIOD_NS, MSG_SEQUENCE, SIM_CYCLES, RESET_CYCLES
+from ITCH_config import MSG_LENGTHS, SIM_HEADERS
 import csv
 
 
