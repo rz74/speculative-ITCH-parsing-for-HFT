@@ -22,24 +22,21 @@
 # [20250501-1] RZ: Removed obsolete header_parser.v from the list of sources.
 # [20250501-2] RZ: Added executed_order module and testbench.
 # [20250501-3] RZ: Added trade module and testbench.
+# [20250504-1] RZ: Commented unused targets
 # 
 # =============================================
 # =============================================
-# Makefile (Patched)
+# Makefile  
 # =============================================
 # Description: Cocotb Makefile for ITCH Decoder Simulation
 # Author: RZ
-# Updated: 2025-04-30 — removed obsolete header_parser.v
+ 
 # =============================================
-
-# =============================================
-# Makefile (Final Patched)
-# =============================================
+ 
 
 TOPLEVEL_LANG = verilog
 
 VERILOG_SOURCES = \
-    ../sim/top_test.v \
     ../rtl/add_order_decoder.v \
     ../rtl/cancel_order_decoder.v \
     ../rtl/delete_order_decoder.v \
@@ -47,11 +44,9 @@ VERILOG_SOURCES = \
 	../rtl/executed_order_decoder.v \
 	../rtl/trade_decoder.v \
 	../rtl/decoder_watchdog.v \
-	../rtl/itch_parser.v \
 	../rtl/integrated.v
 
-
-TOPLEVEL = top_test
+TOPLEVEL = integrated
 SIM = icarus
 
 COMPILE_ARGS += -g2012 -DCOCOTB_SIM
@@ -68,73 +63,12 @@ killwave:
 # =============================================
 # Simulation Targets
 # =============================================
-
-add_order: killwave
-	@mkdir -p vcd
-	TIMESTAMP=$$(date +%m%d%Y_%H%M%S); \
-	$(MAKE) MODULE=test_add_order TOPLEVEL=top_test COMPILE_ARGS="$(COMPILE_ARGS) -DTEST_ADD_ORDER_DECODER"; \
-	mv dump.vcd vcd/add_order_dump_$${TIMESTAMP}.vcd; \
-	gtkwave vcd/add_order_dump_$${TIMESTAMP}.vcd &
-
-cancel_order: killwave
-	@mkdir -p vcd
-	TIMESTAMP=$$(date +%m%d%Y_%H%M%S); \
-	$(MAKE) MODULE=test_cancel_order TOPLEVEL=top_test COMPILE_ARGS="$(COMPILE_ARGS) -DTEST_CANCEL_ORDER_DECODER"; \
-	mv dump.vcd vcd/cancel_order_dump_$${TIMESTAMP}.vcd; \
-	gtkwave vcd/cancel_order_dump_$${TIMESTAMP}.vcd &
-
-delete_order: killwave
-	@mkdir -p vcd
-	TIMESTAMP=$$(date +%m%d%Y_%H%M%S); \
-	$(MAKE) MODULE=test_delete_order TOPLEVEL=top_test COMPILE_ARGS="$(COMPILE_ARGS) -DTEST_DELETE_ORDER_DECODER"; \
-	mv dump.vcd vcd/delete_order_dump_$${TIMESTAMP}.vcd; \
-	gtkwave vcd/delete_order_dump_$${TIMESTAMP}.vcd &
-
-
-replace_order: killwave
-	@mkdir -p vcd
-	TIMESTAMP=$$(date +%m%d%Y_%H%M%S); \
-	$(MAKE) MODULE=test_replace_order TOPLEVEL=top_test COMPILE_ARGS="$(COMPILE_ARGS) -DTEST_REPLACE_ORDER_DECODER"; \
-	mv dump.vcd vcd/replace_order_dump_$${TIMESTAMP}.vcd; \
-	gtkwave vcd/replace_order_dump_$${TIMESTAMP}.vcd &
-
-executed_order: killwave
-	@mkdir -p vcd
-	TIMESTAMP=$$(date +%m%d%Y_%H%M%S); \
-	$(MAKE) MODULE=test_executed_order TOPLEVEL=top_test COMPILE_ARGS="$(COMPILE_ARGS) -DTEST_EXECUTED_ORDER_DECODER"; \
-	mv dump.vcd vcd/executed_order_dump_$${TIMESTAMP}.vcd; \
-	gtkwave vcd/executed_order_dump_$${TIMESTAMP}.vcd &
-
-trade: killwave
-	@mkdir -p vcd
-	TIMESTAMP=$$(date +%m%d%Y_%H%M%S); \
-	$(MAKE) MODULE=test_trade TOPLEVEL=top_test COMPILE_ARGS="$(COMPILE_ARGS) -DTEST_TRADE_DECODER"; \
-	mv dump.vcd vcd/trade_dump_$${TIMESTAMP}.vcd; \
-	gtkwave vcd/trade_dump_$${TIMESTAMP}.vcd &
-
-watchdog: killwave
-	@mkdir -p vcd
-	TIMESTAMP=$$(date +%m%d%Y_%H%M%S); \
-	$(MAKE) MODULE=test_decoder_watchdog TOPLEVEL=decoder_watchdog COMPILE_ARGS="$(COMPILE_ARGS)"; \
-	mv dump.vcd vcd/watchdog_dump_$${TIMESTAMP}.vcd; \
-	gtkwave vcd/watchdog_dump_$${TIMESTAMP}.vcd &
-
-
-itch_parser: killwave
-	@mkdir -p vcd
-	TIMESTAMP=$$(date +%m%d%Y_%H%M%S); \
-	$(MAKE) MODULE=test_itch_parser TOPLEVEL=itch_parser COMPILE_ARGS="$(COMPILE_ARGS) -DTEST_ITCH_PARSER"; \
-	mv dump.vcd vcd/itch_parser_dump_$${TIMESTAMP}.vcd; \
-	gtkwave vcd/itch_parser_dump_$${TIMESTAMP}.vcd &
-
 integrated: killwave
 	@mkdir -p vcd
 	TIMESTAMP=$$(date +%m%d%Y_%H%M%S); \
 	$(MAKE) MODULE=test_integrated TOPLEVEL=integrated COMPILE_ARGS="$(COMPILE_ARGS)"; \
 	mv dump.vcd vcd/integrated_dump_$${TIMESTAMP}.vcd; \
 	gtkwave vcd/integrated_dump_$${TIMESTAMP}.vcd &
-
-
 
 # =============================================
 # Cleanup
@@ -148,3 +82,62 @@ cleanall:
 
 view_latest:
 	gtkwave $$(ls -t vcd/*.vcd | head -n1) &
+# add_order: killwave
+# 	@mkdir -p vcd
+# 	TIMESTAMP=$$(date +%m%d%Y_%H%M%S); \
+# 	$(MAKE) MODULE=test_add_order TOPLEVEL=top_test COMPILE_ARGS="$(COMPILE_ARGS) -DTEST_ADD_ORDER_DECODER"; \
+# 	mv dump.vcd vcd/add_order_dump_$${TIMESTAMP}.vcd; \
+# 	gtkwave vcd/add_order_dump_$${TIMESTAMP}.vcd &
+
+# cancel_order: killwave
+# 	@mkdir -p vcd
+# 	TIMESTAMP=$$(date +%m%d%Y_%H%M%S); \
+# 	$(MAKE) MODULE=test_cancel_order TOPLEVEL=top_test COMPILE_ARGS="$(COMPILE_ARGS) -DTEST_CANCEL_ORDER_DECODER"; \
+# 	mv dump.vcd vcd/cancel_order_dump_$${TIMESTAMP}.vcd; \
+# 	gtkwave vcd/cancel_order_dump_$${TIMESTAMP}.vcd &
+
+# delete_order: killwave
+# 	@mkdir -p vcd
+# 	TIMESTAMP=$$(date +%m%d%Y_%H%M%S); \
+# 	$(MAKE) MODULE=test_delete_order TOPLEVEL=top_test COMPILE_ARGS="$(COMPILE_ARGS) -DTEST_DELETE_ORDER_DECODER"; \
+# 	mv dump.vcd vcd/delete_order_dump_$${TIMESTAMP}.vcd; \
+# 	gtkwave vcd/delete_order_dump_$${TIMESTAMP}.vcd &
+
+
+# replace_order: killwave
+# 	@mkdir -p vcd
+# 	TIMESTAMP=$$(date +%m%d%Y_%H%M%S); \
+# 	$(MAKE) MODULE=test_replace_order TOPLEVEL=top_test COMPILE_ARGS="$(COMPILE_ARGS) -DTEST_REPLACE_ORDER_DECODER"; \
+# 	mv dump.vcd vcd/replace_order_dump_$${TIMESTAMP}.vcd; \
+# 	gtkwave vcd/replace_order_dump_$${TIMESTAMP}.vcd &
+
+# executed_order: killwave
+# 	@mkdir -p vcd
+# 	TIMESTAMP=$$(date +%m%d%Y_%H%M%S); \
+# 	$(MAKE) MODULE=test_executed_order TOPLEVEL=top_test COMPILE_ARGS="$(COMPILE_ARGS) -DTEST_EXECUTED_ORDER_DECODER"; \
+# 	mv dump.vcd vcd/executed_order_dump_$${TIMESTAMP}.vcd; \
+# 	gtkwave vcd/executed_order_dump_$${TIMESTAMP}.vcd &
+
+# trade: killwave
+# 	@mkdir -p vcd
+# 	TIMESTAMP=$$(date +%m%d%Y_%H%M%S); \
+# 	$(MAKE) MODULE=test_trade TOPLEVEL=top_test COMPILE_ARGS="$(COMPILE_ARGS) -DTEST_TRADE_DECODER"; \
+# 	mv dump.vcd vcd/trade_dump_$${TIMESTAMP}.vcd; \
+# 	gtkwave vcd/trade_dump_$${TIMESTAMP}.vcd &
+
+# watchdog: killwave
+# 	@mkdir -p vcd
+# 	TIMESTAMP=$$(date +%m%d%Y_%H%M%S); \
+# 	$(MAKE) MODULE=test_decoder_watchdog TOPLEVEL=decoder_watchdog COMPILE_ARGS="$(COMPILE_ARGS)"; \
+# 	mv dump.vcd vcd/watchdog_dump_$${TIMESTAMP}.vcd; \
+# 	gtkwave vcd/watchdog_dump_$${TIMESTAMP}.vcd &
+
+
+# itch_parser: killwave
+# 	@mkdir -p vcd
+# 	TIMESTAMP=$$(date +%m%d%Y_%H%M%S); \
+# 	$(MAKE) MODULE=test_itch_parser TOPLEVEL=itch_parser COMPILE_ARGS="$(COMPILE_ARGS) -DTEST_ITCH_PARSER"; \
+# 	mv dump.vcd vcd/itch_parser_dump_$${TIMESTAMP}.vcd; \
+# 	gtkwave vcd/itch_parser_dump_$${TIMESTAMP}.vcd &
+
+

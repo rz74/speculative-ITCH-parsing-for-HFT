@@ -1,8 +1,14 @@
 # helpers/full_workload_helper.py
-from sim_config import SIM_CLK_PERIOD_NS, MSG_LENGTHS
+from sim_config import SIM_CLK_PERIOD_NS, MSG_LENGTHS, RESET_CYCLES, MSG_MODE
 
 
-from .payload_generator_helper import  generate_add_order_payload, generate_cancel_order_payload, generate_delete_order_payload, generate_replace_order_payload, generate_executed_order_payload, generate_trade_payload
+from .payload_generator_helper import (
+    generate_add_order_payload, 
+    generate_cancel_order_payload, 
+    generate_delete_order_payload,
+    generate_replace_order_payload,
+    generate_executed_order_payload, 
+    generate_trade_payload)
 
 
 def generate_payload_by_type(msg_type, mode='set'):
@@ -33,6 +39,7 @@ def generate_payload_by_type(msg_type, mode='set'):
 
 
 def run_full_payload_workload(message_plan):
+
     """
     Generates a full ITCH message stream and logs timing info.
 
@@ -47,26 +54,27 @@ def run_full_payload_workload(message_plan):
         }
     """
     full_stream = []
-    injection_schedule = []
-    RESET_CYCLES = 3
-    current_cycle = RESET_CYCLES
-
+    schedule = []
+    current_cycle = 0
 
     for msg_type in message_plan:
-        payload = generate_payload_by_type(msg_type, mode="set")
+        payload = generate_payload_by_type(msg_type, MSG_MODE)
         msg_len = len(payload)
 
-        injection_schedule.append({
+        expected_valid_cycle = current_cycle + msg_len + RESET_CYCLES
+        full_stream.extend(payload)  # Injected byte stream
+
+        schedule.append({
             "type": msg_type,
-            "start_cycle": current_cycle,
-            "start_time_ns": current_cycle * SIM_CLK_PERIOD_NS,
-            "expected_valid_cycle": current_cycle + MSG_LENGTHS[msg_type],
+            "payload": payload,
+            "expected_valid_cycle": expected_valid_cycle
         })
 
-        full_stream.extend(payload)
         current_cycle += msg_len
 
     return {
         "full_stream": full_stream,
-        "injection_schedule": injection_schedule,
+        "injection_schedule": schedule
     }
+
+
