@@ -12,10 +12,14 @@ module integrated (
     input  logic        valid_in,
 
     output logic        add_internal_valid,
-    output logic        cancel_internal_valid
+    output logic        cancel_internal_valid,
+    output logic        delete_internal_valid,
+    output logic        replace_internal_valid
+
+
 );
 
-    // Ignoring unused outputs for now
+    
     logic        add_packet_invalid;
     logic [63:0] add_order_ref;
     logic        add_side;
@@ -26,6 +30,18 @@ module integrated (
     logic        cancel_packet_invalid;
     logic [63:0] cancel_order_ref;
     logic [31:0] cancel_canceled_shares;
+
+    logic        delete_packet_invalid;
+    logic [63:0] delete_order_ref;
+
+    logic        replace_packet_invalid;
+    logic [63:0] replace_old_order_ref;
+    logic [63:0] replace_new_order_ref;
+    logic [31:0] replace_shares;
+    logic [31:0] replace_price;
+ 
+
+
 
     add_order_decoder u_add (
         .clk(clk),
@@ -50,6 +66,27 @@ module integrated (
         .cancel_packet_invalid(cancel_packet_invalid),
         .cancel_order_ref(cancel_order_ref),
         .cancel_canceled_shares(cancel_canceled_shares)
+    );
+
+    delete_order_decoder u_delete_order_decoder (
+        .clk                   (clk),
+        .rst                   (rst),
+        .byte_in               (byte_in),
+        .valid_in              (valid_in),
+        .delete_internal_valid(delete_internal_valid),
+        .delete_order_ref      (delete_order_ref)
+    );
+
+    replace_order_decoder u_replace_order_decoder (
+        .clk                   (clk),
+        .rst                   (rst),
+        .byte_in               (byte_in),
+        .valid_in              (valid_in),
+        .replace_internal_valid(replace_internal_valid),
+        .replace_old_order_ref (replace_old_order_ref),
+        .replace_new_order_ref (replace_new_order_ref),
+        .replace_shares        (replace_shares),
+        .replace_price         (replace_price)
     );
 
 

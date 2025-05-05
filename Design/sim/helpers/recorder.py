@@ -1,3 +1,12 @@
+# ==========================================================================
+
+# init
+# added add and cancel
+# updated to use hex
+# updated with delete order
+
+# ==========================================================================
+
 import cocotb
 from cocotb.triggers import RisingEdge
 from cocotb.utils import get_sim_time
@@ -24,14 +33,28 @@ async def record_all_internal_valids(dut, total_cycles=300):
         # Extract signals and default to 0 if not present
         row = {
             "cycle": abs_cycle,
-            "add_internal_valid": int(dut.add_internal_valid.value),
-            "cancel_internal_valid": int(dut.cancel_internal_valid.value),
-            "add_order_ref": hex(getattr(dut, 'add_order_ref', 0).value.integer) if hasattr(dut, 'add_order_ref') else 0,
-            "add_shares": hex(getattr(dut, 'add_shares', 0).value.integer) if hasattr(dut, 'add_shares') else 0,
-            "add_side": hex(getattr(dut, 'add_side', 0).value.integer) if hasattr(dut, 'add_side') else "",
-            "add_price": hex(getattr(dut, 'add_price', 0).value.integer) if hasattr(dut, 'add_price') else 0,
-            "cancel_order_ref": hex(getattr(dut, 'cancel_order_ref', 0).value.integer) if hasattr(dut, 'cancel_order_ref') else 0,
-            "cancel_shares": hex(getattr(dut, 'cancel_canceled_shares', 0).value.integer) if hasattr(dut, 'cancel_canceled_shares') else 0,
+
+            "add_internal_valid":       int(dut.add_internal_valid.value),
+            "cancel_internal_valid":    int(dut.cancel_internal_valid.value),
+            "delete_internal_valid":    int(dut.delete_internal_valid.value),
+            "replace_internal_valid":   int(dut.replace_internal_valid.value),
+
+            "add_order_ref":            hex(getattr(dut, 'add_order_ref', 0).value.integer) if hasattr(dut, 'add_order_ref') else 0,
+            "add_shares":               hex(getattr(dut, 'add_shares', 0).value.integer) if hasattr(dut, 'add_shares') else 0,
+            "add_side":                 hex(getattr(dut, 'add_side', 0).value.integer) if hasattr(dut, 'add_side') else "",
+            "add_price":                hex(getattr(dut, 'add_price', 0).value.integer) if hasattr(dut, 'add_price') else 0,
+
+            "cancel_order_ref":         hex(getattr(dut, 'cancel_order_ref', 0).value.integer) if hasattr(dut, 'cancel_order_ref') else 0,
+            "cancel_shares":            hex(getattr(dut, 'cancel_canceled_shares', 0).value.integer) if hasattr(dut, 'cancel_canceled_shares') else 0,
+
+            "delete_order_ref":         hex(getattr(dut, 'delete_order_ref', 0).value.integer) if hasattr(dut, 'delete_order_ref') else 0,
+            
+            "replace_old_order_ref":   hex(getattr(dut, 'replace_old_order_ref', 0).value.integer) if hasattr(dut, 'replace_old_order_ref') else 0,
+            "replace_new_order_ref":    hex(getattr(dut, 'replace_new_order_ref', 0).value.integer) if hasattr(dut, 'replace_new_order_ref') else 0,
+            "replace_shares":           hex(getattr(dut, 'replace_shares', 0).value.integer) if hasattr(dut, 'replace_shares') else 0,
+            "replace_price":            hex(getattr(dut, 'replace_price', 0).value.integer) if hasattr(dut, 'replace_price') else 0,
+
+
         }
 
         # Log to console

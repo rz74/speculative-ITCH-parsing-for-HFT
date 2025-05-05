@@ -1,6 +1,6 @@
-cycle,add_internal_valid,cancel_internal_valid,add_order_ref,add_shares,add_price,add_side,cancel_order_ref,cancel_shares
-26,,1,,,,,0xfedcba9876543210,0x32
-62,1,,0x123456789abcdef,0x64,0xfa0,0x1,,
-98,1,,0x123456789abcdef,0x64,0xfa0,0x1,,
-121,,1,,,,,0xfedcba9876543210,0x32
-144,,1,,,,,0xfedcba9876543210,0x32
+cycle,add_internal_valid,cancel_internal_valid,add_order_ref,add_shares,add_price,add_side,cancel_order_ref,cancel_shares,delete_internal_valid,delete_order_ref,replace_internal_valid,replace_orig_order_ref,replace_new_order_ref,replace_shares,replace_price
+30,,,,,,,,,,,1,0x1122334455667788,0x99aabbccddeeff00,0x12c,0x2710
+39,,,,,,,,,1,0x123456789abcdef0,,,,,
+66,,,,,,,,,,,1,0x1122334455667788,0x99aabbccddeeff00,0x12c,0x2710
+93,,,,,,,,,,,1,0x1122334455667788,0x99aabbccddeeff00,0x12c,0x2710
+102,,,,,,,,,1,0x123456789abcdef0,,,,,

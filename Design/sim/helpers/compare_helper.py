@@ -1,6 +1,13 @@
 # compare_helper.py
+# ==========================================================================
 
-from helpers.payload_generator_helper import generate_add_order_payload, generate_cancel_order_payload
+# init
+# added add and cancel
+# updated to use hex
+# updated with delete order
+
+# ==========================================================================
+from helpers.payload_generator_helper import generate_add_order_payload, generate_cancel_order_payload, generate_delete_order_payload, generate_replace_order_payload
 from helpers.full_workload_helper import MSG_LENGTHS
 from sim_config import RESET_CYCLES, SIM_CLK_PERIOD_NS, SIM_HEADERS
 
@@ -48,17 +55,32 @@ def generate_expected_events_with_fields(message_plan):
 
         if msg_type == "add":
             payload = generate_add_order_payload()
-            row["add_internal_valid"] = 1
-            row["add_order_ref"] = hex(int.from_bytes(payload[1:9], byteorder='big'))
-            row["add_side"] = hex(0) if payload[9] == ord('B') else hex(1)
-            row["add_shares"] = hex(int.from_bytes(payload[10:14], byteorder='big'))
-            row["add_price"] = hex(int.from_bytes(payload[22:26], byteorder='big'))
+            row["add_internal_valid"]           = 1
+            row["add_order_ref"]                = hex(int.from_bytes(payload[1:9], byteorder='big'))
+            row["add_side"]                     = hex(0) if payload[9] == ord('B') else hex(1)
+            row["add_shares"]                   = hex(int.from_bytes(payload[10:14], byteorder='big'))
+            row["add_price"]                    = hex(int.from_bytes(payload[22:26], byteorder='big'))
 
         elif msg_type == "cancel":
             payload = generate_cancel_order_payload()
-            row["cancel_internal_valid"] = 1
-            row["cancel_order_ref"] = hex(int.from_bytes(payload[1:9], byteorder='big'))
-            row["cancel_shares"] = hex(int.from_bytes(payload[9:13], byteorder='big'))
+            row["cancel_internal_valid"]        = 1
+            row["cancel_order_ref"]             = hex(int.from_bytes(payload[1:9], byteorder='big'))
+            row["cancel_shares"]                = hex(int.from_bytes(payload[9:13], byteorder='big'))
+
+        elif msg_type == "delete":
+            payload = generate_delete_order_payload()
+            row["delete_internal_valid"]        = 1
+            row["delete_order_ref"]             = hex(int.from_bytes(payload[1:9], byteorder='big'))
+
+        elif msg_type == "replace":
+            payload = generate_replace_order_payload()
+            row["replace_internal_valid"]       = 1
+            row["replace_old_order_ref"]       = hex(int.from_bytes(payload[1:9], byteorder='big'))
+            row["replace_new_order_ref"]        = hex(int.from_bytes(payload[9:17], byteorder='big'))
+            row["replace_shares"]               = hex(int.from_bytes(payload[17:21], byteorder='big'))
+            row["replace_price"]                = hex(int.from_bytes(payload[21:25], byteorder='big'))
+
+
 
         expected_events.append(row)
         current_cycle += msg_len

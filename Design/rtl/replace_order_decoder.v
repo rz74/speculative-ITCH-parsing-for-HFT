@@ -23,18 +23,20 @@
 // While some ITCH variants or academic simulations include stock symbol or participant metadata 
 // (e.g., total 35 bytes), the Nasdaq ITCH 5.0 spec defines the Replace Order ('U') message as 
 // exactly 25 bytes: 1-byte type, 2x 64-bit refs, 32-bit shares, and 32-bit price.
-// This decoder implements the 25-byte ITCH 5.0 version.
+// This decoder implements the 27-byte ITCH 5.0 version.
 // ------------------------------------------------------------------------------------------------
 //
 // ------------------------------------------------------------------------------------------------
 // Architecture Notes:
 // ------------------------------------------------------------------------------------------------
-// The ITCH "Replace Order" ('U') message has a fixed length of 25 bytes and is structured as:
+// The ITCH "Replace Order" ('U') message has a fixed length of 27 bytes and is structured as:
 //   [0]      = Message Type (ASCII 'U')
 //   [1:8]    = Original Order Reference Number (64-bit)
 //   [9:16]   = New Order Reference Number (64-bit)
 //   [17:20]  = Updated Shares (32-bit)
 //   [21:24]  = Updated Price (32-bit)
+//   [25:26]  = Reserved bytes (ignored, for alignment)
+
 //
 // This decoder consumes a byte-aligned, per-cycle stream of ITCH bytes and speculatively 
 // begins parsing at cycle 0. On cycle 0, it captures the message type and immediately decodes
@@ -80,7 +82,7 @@ module replace_order_decoder (
             "U": return 27;
             "D": return 9;
             "E": return 30;
-            "P": return 44;
+            "P": return 40;
             default: return 2;
         endcase
     endfunction
@@ -154,6 +156,7 @@ module replace_order_decoder (
                     22: replace_price[23:16] <= byte_in;
                     23: replace_price[15:8]  <= byte_in;
                     24: replace_price[7:0]   <= byte_in;
+                    //   [25:26]  = Reserved bytes (ignored)
                 endcase
 
                 if (byte_index == MSG_LENGTH - 1)

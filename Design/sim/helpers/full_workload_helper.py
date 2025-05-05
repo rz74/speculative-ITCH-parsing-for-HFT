@@ -11,17 +11,28 @@ MSG_LENGTHS = {
     "trade": 44
 }
 
-from .payload_generator_helper import  generate_add_order_payload, generate_cancel_order_payload
+from .payload_generator_helper import  generate_add_order_payload, generate_cancel_order_payload, generate_delete_order_payload, generate_replace_order_payload
 
 
-def generate_payload_by_type(msg_type: str, mode: str = "set"):
-    if msg_type == "add":
+def generate_payload_by_type(msg_type, mode='set'):
+    if msg_type == 'add':
         return generate_add_order_payload(mode)
-    elif msg_type == "cancel":
+    elif msg_type == 'cancel':
         return generate_cancel_order_payload(mode)
- 
+    elif msg_type == 'delete':
+        return generate_delete_order_payload(mode)
+    elif msg_type == 'replace':
+        return generate_replace_order_payload(mode)
     else:
-        raise ValueError(f"Unknown message type: {msg_type}")
+        raise ValueError(f"Unsupported message type: {msg_type}")
+# def generate_payload_by_type(msg_type: str, mode: str = "set"):
+#     if msg_type == "add":
+#         return generate_add_order_payload(mode)
+#     elif msg_type == "cancel":
+#         return generate_cancel_order_payload(mode)
+ 
+#     else:
+#         raise ValueError(f"Unknown message type: {msg_type}")
 
 
 def run_full_payload_workload(message_plan):

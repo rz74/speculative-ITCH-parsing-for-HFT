@@ -75,7 +75,7 @@ module add_order_decoder (
             "U": return 27;
             "D": return 9;
             "E": return 30;
-            "P": return 44;
+            "P": return 40;
             default: return 2;
         endcase
     endfunction

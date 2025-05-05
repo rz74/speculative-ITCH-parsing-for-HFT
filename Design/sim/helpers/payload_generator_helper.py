@@ -66,13 +66,45 @@ def generate_cancel_order_payload(mode='set'):
 
     return payload
 
-def generate_payload_by_type(msg_type, mode='set'):
-    if msg_type == 'add':
-        return generate_add_order_payload(mode)
-    elif msg_type == 'cancel':
-        return generate_cancel_order_payload(mode)
+def generate_delete_order_payload(mode='set'):
+    if mode == 'set':
+        payload = [
+            ord('D'),                              # Message Type
+            *b'\x12\x34\x56\x78\x9A\xBC\xDE\xF0',  # Order Ref (64-bit)
+        ] 
+    elif mode == 'rand':
+        order_ref = random.getrandbits(64).to_bytes(8, 'big')
+        
+        payload = [ord('D')] + list(order_ref) 
     else:
-        raise ValueError(f"Unsupported message type: {msg_type}")
+        raise ValueError("Mode must be 'set' or 'rand'")
+    
+    return payload
+
+def generate_replace_order_payload(mode='set'):
+    if mode == 'set':
+        payload = [
+            ord('U'),                                # Message Type
+            *b'\x11\x22\x33\x44\x55\x66\x77\x88',    # Original Order Ref (64-bit)
+            *b'\x99\xAA\xBB\xCC\xDD\xEE\xFF\x00',    # New Order Ref (64-bit)
+            *b'\x00\x00\x01\x2C',                    # Updated Shares = 300
+            *b'\x00\x00\x27\x10',                    # Updated Price = 10000 (1.0000)
+        ]
+    elif mode == 'rand':
+        orig_ref = random.getrandbits(64).to_bytes(8, 'big')
+        new_ref  = random.getrandbits(64).to_bytes(8, 'big')
+        shares   = random.randint(1, 1_000_000).to_bytes(4, 'big')
+        price    = random.randint(1, 1_000_000).to_bytes(4, 'big')
+
+        payload = [ord('U')] + list(orig_ref) + list(new_ref) + list(shares) + list(price)
+    else:
+        raise ValueError("Mode must be 'set' or 'rand'")
+
+    return payload
+
+
+
+
 
 
 # =======================================================================
