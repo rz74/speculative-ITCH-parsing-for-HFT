@@ -1,4 +1,5 @@
 import random
+import itertools
 from ITCH_config import MSG_LENGTHS
 
 def generate_msg_sequence(length, weights=None):
@@ -25,5 +26,26 @@ def generate_msg_sequence(length, weights=None):
 
     return random.choices(message_types, weights=probabilities, k=length)
 
+def generate_permutation_coverage_sequence(shuffle=False):
+    """
+    Generate a sequence that covers all permutations of the 6 message types exactly once.
+
+    Args:
+        shuffle (bool): If True, shuffles the order of permutations.
+
+    Returns:
+        list: A list of message types covering all permutations.
+    """
+    message_types = list(MSG_LENGTHS.keys())
+    all_perms = list(itertools.permutations(message_types))
+
+    if shuffle:
+        random.shuffle(all_perms)
+
+    # Flatten list of permutations
+    flat_sequence = [msg for perm in all_perms for msg in perm]
+    return flat_sequence
+
+ 
  
 

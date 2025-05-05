@@ -6,7 +6,6 @@ from cocotb.utils import get_sim_time
 from helpers.reset_helper import reset_dut
 from helpers.recorder import record_all_internal_valids, get_recorded_log
 from helpers.full_workload_helper import run_full_payload_workload
-from helpers.injection_helper import inject_payload
 from helpers.compare_helper import compare_against_expected, generate_expected_events_with_fields, generate_expected_events_from_schedule
 from sim_config import SIM_CLK_PERIOD_NS, MSG_SEQUENCE, SIM_CYCLES, RESET_CYCLES
 from ITCH_config import MSG_LENGTHS, SIM_HEADERS
@@ -15,7 +14,7 @@ import csv
 
 
 @cocotb.test()
-async def test_full_add_cancel_workload(dut):
+async def test_full_permutations(dut):
     dut._log.info("Starting full workload test")
 
     # Start the clock
