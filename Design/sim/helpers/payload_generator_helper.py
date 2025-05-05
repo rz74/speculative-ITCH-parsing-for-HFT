@@ -5,7 +5,7 @@
 # Description: ITCH-compliant payload generators for valid test inputs.
 # Author: RZ
 # Start Date: 04172025
-# Version: 0.3
+# Version: 0.8
 
 # Changelog
 # =============================================
@@ -13,41 +13,139 @@
 # [20250428-2] RZ: Added Delete/Replace and dummy payload generators.
 # [20250429-1] RZ: Adopted into payload_generator_helper.py from payload_generators.py.
 # [20250429-2] RZ: Added random_valid_payload() for randomized test cases.
+# [20250504-1] RZ: updated cancel_order_payload to provide unused bytes for testing for real applications
+# [20250504-2] RZ: updated delete_order_payload.
+# [20250504-3] RZ: updated replace_order_payload.
+# [20250504-4] RZ: updated executed_order_payload.
+# [20250504-5] RZ: updated trade_payload.
 # =============================================
 
 import random
+import string
 
-def generate_add_order_payload(index=0):
-    # return bytes([0x41]) + index.to_bytes(8, 'big') + b'B' + (100).to_bytes(4, 'big') + b'ABCDE123' + (1234500).to_bytes(4, 'big')
-    payload = bytearray(64)
-    payload[0] = ord('A')  # msg_type
-    payload[1:9] = (0x1234567800000000 + index).to_bytes(8, 'big')  # order_ref
-    payload[9] = ord('B')  # buy/sell
-    payload[10:14] = (1000 + index).to_bytes(4, 'big')  # shares
-    payload[14:22] = b"GOOG    "  # stock symbol
-    payload[22:26] = (100000 + index*10).to_bytes(4, 'big')  # price
+def generate_add_order_payload(mode='set'):
+    if mode == 'set':
+        payload = [
+            ord('A'),                              # Message Type
+            *b'\x01\x23\x45\x67\x89\xAB\xCD\xEF',  # Order Ref  
+            ord('S'),                              # Buy/Sell
+            *b'\x00\x00\x00\x64',                  # Shares = 100
+            *b'ABCD1234',                          # Symbol  
+            *b'\x00\x00\x0F\xA0',                  # Price = 4000
+        ] + list(range(1, 11))                     # Padding
+    elif mode == 'rand':
+        order_ref = random.getrandbits(64).to_bytes(8, 'big')
+        buy_sell = random.choice([ord('B'), ord('S')])
+        shares = random.randint(1, 1_000_000).to_bytes(4, 'big')
+        symbol = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8)).encode('ascii')
+        price = random.randint(1, 1_000_000).to_bytes(4, 'big')
+        padding = [random.randint(0, 255) for _ in range(10)]
+
+        payload = [ord('A')] + list(order_ref) + [buy_sell] + list(shares) + list(symbol) + list(price) + padding
+    else:
+        raise ValueError("Mode must be 'set' or 'rand'")
+    
     return payload
 
+def generate_cancel_order_payload(mode='set'):
+    if mode == 'set':
+        payload = [
+            ord('X'),                              # Message Type
+            *b'\xFE\xDC\xBA\x98\x76\x54\x32\x10',  # Order Ref (64-bit)
+            *b'\x00\x00\x00\x32',                  # Canceled Shares = 50
+        ] + list(range(11, 21))                    # Padding
+    elif mode == 'rand':
+        order_ref = random.getrandbits(64).to_bytes(8, 'big')
+        shares = random.randint(1, 1_000_000).to_bytes(4, 'big')
+        padding = [random.randint(0, 255) for _ in range(10)]
 
-def generate_cancel_order_payload(index=0):
-    return bytes([0x58]) + index.to_bytes(8, 'big') + (50).to_bytes(4, 'big')
+        payload = [ord('X')] + list(order_ref) + list(shares) + padding
+    else:
+        raise ValueError("Mode must be 'set' or 'rand'")
 
-def generate_delete_order_payload(index=0):
-    return bytes([0x44]) + index.to_bytes(8, 'big')
+    return payload
 
-def generate_replace_order_payload(index=0):
-    return bytes([0x55]) + index.to_bytes(8, 'big') + (index+1).to_bytes(8, 'big') + (200).to_bytes(4, 'big') + (1250000).to_bytes(4, 'big')
+def generate_delete_order_payload(mode='set'):
+    if mode == 'set':
+        payload = [
+            ord('D'),                              # Message Type
+            *b'\x12\x34\x56\x78\x9A\xBC\xDE\xF0',  # Order Ref (64-bit)
+        ] 
+    elif mode == 'rand':
+        order_ref = random.getrandbits(64).to_bytes(8, 'big')
+        
+        payload = [ord('D')] + list(order_ref) 
+    else:
+        raise ValueError("Mode must be 'set' or 'rand'")
+    
+    return payload
 
-def generate_dummy_payload(index=0):
-    return bytes([0x5A]) + index.to_bytes(8, 'big') + b'BADINPUT'
+def generate_replace_order_payload(mode='set'):
+    if mode == 'set':
+        payload = [
+            ord('U'),
+            *b'\x11\x22\x33\x44\x55\x66\x77\x88',  # Original Ref
+            *b'\x88\x77\x66\x55\x44\x33\x22\x11',  # New Ref
+            *b'\x00\x00\x00\x64',                  # Updated Shares = 100
+            *b'\x00\x00\x27\x10',                  # Updated Price = 10000
+            0x00, 0x00                             # Reserved
+        ]
+    elif mode == 'rand':
+        orig_ref = random.getrandbits(64).to_bytes(8, 'big')
+        new_ref  = random.getrandbits(64).to_bytes(8, 'big')
+        shares   = random.randint(1, 1_000_000).to_bytes(4, 'big')
+        price    = random.randint(100, 500_000).to_bytes(4, 'big')
+        reserved = random.randint(100, 500_000).to_bytes(2, 'big')
+        payload  = [ord('U')] + list(orig_ref) + list(new_ref) + list(shares) + list(price) + reserved
+    else:
+        raise ValueError("Mode must be 'set' or 'rand'")
 
-def generate_random_valid_payload(index=0) -> bytes:
-    """Generate a valid payload for a random known ITCH message type."""
-    generators = [
-        generate_add_order_payload,
-        generate_cancel_order_payload,
-        generate_delete_order_payload,
-        generate_replace_order_payload
-    ]
-    return random.choice(generators)(index)
+    return payload
+
+def generate_executed_order_payload(mode='set'):
+    if mode == 'set':
+        payload = [
+            ord('E'),
+            *b'\x00\x00\x00\x00\x00\x01',                # Timestamp
+            *b'\xAA\xBB\xCC\xDD\xEE\xFF\x00\x11',        # Order Ref
+            *b'\x00\x00\x00\x0A',                        # Executed Shares = 10
+            *b'\x12\x34\x56\x78\x9A\xBC\xDE\xF0',        # Match ID
+        ] + [0] * 3  # Reserved
+    elif mode == 'rand':
+        timestamp = random.getrandbits(48).to_bytes(6, 'big')
+        order_ref = random.getrandbits(64).to_bytes(8, 'big')
+        shares = random.randint(1, 1_000_000).to_bytes(4, 'big')
+        match_id = random.getrandbits(64).to_bytes(8, 'big')
+        payload = [ord('E')] + list(timestamp) + list(order_ref) + list(shares) + list(match_id) + [0]*3
+    else:
+        raise ValueError("Mode must be 'set' or 'rand'")
+    
+    return payload
+
+def generate_trade_payload(mode='set'):
+    if mode == 'set':
+        payload = [
+            ord('P'),
+            *b'\x00\x00\x00\x00\xAB\xCD',                    # Timestamp
+            *b'\x11\x22\x33\x44\x55\x66\x77\x88',            # Order Ref
+            ord('B'),                                        # Buy
+            *b'\x00\x00\x00\x64',                            # Shares = 100
+            *b'ABCD1234',                                    # 8-char symbol 
+            *b'\x00\x00\x27\x10',                            # Price = 10000
+            *b'\x99\x88\x77\x66\x55\x44\x33\x22',            # Match ID
+        ]
+    elif mode == 'rand':
+        timestamp = random.getrandbits(48).to_bytes(6, 'big')
+        order_ref = random.getrandbits(64).to_bytes(8, 'big')
+        side      = random.choice([ord('B'), ord('S')])
+        shares    = random.randint(1, 10_000).to_bytes(4, 'big')
+        symbol    = ''.join(random.choices("ABCDEFGHIJKLMNOPQRSTUVWXYZ", k=6)).ljust(8).encode('ascii')
+        price     = random.randint(1_000, 1_000_000).to_bytes(4, 'big')   
+        match_id  = random.getrandbits(64).to_bytes(8, 'big')
+
+        payload = [ord('P')] + list(timestamp) + list(order_ref) + [side] + list(shares) + list(symbol) + list(price) + list(match_id)
+    else:
+        raise ValueError("Mode must be 'set' or 'rand'")
+ 
+    return payload
 

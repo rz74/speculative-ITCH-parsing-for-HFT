@@ -23,17 +23,18 @@ async def start_clock(dut, period_ns=10):
     cocotb.start_soon(Clock(dut.clk, period_ns, units="ns").start())
 
 async def reset_dut(dut, duration_clks=2):
-    dut.rst_n.value = 0
+    dut.rst.value = 1
     for _ in range(duration_clks):
         await RisingEdge(dut.clk)
-    dut.rst_n.value = 1
+    dut.rst.value = 0
     await RisingEdge(dut.clk)
 
 async def reset_midstream(dut, trigger_cycle=2):
-    dut.rst_n.value = 1
+    dut.rst.value = 0
     for cycle in range(trigger_cycle):
         await RisingEdge(dut.clk)
-    dut.rst_n.value = 0
+    dut.rst.value = 1
     await RisingEdge(dut.clk)
-    dut.rst_n.value = 1
+    dut.rst.value = 0
     await RisingEdge(dut.clk)
+

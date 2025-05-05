@@ -1,0 +1,63 @@
+$date
+	Wed Apr 30 16:04:29 2025
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1ps
+$end
+$scope module top_test $end
+$var wire 8 ! byte_in [7:0] $end
+$var wire 1 " clk $end
+$var wire 1 # rst $end
+$var wire 1 $ valid_in $end
+$var wire 32 % timestamp [31:0] $end
+$var wire 1 & side $end
+$var wire 32 ' shares [31:0] $end
+$var wire 64 ( price [63:0] $end
+$var wire 1 ) packet_invalid $end
+$var wire 64 * order_ref [63:0] $end
+$var wire 64 + misc_data [63:0] $end
+$var wire 1 , internal_valid $end
+$scope module u_add_order_decoder $end
+$var wire 8 - byte_in [7:0] $end
+$var wire 1 " clk $end
+$var wire 1 # rst $end
+$var wire 1 $ valid_in $end
+$var reg 1 . active $end
+$var reg 6 / byte_index [5:0] $end
+$var reg 1 , internal_valid $end
+$var reg 64 0 misc_data [63:0] $end
+$var reg 64 1 order_ref [63:0] $end
+$var reg 1 ) packet_invalid $end
+$var reg 64 2 price [63:0] $end
+$var reg 32 3 shares [31:0] $end
+$var reg 1 & side $end
+$var reg 32 4 timestamp [31:0] $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+#0
+$dumpvars
+bx 4
+bx 3
+bx 2
+bx 1
+bx 0
+bx /
+x.
+b0 -
+x,
+bx +
+bx *
+x)
+bx (
+bx '
+x&
+bx %
+0$
+1#
+z"
+b0 !
+$end
