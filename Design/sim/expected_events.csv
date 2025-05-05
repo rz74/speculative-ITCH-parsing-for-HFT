@@ -1,6 +1,10 @@
-cycle,add_internal_valid,cancel_internal_valid,add_order_ref,add_shares,add_price,add_side,cancel_order_ref,cancel_shares,delete_internal_valid,delete_order_ref,replace_internal_valid,replace_orig_order_ref,replace_new_order_ref,replace_shares,replace_price
-30,,,,,,,,,,,1,0x1122334455667788,0x99aabbccddeeff00,0x12c,0x2710
-39,,,,,,,,,1,0x123456789abcdef0,,,,,
-66,,,,,,,,,,,1,0x1122334455667788,0x99aabbccddeeff00,0x12c,0x2710
-93,,,,,,,,,,,1,0x1122334455667788,0x99aabbccddeeff00,0x12c,0x2710
-102,,,,,,,,,1,0x123456789abcdef0,,,,,
+cycle,add_internal_valid,cancel_internal_valid,delete_internal_valid,replace_internal_valid,executed_internal_valid,add_order_ref,add_shares,add_price,add_side,cancel_order_ref,cancel_shares,delete_order_ref,replace_old_order_ref,replace_new_order_ref,replace_shares,replace_price,exec_timestamp,exec_order_ref,exec_shares,exec_match_id,trade_internal_valid,trade_timestamp,trade_order_ref,trade_side,trade_shares,trade_stock_symbol,trade_price,trade_match_id
+39,1,,,,,0x123456789abcdef,0x64,0xfa0,0x1,,,,,,,,,,,,,,,,,,,
+75,1,,,,,0x123456789abcdef,0x64,0xfa0,0x1,,,,,,,,,,,,,,,,,,,
+98,,1,,,,,,,,0xfedcba9876543210,0x32,,,,,,,,,,,,,,,,,
+121,,1,,,,,,,,0xfedcba9876543210,0x32,,,,,,,,,,,,,,,,,
+148,,,,1,,,,,,,,,0x1122334455667788,0x8877665544332211,0x64,0x2710,,,,,,,,,,,,
+157,,,1,,,,,,,,,0x123456789abcdef0,,,,,,,,,,,,,,,,
+187,,,,,1,,,,,,,,,,,,0x1,0xaabbccddeeff0011,0xa,0x123456789abcdef0,,,,,,,,
+227,,,,,,,,,,,,,,,,,,,,,1,0xabcd,0x1122334455667788,0x0,0x64,0x4142434431323334,0x2710,0x9988776655443322
+267,,,,,,,,,,,,,,,,,,,,,1,0xabcd,0x1122334455667788,0x0,0x64,0x4142434431323334,0x2710,0x9988776655443322

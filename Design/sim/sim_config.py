@@ -3,7 +3,9 @@
 # Define global simulation period in ns  
 SIM_CLK_PERIOD_NS = 10  
 RESET_CYCLES = 3  # Number of cycles to reset the DUT before starting the test
-MSG_SEQUENCE = ['replace', 'delete', 'replace', 'replace', 'delete'] # message sequence for testing
+# MSG_SEQUENCE = ['trade', 'trade', 'executed', 'executed', 'delete'] # message sequence for testing
+MSG_SEQUENCE = ['add','add', 'cancel','cancel', 'replace', 'delete', 'executed','trade', 'trade'] # message sequence for testing
+# MSG_SEQUENCE = ['add', 'cancel', 'delete', 'trade', 'replace', 'replace', 'executed', 'trade'] # message sequence for testing
 
 # Define common headers to enforce identical CSV structure
 SIM_HEADERS = [
@@ -11,6 +13,9 @@ SIM_HEADERS = [
     
     "add_internal_valid",
     "cancel_internal_valid",
+    "delete_internal_valid",
+    "replace_internal_valid",
+    "executed_internal_valid", 
     
     "add_order_ref",
     "add_shares",
@@ -19,15 +24,26 @@ SIM_HEADERS = [
     
     "cancel_order_ref",
     "cancel_shares",
-    
-    "delete_internal_valid",
+        
     "delete_order_ref",
-
-    "replace_internal_valid",
+    
     "replace_old_order_ref",
     "replace_new_order_ref",
     "replace_shares",
     "replace_price",
 
+    "exec_timestamp",
+    "exec_order_ref",
+    "exec_shares",
+    "exec_match_id",
+
+    "trade_internal_valid",
+    "trade_timestamp",
+    "trade_order_ref",
+    "trade_side",
+    "trade_shares",
+    "trade_stock_symbol",
+    "trade_price",
+    "trade_match_id"
 
 ]

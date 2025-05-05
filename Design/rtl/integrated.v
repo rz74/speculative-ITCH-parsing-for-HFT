@@ -14,7 +14,9 @@ module integrated (
     output logic        add_internal_valid,
     output logic        cancel_internal_valid,
     output logic        delete_internal_valid,
-    output logic        replace_internal_valid
+    output logic        replace_internal_valid,
+    output logic        exec_internal_valid,
+    output logic        trade_internal_valid
 
 
 );
@@ -39,6 +41,19 @@ module integrated (
     logic [63:0] replace_new_order_ref;
     logic [31:0] replace_shares;
     logic [31:0] replace_price;
+
+    logic [63:0] exec_order_ref;
+    logic [31:0] exec_shares;
+    logic [63:0] exec_match_id;
+    logic [47:0] exec_timestamp;
+
+    logic [47:0] trade_timestamp;
+    logic [63:0] trade_order_ref;
+    logic [7:0]  trade_side;
+    logic [31:0] trade_shares;
+    logic [63:0] trade_match_id;
+    logic [31:0] trade_price;
+    logic [63:0] trade_stock_symbol;
  
 
 
@@ -87,6 +102,33 @@ module integrated (
         .replace_new_order_ref (replace_new_order_ref),
         .replace_shares        (replace_shares),
         .replace_price         (replace_price)
+    );
+
+    executed_order_decoder u_executed_order_decoder (
+        .clk                 (clk),
+        .rst                 (rst),
+        .byte_in             (byte_in),
+        .valid_in            (valid_in),
+        .exec_internal_valid (exec_internal_valid),
+        .exec_order_ref      (exec_order_ref),
+        .exec_shares         (exec_shares),
+        .exec_match_id       (exec_match_id),
+        .exec_timestamp      (exec_timestamp)
+    );
+
+    trade_decoder u_trade_decoder (
+        .clk                (clk),
+        .rst                (rst),
+        .byte_in            (byte_in),
+        .valid_in           (valid_in),
+        .trade_internal_valid (trade_internal_valid),
+        .trade_timestamp    (trade_timestamp),
+        .trade_order_ref    (trade_order_ref),
+        .trade_side         (trade_side),
+        .trade_shares       (trade_shares),
+        .trade_price        (trade_price),
+        .trade_match_id     (trade_match_id),
+        .trade_stock_symbol       (trade_stock_symbol)
     );
 
 

@@ -7,7 +7,7 @@
 # updated with delete order
 
 # ==========================================================================
-from helpers.payload_generator_helper import generate_add_order_payload, generate_cancel_order_payload, generate_delete_order_payload, generate_replace_order_payload
+from helpers.payload_generator_helper import generate_add_order_payload, generate_cancel_order_payload, generate_delete_order_payload, generate_replace_order_payload, generate_executed_order_payload, generate_trade_payload
 from helpers.full_workload_helper import MSG_LENGTHS
 from sim_config import RESET_CYCLES, SIM_CLK_PERIOD_NS, SIM_HEADERS
 
@@ -75,11 +75,33 @@ def generate_expected_events_with_fields(message_plan):
         elif msg_type == "replace":
             payload = generate_replace_order_payload()
             row["replace_internal_valid"]       = 1
-            row["replace_old_order_ref"]       = hex(int.from_bytes(payload[1:9], byteorder='big'))
+            row["replace_old_order_ref"]        = hex(int.from_bytes(payload[1:9], byteorder='big'))
             row["replace_new_order_ref"]        = hex(int.from_bytes(payload[9:17], byteorder='big'))
             row["replace_shares"]               = hex(int.from_bytes(payload[17:21], byteorder='big'))
             row["replace_price"]                = hex(int.from_bytes(payload[21:25], byteorder='big'))
 
+        elif msg_type == "executed":
+            payload = generate_executed_order_payload()
+
+            row["executed_internal_valid"]      = 1
+            row["exec_timestamp"]           = hex(int.from_bytes(payload[1:7], byteorder='big'))
+            row["exec_order_ref"]           = hex(int.from_bytes(payload[7:15], byteorder='big'))
+            row["exec_shares"]              = hex(int.from_bytes(payload[15:19], byteorder='big'))
+            row["exec_match_id"]            = hex(int.from_bytes(payload[19:27], byteorder='big'))
+
+        elif msg_type == "trade":
+            payload = generate_trade_payload()
+            row["trade_internal_valid"] = 1
+            row["trade_timestamp"]  = hex(int.from_bytes(payload[1:7], byteorder='big'))
+            row["trade_order_ref"]  = hex(int.from_bytes(payload[7:15], byteorder='big'))
+            row["trade_side"]       = hex(0) if payload[15] == ord('B') else hex(1)
+            row["trade_shares"]     = hex(int.from_bytes(payload[16:20], byteorder='big'))
+            row["trade_stock_symbol"]     = hex(int.from_bytes(payload[20:28], byteorder='big'))  
+            row["trade_price"]      = hex(int.from_bytes(payload[28:32], byteorder='big'))
+            row["trade_match_id"]   = hex(int.from_bytes(payload[32:40], byteorder='big'))
+
+
+ 
 
 
         expected_events.append(row)

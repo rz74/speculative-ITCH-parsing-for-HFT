@@ -47,7 +47,6 @@ def generate_add_order_payload(mode='set'):
     
     return payload
 
-
 def generate_cancel_order_payload(mode='set'):
     if mode == 'set':
         payload = [
@@ -84,104 +83,69 @@ def generate_delete_order_payload(mode='set'):
 def generate_replace_order_payload(mode='set'):
     if mode == 'set':
         payload = [
-            ord('U'),                                # Message Type
-            *b'\x11\x22\x33\x44\x55\x66\x77\x88',    # Original Order Ref (64-bit)
-            *b'\x99\xAA\xBB\xCC\xDD\xEE\xFF\x00',    # New Order Ref (64-bit)
-            *b'\x00\x00\x01\x2C',                    # Updated Shares = 300
-            *b'\x00\x00\x27\x10',                    # Updated Price = 10000 (1.0000)
+            ord('U'),
+            *b'\x11\x22\x33\x44\x55\x66\x77\x88',  # Original Ref
+            *b'\x88\x77\x66\x55\x44\x33\x22\x11',  # New Ref
+            *b'\x00\x00\x00\x64',                  # Updated Shares = 100
+            *b'\x00\x00\x27\x10',                  # Updated Price = 10000
+            0x00, 0x00                             # Reserved
         ]
     elif mode == 'rand':
         orig_ref = random.getrandbits(64).to_bytes(8, 'big')
         new_ref  = random.getrandbits(64).to_bytes(8, 'big')
         shares   = random.randint(1, 1_000_000).to_bytes(4, 'big')
-        price    = random.randint(1, 1_000_000).to_bytes(4, 'big')
-
-        payload = [ord('U')] + list(orig_ref) + list(new_ref) + list(shares) + list(price)
+        price    = random.randint(100, 500_000).to_bytes(4, 'big')
+        reserved = random.randint(100, 500_000).to_bytes(2, 'big')
+        payload  = [ord('U')] + list(orig_ref) + list(new_ref) + list(shares) + list(price) + reserved
     else:
         raise ValueError("Mode must be 'set' or 'rand'")
 
     return payload
 
+def generate_executed_order_payload(mode='set'):
+    if mode == 'set':
+        payload = [
+            ord('E'),
+            *b'\x00\x00\x00\x00\x00\x01',                # Timestamp
+            *b'\xAA\xBB\xCC\xDD\xEE\xFF\x00\x11',        # Order Ref
+            *b'\x00\x00\x00\x0A',                        # Executed Shares = 10
+            *b'\x12\x34\x56\x78\x9A\xBC\xDE\xF0',        # Match ID
+        ] + [0] * 3  # Reserved
+    elif mode == 'rand':
+        timestamp = random.getrandbits(48).to_bytes(6, 'big')
+        order_ref = random.getrandbits(64).to_bytes(8, 'big')
+        shares = random.randint(1, 1_000_000).to_bytes(4, 'big')
+        match_id = random.getrandbits(64).to_bytes(8, 'big')
+        payload = [ord('E')] + list(timestamp) + list(order_ref) + list(shares) + list(match_id) + [0]*3
+    else:
+        raise ValueError("Mode must be 'set' or 'rand'")
+    
+    return payload
 
+def generate_trade_payload(mode='set'):
+    if mode == 'set':
+        payload = [
+            ord('P'),
+            *b'\x00\x00\x00\x00\xAB\xCD',                    # Timestamp
+            *b'\x11\x22\x33\x44\x55\x66\x77\x88',            # Order Ref
+            ord('B'),                                        # Buy
+            *b'\x00\x00\x00\x64',                            # Shares = 100
+            *b'ABCD1234',                                    # 8-char symbol 
+            *b'\x00\x00\x27\x10',                            # Price = 10000
+            *b'\x99\x88\x77\x66\x55\x44\x33\x22',            # Match ID
+        ]
+    elif mode == 'rand':
+        timestamp = random.getrandbits(48).to_bytes(6, 'big')
+        order_ref = random.getrandbits(64).to_bytes(8, 'big')
+        side      = random.choice([ord('B'), ord('S')])
+        shares    = random.randint(1, 10_000).to_bytes(4, 'big')
+        symbol    = ''.join(random.choices("ABCDEFGHIJKLMNOPQRSTUVWXYZ", k=6)).ljust(8).encode('ascii')
+        price     = random.randint(1_000, 1_000_000).to_bytes(4, 'big')  # 0.1000 to 100.0000
+        match_id  = random.getrandbits(64).to_bytes(8, 'big')
 
-
-
-
-# =======================================================================
-
-# def generate_add_order_payload(index=0):
-#     payload = bytearray(36)
-#     payload[0] = ord('A')  # Message Type
-
-#     # Order Reference
-#     payload[1:9] = (0x1234567800000000 + index).to_bytes(8, 'big')
-
-#     # Buy/Sell Indicator
-#     payload[9] = ord('S') if index % 2 else ord('B')
-
-#     # Shares
-#     payload[10:14] = (1000 + index).to_bytes(4, 'big')
-
-#     # Stock Symbol (left-padded to 8 bytes)
-#     symbol = f"STK{index}".ljust(8)
-#     payload[14:22] = symbol.encode('ascii')
-
-#     # Price (e.g. $123.45 → 1234500)
-#     payload[22:26] = (1234500 + index * 10).to_bytes(4, 'big')
-
-#     return payload
-
-# def generate_cancel_order_payload(index=0):
-#     payload = bytearray(23)
-#     payload[0] = ord('X')  # Cancel Order
-
-#     payload[1:9] = (0xABCDEF0000000000 + index).to_bytes(8, 'big')   # Order Ref
-#     payload[9:13] = (500 + index).to_bytes(4, 'big')                 # Shares
-#     # Fill unused 13–22 with junk
-#     payload[13:23] = bytes([0xAA] * 10)   
-#     # payload[13:] = b'\x00' * (23 - 13)                               # Reserved padding
-
-#     return payload
-
-# def generate_delete_order_payload(index=0):
-#     """Generate a valid 9-byte Delete Order ('D') ITCH packet"""
-#     payload = bytearray(9)
-#     payload[0] = ord('D')  # Message Type
-#     payload[1:9] = (0x1234567800000000 + index).to_bytes(8, 'big')  # Order Ref
-#     return payload
-
-# def generate_replace_order_payload(index=0):
-#     """Generate a valid 25-byte Replace Order ('U') ITCH packet"""
-#     payload = bytearray(25)
-#     payload[0] = ord('U')  # Message Type
-#     payload[1:9] = (0xAAAABBBB00000000 + index).to_bytes(8, 'big')   # Old Order Ref
-#     payload[9:17] = (0xCCCCDDDD00000000 + index).to_bytes(8, 'big')  # New Order Ref
-#     payload[17:21] = (1000 + index).to_bytes(4, 'big')               # Shares
-#     payload[21:25] = (1234500 + index * 10).to_bytes(4, 'big')       # Price
-#     return payload
-
-# def generate_executed_order_payload(index=0):
-#     """Generate a valid 31-byte Executed Order ('E') ITCH packet"""
-#     payload = bytearray(31)
-#     payload[0] = ord('E')  # Message Type
-#     payload[1:9] = (0x1000000000000000 + index).to_bytes(8, 'big')     # Order Ref
-#     payload[9:13] = (100 + index).to_bytes(4, 'big')                   # Executed Shares
-#     payload[13:21] = (0xABCDEF0000000000 + index).to_bytes(8, 'big')   # Match ID
-#     payload[21:25] = (123456789 + index).to_bytes(4, 'big')           # Timestamp
-#     # [25:31] Reserved — leave as zeros
-#     return payload
-
-# def generate_trade_payload(index=0):
-#     """Generate a valid 44-byte Trade ('P') ITCH packet"""
-#     payload = bytearray(44)
-#     payload[0] = ord('P')  # Message Type
-#     payload[1:9] = (0x9000000000000000 + index).to_bytes(8, 'big')       # Order Ref
-#     payload[9:13] = (500 + index).to_bytes(4, 'big')                     # Shares
-#     payload[13:21] = (0xABC0000000000000 + index).to_bytes(8, 'big')     # Match ID
-#     payload[21:29] = b"TSLA    "                                         # Symbol (8 bytes, space-padded)
-#     payload[29:33] = (100000 + index * 5).to_bytes(4, 'big')             # Price
-#     payload[33:37] = (98765432 + index).to_bytes(4, 'big')               # Timestamp
-#     # [37:44] Reserved — leave as 0
-#     return payload
-
+        payload = [ord('P')] + list(timestamp) + list(order_ref) + [side] + list(shares) + list(symbol) + list(price) + list(match_id)
+    else:
+        raise ValueError("Mode must be 'set' or 'rand'")
+ 
+    return payload
 
