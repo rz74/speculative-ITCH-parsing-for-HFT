@@ -32,24 +32,23 @@
 # Author: RZ
  
 # =============================================
- 
-
-TOPLEVEL_LANG = verilog
+ TOPLEVEL_LANG = verilog
 
 VERILOG_SOURCES = \
     ../rtl/add_order_decoder.v \
     ../rtl/cancel_order_decoder.v \
     ../rtl/delete_order_decoder.v \
     ../rtl/replace_order_decoder.v \
-	../rtl/executed_order_decoder.v \
-	../rtl/trade_decoder.v \
-	../rtl/decoder_watchdog.v \
-	../rtl/integrated.v
+    ../rtl/executed_order_decoder.v \
+    ../rtl/trade_decoder.v \
+    ../rtl/decoder_watchdog.v \
+    ../rtl/integrated.v
 
 TOPLEVEL = integrated
 SIM = icarus
 
-COMPILE_ARGS += -g2012 -DCOCOTB_SIM
+# Correct include path for itch_utils.vh
+COMPILE_ARGS += -g2012 -DCOCOTB_SIM -I../rtl
 EXTRA_ARGS ?=
 
 include $(shell cocotb-config --makefiles)/Makefile.sim
@@ -73,7 +72,6 @@ integrated: killwave
 # =============================================
 # Cleanup
 # =============================================
-
 cleanall:
 	find vcd/ -name "*.vcd" -type f -mtime +1 -delete
 	rm -rf sim_build
@@ -82,6 +80,7 @@ cleanall:
 
 view_latest:
 	gtkwave $$(ls -t vcd/*.vcd | head -n1) &
+
 # add_order: killwave
 # 	@mkdir -p vcd
 # 	TIMESTAMP=$$(date +%m%d%Y_%H%M%S); \

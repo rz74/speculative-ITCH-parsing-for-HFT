@@ -32,20 +32,23 @@ def generate_add_order_payload(mode='set'):
             *b'\x00\x00\x00\x64',                  # Shares = 100
             *b'ABCD1234',                          # Symbol  
             *b'\x00\x00\x0F\xA0',                  # Price = 4000
-        ] + list(range(1, 11))                     # Padding
+        ] + [0] * 10                               # Zeroed Padding
     elif mode == 'rand':
         order_ref = random.getrandbits(64).to_bytes(8, 'big')
-        buy_sell = random.choice([ord('B'), ord('S')])
-        shares = random.randint(1, 1_000_000).to_bytes(4, 'big')
-        symbol = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8)).encode('ascii')
-        price = random.randint(1, 1_000_000).to_bytes(4, 'big')
-        padding = [random.randint(0, 255) for _ in range(10)]
-
-        payload = [ord('A')] + list(order_ref) + [buy_sell] + list(shares) + list(symbol) + list(price) + padding
+        buy_sell  = random.choice([ord('B'), ord('S')])
+        shares    = random.randint(1, 1_000_000).to_bytes(4, 'big')
+        symbol_length = random.randint(3, 6)
+        symbol_core   = ''.join(random.choices("ABCDEFGHIJKLMNOPQRSTUVWXYZ", k=symbol_length))
+        symbol_str    = symbol_core.ljust(8)
+        symbol_bytes  = symbol_str.encode('ascii')
+        price     = random.randint(1, 1_000_000).to_bytes(4, 'big')
+        padding   = [0] * 10
+        payload   = [ord('A')] + list(order_ref) + [buy_sell] + list(shares) + list(symbol_bytes) + list(price) + padding
     else:
         raise ValueError("Mode must be 'set' or 'rand'")
-    
+
     return payload
+
 
 def generate_cancel_order_payload(mode='set'):
     if mode == 'set':
@@ -53,13 +56,13 @@ def generate_cancel_order_payload(mode='set'):
             ord('X'),                              # Message Type
             *b'\xFE\xDC\xBA\x98\x76\x54\x32\x10',  # Order Ref (64-bit)
             *b'\x00\x00\x00\x32',                  # Canceled Shares = 50
-        ] + list(range(11, 21))                    # Padding
+        ] + [0] * 10                               # Padding
     elif mode == 'rand':
         order_ref = random.getrandbits(64).to_bytes(8, 'big')
         shares = random.randint(1, 1_000_000).to_bytes(4, 'big')
         padding = [random.randint(0, 255) for _ in range(10)]
 
-        payload = [ord('X')] + list(order_ref) + list(shares) + padding
+        payload = [ord('X')] + list(order_ref) + list(shares) + [0] * 10
     else:
         raise ValueError("Mode must be 'set' or 'rand'")
 
@@ -95,7 +98,7 @@ def generate_replace_order_payload(mode='set'):
         new_ref  = random.getrandbits(64).to_bytes(8, 'big')
         shares   = random.randint(1, 1_000_000).to_bytes(4, 'big')
         price    = random.randint(100, 500_000).to_bytes(4, 'big')
-        reserved = random.randint(100, 500_000).to_bytes(2, 'big')
+        reserved = [0, 0]
         payload  = [ord('U')] + list(orig_ref) + list(new_ref) + list(shares) + list(price) + reserved
     else:
         raise ValueError("Mode must be 'set' or 'rand'")
@@ -139,7 +142,12 @@ def generate_trade_payload(mode='set'):
         order_ref = random.getrandbits(64).to_bytes(8, 'big')
         side      = random.choice([ord('B'), ord('S')])
         shares    = random.randint(1, 10_000).to_bytes(4, 'big')
-        symbol    = ''.join(random.choices("ABCDEFGHIJKLMNOPQRSTUVWXYZ", k=6)).ljust(8).encode('ascii')
+        symbol_length = random.randint(3, 6)
+        symbol_core = ''.join(random.choices("ABCDEFGHIJKLMNOPQRSTUVWXYZ", k=symbol_length))
+        symnol_str = symbol_core.ljust(8)
+        symbol_bytes = symnol_str.encode('ascii')       
+        symbol  = list(symbol_bytes) 
+        # symbol    = ''.join(random.choices("ABCDEFGHIJKLMNOPQRSTUVWXYZ", k=6)).ljust(8).encode('ascii')
         price     = random.randint(1_000, 1_000_000).to_bytes(4, 'big')   
         match_id  = random.getrandbits(64).to_bytes(8, 'big')
 
