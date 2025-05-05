@@ -1,15 +1,6 @@
 # helpers/full_workload_helper.py
+from sim_config import SIM_CLK_PERIOD_NS, MSG_LENGTHS
 
-SIM_CLK_PERIOD_NS = 10
-
-MSG_LENGTHS = {
-    "add": 36,
-    "cancel": 23,
-    "replace": 27,
-    "delete": 9,
-    "executed": 30,
-    "trade": 40
-}
 
 from .payload_generator_helper import  generate_add_order_payload, generate_cancel_order_payload, generate_delete_order_payload, generate_replace_order_payload, generate_executed_order_payload, generate_trade_payload
 

@@ -5,7 +5,7 @@
 # Description: ITCH-compliant payload generators for valid test inputs.
 # Author: RZ
 # Start Date: 04172025
-# Version: 0.9
+# Version: 0.8
 
 # Changelog
 # =============================================
@@ -13,11 +13,11 @@
 # [20250428-2] RZ: Added Delete/Replace and dummy payload generators.
 # [20250429-1] RZ: Adopted into payload_generator_helper.py from payload_generators.py.
 # [20250429-2] RZ: Added random_valid_payload() for randomized test cases.
-# [20250501-1] RZ: updated cancel_order_payload to provide unused bytes for testing for real applications
-# [20250501-2] RZ: updated delete_order_payload.
-# [20250501-3] RZ: updated replace_order_payload.
-# [20250501-4] RZ: updated executed_order_payload.
-# [20250501-5] RZ: updated trade_payload.
+# [20250504-1] RZ: updated cancel_order_payload to provide unused bytes for testing for real applications
+# [20250504-2] RZ: updated delete_order_payload.
+# [20250504-3] RZ: updated replace_order_payload.
+# [20250504-4] RZ: updated executed_order_payload.
+# [20250504-5] RZ: updated trade_payload.
 # =============================================
 
 import random
@@ -27,10 +27,10 @@ def generate_add_order_payload(mode='set'):
     if mode == 'set':
         payload = [
             ord('A'),                              # Message Type
-            *b'\x01\x23\x45\x67\x89\xAB\xCD\xEF',  # Order Ref (64-bit)
+            *b'\x01\x23\x45\x67\x89\xAB\xCD\xEF',  # Order Ref  
             ord('S'),                              # Buy/Sell
             *b'\x00\x00\x00\x64',                  # Shares = 100
-            *b'ABCD1234',                          # Symbol (8 ASCII)
+            *b'ABCD1234',                          # Symbol  
             *b'\x00\x00\x0F\xA0',                  # Price = 4000
         ] + list(range(1, 11))                     # Padding
     elif mode == 'rand':
@@ -140,7 +140,7 @@ def generate_trade_payload(mode='set'):
         side      = random.choice([ord('B'), ord('S')])
         shares    = random.randint(1, 10_000).to_bytes(4, 'big')
         symbol    = ''.join(random.choices("ABCDEFGHIJKLMNOPQRSTUVWXYZ", k=6)).ljust(8).encode('ascii')
-        price     = random.randint(1_000, 1_000_000).to_bytes(4, 'big')  # 0.1000 to 100.0000
+        price     = random.randint(1_000, 1_000_000).to_bytes(4, 'big')   
         match_id  = random.getrandbits(64).to_bytes(8, 'big')
 
         payload = [ord('P')] + list(timestamp) + list(order_ref) + [side] + list(shares) + list(symbol) + list(price) + list(match_id)

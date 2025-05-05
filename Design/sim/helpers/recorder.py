@@ -57,20 +57,18 @@ async def record_all_internal_valids(dut, total_cycles=300):
             "replace_shares":           hex(getattr(dut, 'replace_shares', 0).value.integer)        if hasattr(dut, 'replace_shares') else 0,
             "replace_price":            hex(getattr(dut, 'replace_price', 0).value.integer)         if hasattr(dut, 'replace_price') else 0,
 
-            "exec_timestamp":       hex(getattr(dut, 'exec_timestamp', 0).value.integer)  if hasattr(dut, 'exec_timestamp') else 0,
-            "exec_order_ref":       hex(getattr(dut, 'exec_order_ref', 0).value.integer)  if hasattr(dut, 'exec_order_ref') else 0,
-            "exec_shares":          hex(getattr(dut, 'exec_shares', 0).value.integer)     if hasattr(dut, 'exec_shares') else 0,
-            "exec_match_id":        hex(getattr(dut, 'exec_match_id', 0).value.integer)   if hasattr(dut, 'exec_match_id') else 0,
+            "exec_timestamp":           hex(getattr(dut, 'exec_timestamp', 0).value.integer)        if hasattr(dut, 'exec_timestamp') else 0,
+            "exec_order_ref":           hex(getattr(dut, 'exec_order_ref', 0).value.integer)        if hasattr(dut, 'exec_order_ref') else 0,
+            "exec_shares":              hex(getattr(dut, 'exec_shares', 0).value.integer)           if hasattr(dut, 'exec_shares') else 0,
+            "exec_match_id":            hex(getattr(dut, 'exec_match_id', 0).value.integer)         if hasattr(dut, 'exec_match_id') else 0,
                 
-            "trade_timestamp":      hex(getattr(dut, 'trade_timestamp', 0).value.integer)     if hasattr(dut, 'trade_timestamp') else 0,
-            "trade_order_ref":      hex(getattr(dut, 'trade_order_ref', 0).value.integer)     if hasattr(dut, 'trade_order_ref') else 0,
-            "trade_side":           hex(getattr(dut, 'trade_side', 0).value.integer)          if hasattr(dut, 'trade_side') else 0,
-            "trade_shares":         hex(getattr(dut, 'trade_shares', 0).value.integer)        if hasattr(dut, 'trade_shares') else 0,
-            "trade_stock_symbol":         hex(getattr(dut, 'trade_stock_symbol', 0).value.integer)        if hasattr(dut, 'trade_stock_symbol') else 0,
-            "trade_price":          hex(getattr(dut, 'trade_price', 0).value.integer)         if hasattr(dut, 'trade_price') else 0,
-            "trade_match_id":       hex(getattr(dut, 'trade_match_id', 0).value.integer)      if hasattr(dut, 'trade_match_id') else 0,
-
-
+            "trade_timestamp":          hex(getattr(dut, 'trade_timestamp', 0).value.integer)       if hasattr(dut, 'trade_timestamp') else 0,
+            "trade_order_ref":          hex(getattr(dut, 'trade_order_ref', 0).value.integer)       if hasattr(dut, 'trade_order_ref') else 0,
+            "trade_side":               hex(getattr(dut, 'trade_side', 0).value.integer)            if hasattr(dut, 'trade_side') else 0,
+            "trade_shares":             hex(getattr(dut, 'trade_shares', 0).value.integer)          if hasattr(dut, 'trade_shares') else 0,
+            "trade_stock_symbol":       hex(getattr(dut, 'trade_stock_symbol', 0).value.integer)    if hasattr(dut, 'trade_stock_symbol') else 0,
+            "trade_price":              hex(getattr(dut, 'trade_price', 0).value.integer)           if hasattr(dut, 'trade_price') else 0,
+            "trade_match_id":           hex(getattr(dut, 'trade_match_id', 0).value.integer)        if hasattr(dut, 'trade_match_id') else 0,
 
 
         }

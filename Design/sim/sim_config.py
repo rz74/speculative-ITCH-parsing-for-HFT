@@ -2,10 +2,48 @@
 
 # Define global simulation period in ns  
 SIM_CLK_PERIOD_NS = 10  
+SIM_CYCLES = 300  # Number of cycles to run the simulation--placeholder
 RESET_CYCLES = 3  # Number of cycles to reset the DUT before starting the test
+MSG_MODE = 'set'  # Message mode for payload generation (set or rand)
+
 # MSG_SEQUENCE = ['trade', 'trade', 'executed', 'executed', 'delete'] # message sequence for testing
-MSG_SEQUENCE = ['add','add', 'cancel','cancel', 'replace', 'delete', 'executed','trade', 'trade'] # message sequence for testing
+MSG_SEQUENCE = [
+    'add',
+    'add', 
+    'cancel',
+    'cancel', 
+    'replace', 
+    'delete', 
+    'trade',
+    'replace', 
+    'delete', 
+    'trade',
+    'trade',
+    'trade',
+    'add', 
+    'cancel',
+    'executed',
+    'trade', 
+    'trade'
+    ] # message sequence for testing
 # MSG_SEQUENCE = ['add', 'cancel', 'delete', 'trade', 'replace', 'replace', 'executed', 'trade'] # message sequence for testing
+
+
+
+
+
+# Define message lengths for each type of message
+# These lengths are based on the ITCH protocol specification
+MSG_LENGTHS = {
+    "add": 36,
+    "cancel": 23,
+    "replace": 27,
+    "delete": 9,
+    "executed": 30,
+    "trade": 40
+}
+
+SIM_CYCLES = sum(MSG_LENGTHS[msg] for msg in MSG_SEQUENCE) + RESET_CYCLES + 20  # Total cycles to run the simulation
 
 # Define common headers to enforce identical CSV structure
 SIM_HEADERS = [

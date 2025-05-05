@@ -8,7 +8,7 @@ from helpers.recorder import record_all_internal_valids, get_recorded_log
 from helpers.full_workload_helper import run_full_payload_workload
 from helpers.injection_helper import inject_payload
 from helpers.compare_helper import compare_against_expected, generate_expected_events_with_fields
-from sim_config import SIM_CLK_PERIOD_NS, SIM_HEADERS, MSG_SEQUENCE
+from sim_config import SIM_CLK_PERIOD_NS, SIM_HEADERS, MSG_SEQUENCE, SIM_CYCLES, MSG_MODE
 
 import csv
 
@@ -30,7 +30,7 @@ async def test_full_add_cancel_workload(dut):
     expected_events = generate_expected_events_with_fields(MSG_SEQUENCE)
 
     # Start recording before any injection
-    cocotb.start_soon(record_all_internal_valids(dut, total_cycles=300))
+    cocotb.start_soon(record_all_internal_valids(dut, total_cycles=SIM_CYCLES))
 
     # Inject full byte stream serially
     for byte in full_stream:
