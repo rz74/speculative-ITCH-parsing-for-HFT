@@ -81,6 +81,12 @@ cleanall:
 view_latest:
 	gtkwave $$(ls -t vcd/*.vcd | head -n1) &
 
+# =============================================
+# Composite Target
+# =============================================
+run_all: cleanall integrated
+
+
 # add_order: killwave
 # 	@mkdir -p vcd
 # 	TIMESTAMP=$$(date +%m%d%Y_%H%M%S); \
