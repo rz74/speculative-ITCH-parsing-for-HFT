@@ -1,8 +1,0 @@
-<testsuites name="results">
-  <testsuite name="all" package="all">
-    <property name="random_seed" value="1746043468" />
-    <testcase name="sanity_check" classname="test_add_order_decoder" file="/mnt/c/Users/HYRui/Downloads/Git/speculative-ITCH-parsing-for-HFT/add_order_test_project/sim/test_add_order_decoder.py" lineno="4" time="0.006675243377685547" sim_time_ns="0.0" ratio_time="0.0">
-      <failure message="Test failed with RANDOM_SEED=1746043468" />
-    </testcase>
-  </testsuite>
-</testsuites>
