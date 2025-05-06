@@ -88,6 +88,7 @@ module trade_decoder (
     `include "macros/itch_suppression.vh"
     `include "macros/field_macros/itch_fields_trade.vh"
     `include "macros/itch_reset.vh"
+    `include "macros/itch_core_decode.vh"
 
 
     // function automatic logic [5:0] itch_length(input logic [7:0] msg_type);
@@ -121,8 +122,11 @@ module trade_decoder (
     always_ff @(posedge clk) begin
         if (rst) begin
             byte_index            <= 0;
-            is_trade              <= 0;
+            `is_order          <= 0;
+            
             `ITCH_RESET_LOGIC
+
+            // is_trade              <= 0;
             // trade_internal_valid  <= 0;
             // trade_packet_invalid  <= 0;
             // trade_timestamp       <= 0;
@@ -133,23 +137,29 @@ module trade_decoder (
             // trade_price           <= 0;
             // trade_match_id        <= 0;
         end else if (valid_in && decoder_enabled) begin
-            trade_internal_valid <= 0;
-            trade_packet_invalid <= 0;
 
-            if (byte_index == 0) begin
-                is_trade <= (byte_in == MSG_TYPE);
-                if (byte_in == MSG_TYPE)
-                    byte_index <= 1;
-                else begin
-                    suppress_count <= itch_length(byte_in) - 2;
-                    is_trade       <= 0;
-                    byte_index     <= 0;
-                end
-            end else begin
-                byte_index <= byte_index + 1;
-            end
+            `ITCH_CORE_DECODE(MSG_TYPE, MSG_LENGTH)
+            `internal_valid <= 0;
+            `packet_invalid <= 0;
 
-            if (is_trade) begin
+            // trade_internal_valid <= 0;
+            // trade_packet_invalid <= 0;
+
+            // if (byte_index == 0) begin
+            //     is_trade <= (byte_in == MSG_TYPE);
+            //     if (byte_in == MSG_TYPE)
+            //         byte_index <= 1;
+            //     else begin
+            //         suppress_count <= itch_length(byte_in) - 2;
+            //         is_trade       <= 0;
+            //         byte_index     <= 0;
+            //     end
+            // end else begin
+            //     byte_index <= byte_index + 1;
+            // end
+
+            // if (is_trade) begin
+            if (`is_order) begin
                 case (byte_index)
                     1:  trade_timestamp[47:40] <= byte_in;
                     2:  trade_timestamp[39:32] <= byte_in;
@@ -200,18 +210,26 @@ module trade_decoder (
                 endcase
 
                 if (byte_index == MSG_LENGTH - 1)
-                    trade_internal_valid <= 1;
+                    `internal_valid <= 1;
+                    // trade_internal_valid <= 1;
             end
 
             if (byte_index >= MSG_LENGTH && is_trade)
-                trade_packet_invalid <= 1;
+                // trade_packet_invalid <= 1;
+                `packet_invalid <= 1;
         end
 
-        if (is_trade && (
+        if (`is_order && (
             (valid_in == 0 && byte_index > 0 && byte_index < MSG_LENGTH) ||
             (byte_index >= MSG_LENGTH)
         ))
-            trade_packet_invalid <= 1;
+            `packet_invalid <= 1;
+
+        // if (is_trade && (
+        //     (valid_in == 0 && byte_index > 0 && byte_index < MSG_LENGTH) ||
+        //     (byte_index >= MSG_LENGTH)
+        // ))
+        //     trade_packet_invalid <= 1;
 
         if (byte_index == MSG_LENGTH) begin
             trade_internal_valid <= 0;

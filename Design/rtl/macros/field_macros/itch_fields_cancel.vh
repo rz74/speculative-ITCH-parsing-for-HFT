@@ -7,6 +7,7 @@
 `define packet_invalid    cancel_packet_invalid
 `define order_ref         cancel_order_ref
 `define canceled_shares   cancel_canceled_shares
+`define is_order          is_cancel_order   // NEW: used by ITCH_CORE_DECODE
 
 `define ITCH_RESET_FIELDS        \
     `internal_valid    <= 0;     \

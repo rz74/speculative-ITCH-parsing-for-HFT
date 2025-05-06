@@ -61,6 +61,7 @@ module cancel_order_decoder (
     `include "macros/itch_suppression.vh"
     `include "macros/field_macros/itch_fields_cancel.vh"
     `include "macros/itch_reset.vh"
+    `include "macros/itch_core_decode.vh"
 
 
     // // ITCH message length mapping
@@ -94,28 +95,32 @@ module cancel_order_decoder (
     always_ff @(posedge clk) begin
         if (rst) begin
             byte_index              <= 0;
-            is_cancel_order         <= 0;
+            // is_cancel_order         <= 0;
+            `is_order         <= 0;
             `ITCH_RESET_LOGIC
             // cancel_internal_valid   <= 0;
             // cancel_packet_invalid   <= 0;
             // cancel_order_ref        <= 0;
             // cancel_canceled_shares  <= 0;
         end else if (valid_in && decoder_enabled) begin
-            cancel_internal_valid <= 0;
-            cancel_packet_invalid <= 0;
+                `ITCH_CORE_DECODE(MSG_TYPE, MSG_LENGTH)
+                `internal_valid <= 0;
+                `packet_invalid <= 0;
+            // cancel_internal_valid <= 0;
+            // cancel_packet_invalid <= 0;
 
-            if (byte_index == 0) begin
-                is_cancel_order <= (byte_in == MSG_TYPE);
-                if (byte_in == MSG_TYPE)
-                    byte_index <= 1;
-                else begin
-                    suppress_count     <= itch_length(byte_in) - 2;
-                    is_cancel_order    <= 0;
-                    byte_index         <= 0;
-                end
-            end else begin
-                byte_index <= byte_index + 1;
-            end
+            // if (byte_index == 0) begin
+            //     is_cancel_order <= (byte_in == MSG_TYPE);
+            //     if (byte_in == MSG_TYPE)
+            //         byte_index <= 1;
+            //     else begin
+            //         suppress_count     <= itch_length(byte_in) - 2;
+            //         is_cancel_order    <= 0;
+            //         byte_index         <= 0;
+            //     end
+            // end else begin
+            //     byte_index <= byte_index + 1;
+            // end
 
             if (is_cancel_order) begin
                 case (byte_index)
@@ -134,19 +139,27 @@ module cancel_order_decoder (
                 endcase
 
                 if (byte_index == MSG_LENGTH - 1)
-                    cancel_internal_valid <= 1;
+                    // cancel_internal_valid <= 1;
+                    `internal_valid <= 1;
             end
 
             if (byte_index >= MSG_LENGTH && is_cancel_order)
-                cancel_packet_invalid <= 1;
+                // cancel_packet_invalid <= 1;
+                `packet_invalid <= 1;
         end
 
-        // Defensive invalid packet catch
-        if (is_cancel_order && (
+        if (`is_order && (
             (valid_in == 0 && byte_index > 0 && byte_index < MSG_LENGTH) ||
             (byte_index >= MSG_LENGTH)
         ))
-            cancel_packet_invalid <= 1;
+            `packet_invalid <= 1;
+
+        // // Defensive invalid packet catch
+        // if (is_cancel_order && (
+        //     (valid_in == 0 && byte_index > 0 && byte_index < MSG_LENGTH) ||
+        //     (byte_index >= MSG_LENGTH)
+        // ))
+        //     cancel_packet_invalid <= 1;
 
         // --- Clear or prepare for next ---
         if (byte_index == MSG_LENGTH) begin

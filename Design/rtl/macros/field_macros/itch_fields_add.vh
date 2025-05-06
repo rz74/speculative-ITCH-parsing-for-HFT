@@ -10,6 +10,7 @@
 `define shares           add_shares
 `define price            add_price
 `define stock_symbol     add_stock_symbol
+`define is_order         is_add_order   //used by ITCH_CORE_DECODE
 
 `define ITCH_RESET_FIELDS        \
     `internal_valid <= 0;        \

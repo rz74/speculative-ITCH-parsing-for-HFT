@@ -9,6 +9,7 @@
 `define new_order_ref     replace_new_order_ref
 `define shares            replace_shares
 `define price             replace_price
+`define is_order          is_replace_order   // NEW: used by ITCH_CORE_DECODE
 
 `define ITCH_RESET_FIELDS          \
     `internal_valid    <= 0;       \

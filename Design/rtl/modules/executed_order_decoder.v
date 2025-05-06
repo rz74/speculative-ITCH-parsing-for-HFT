@@ -53,6 +53,7 @@ module executed_order_decoder (
     `include "macros/itch_suppression.vh"
     `include "macros/field_macros/itch_fields_executed.vh"
     `include "macros/itch_reset.vh"
+    `include "macros/itch_core_decode.vh"
 
 
     // function automatic logic [5:0] itch_length(input logic [7:0] msg_type);
@@ -86,7 +87,8 @@ module executed_order_decoder (
     always_ff @(posedge clk) begin
         if (rst) begin
             byte_index          <= 0;
-            is_exec_order       <= 0;
+            `is_order          <= 0;
+            // is_exec_order       <= 0;
             `ITCH_RESET_LOGIC
             // exec_internal_valid <= 0;
             // exec_packet_invalid <= 0;
@@ -95,23 +97,28 @@ module executed_order_decoder (
             // exec_match_id       <= 0;
             // exec_timestamp      <= 0;
         end else if (valid_in && decoder_enabled) begin
-            exec_internal_valid <= 0;
-            exec_packet_invalid <= 0;
 
-            if (byte_index == 0) begin
-                is_exec_order <= (byte_in == MSG_TYPE);
-                if (byte_in == MSG_TYPE)
-                    byte_index <= 1;
-                else begin
-                    suppress_count <= itch_length(byte_in) - 2;
-                    is_exec_order  <= 0;
-                    byte_index     <= 0;
-                end
-            end else begin
-                byte_index <= byte_index + 1;
-            end
+            `ITCH_CORE_DECODE(MSG_TYPE, MSG_LENGTH)
+            `internal_valid <= 0;
+            `packet_invalid <= 0;
+            // exec_internal_valid <= 0;
+            // exec_packet_invalid <= 0;
 
-            if (is_exec_order) begin
+            // if (byte_index == 0) begin
+            //     is_exec_order <= (byte_in == MSG_TYPE);
+            //     if (byte_in == MSG_TYPE)
+            //         byte_index <= 1;
+            //     else begin
+            //         suppress_count <= itch_length(byte_in) - 2;
+            //         is_exec_order  <= 0;
+            //         byte_index     <= 0;
+            //     end
+            // end else begin
+            //     byte_index <= byte_index + 1;
+            // end
+            
+            // if (is_exec_order) begin
+            if (`is_order) begin
                 case (byte_index)
                     1:  exec_timestamp[47:40] <= byte_in;
                     2:  exec_timestamp[39:32] <= byte_in;
@@ -145,18 +152,26 @@ module executed_order_decoder (
                 endcase
 
                 if (byte_index == MSG_LENGTH - 1)
-                    exec_internal_valid <= 1;
+                    // exec_internal_valid <= 1;
+                    `internal_valid <= 1;
             end
 
             if (byte_index >= MSG_LENGTH && is_exec_order)
-                exec_packet_invalid <= 1;
+                // exec_packet_invalid <= 1;
+                `packet_invalid <= 1;
         end
 
-        if (is_exec_order && (
+        if (`is_order && (
             (valid_in == 0 && byte_index > 0 && byte_index < MSG_LENGTH) ||
             (byte_index >= MSG_LENGTH)
         ))
-            exec_packet_invalid <= 1;
+            `packet_invalid <= 1;
+
+        // if (is_exec_order && (
+        //     (valid_in == 0 && byte_index > 0 && byte_index < MSG_LENGTH) ||
+        //     (byte_index >= MSG_LENGTH)
+        // ))
+        //     exec_packet_invalid <= 1;
 
         if (byte_index == MSG_LENGTH) begin
             exec_internal_valid <= 0;

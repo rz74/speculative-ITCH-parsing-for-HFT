@@ -79,6 +79,7 @@ module replace_order_decoder (
     `include "macros/itch_suppression.vh"
     `include "macros/field_macros/itch_fields_replace.vh"
     `include "macros/itch_reset.vh"
+    `include "macros/itch_core_decode.vh"
 
 
     // function automatic logic [5:0] itch_length(input logic [7:0] msg_type);
@@ -112,7 +113,8 @@ module replace_order_decoder (
     always_ff @(posedge clk) begin
         if (rst) begin
             byte_index              <= 0;
-            is_replace_order        <= 0;
+            `is_order          <= 0;
+            // is_replace_order        <= 0;
             `ITCH_RESET_LOGIC
             // replace_internal_valid  <= 0;
             // replace_packet_invalid  <= 0;
@@ -121,23 +123,28 @@ module replace_order_decoder (
             // replace_shares          <= 0;
             // replace_price           <= 0;
         end else if (valid_in && decoder_enabled) begin
-            replace_internal_valid <= 0;
-            replace_packet_invalid <= 0;
 
-            if (byte_index == 0) begin
-                is_replace_order <= (byte_in == MSG_TYPE);
-                if (byte_in == MSG_TYPE)
-                    byte_index <= 1;
-                else begin
-                    suppress_count <= itch_length(byte_in) - 2;
-                    is_replace_order <= 0;
-                    byte_index <= 0;
-                end
-            end else begin
-                byte_index <= byte_index + 1;
-            end
+            `ITCH_CORE_DECODE(MSG_TYPE, MSG_LENGTH)
+            `internal_valid <= 0;
+            `packet_invalid <= 0;
+            // replace_internal_valid <= 0;
+            // replace_packet_invalid <= 0;
 
-            if (is_replace_order) begin
+            // if (byte_index == 0) begin
+            //     is_replace_order <= (byte_in == MSG_TYPE);
+            //     if (byte_in == MSG_TYPE)
+            //         byte_index <= 1;
+            //     else begin
+            //         suppress_count <= itch_length(byte_in) - 2;
+            //         is_replace_order <= 0;
+            //         byte_index <= 0;
+            //     end
+            // end else begin
+            //     byte_index <= byte_index + 1;
+            // end
+
+            // if (is_replace_order) begin
+            if (`is_order) begin
                 case (byte_index)
                     1:  replace_old_order_ref[63:56] <= byte_in;
                     2:  replace_old_order_ref[55:48] <= byte_in;
@@ -167,18 +174,26 @@ module replace_order_decoder (
                 endcase
 
                 if (byte_index == MSG_LENGTH - 1)
-                    replace_internal_valid <= 1;
+                    // replace_internal_valid <= 1;
+                    `internal_valid <= 1;
             end
 
             if (byte_index >= MSG_LENGTH && is_replace_order)
-                replace_packet_invalid <= 1;
+                // replace_packet_invalid <= 1;
+                `packet_invalid <= 1;
         end
 
-        if (is_replace_order && (
+        if (`is_order && (
             (valid_in == 0 && byte_index > 0 && byte_index < MSG_LENGTH) ||
             (byte_index >= MSG_LENGTH)
         ))
-            replace_packet_invalid <= 1;
+            `packet_invalid <= 1;
+
+        // if (is_replace_order && (
+        //     (valid_in == 0 && byte_index > 0 && byte_index < MSG_LENGTH) ||
+        //     (byte_index >= MSG_LENGTH)
+        // ))
+        //     replace_packet_invalid <= 1;
 
         if (byte_index == MSG_LENGTH) begin
             replace_internal_valid  <= 0;

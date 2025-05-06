@@ -9,6 +9,7 @@
 `define shares           exec_shares
 `define match_id         exec_match_id
 `define timestamp        exec_timestamp
+`define is_order         is_exec_order   // used by ITCH_CORE_DECODE
 
 `define ITCH_RESET_FIELDS        \
     `internal_valid <= 0;        \

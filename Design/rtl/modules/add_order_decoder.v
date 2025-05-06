@@ -72,6 +72,7 @@ module add_order_decoder (
     `include "macros/itch_suppression.vh"
     `include "macros/field_macros/itch_fields_add.vh"
     `include "macros/itch_reset.vh"
+    `include "macros/itch_core_decode.vh"
 
 
     // function automatic logic [5:0] itch_length(input logic [7:0] msg_type);
@@ -108,7 +109,8 @@ module add_order_decoder (
     always_ff @(posedge clk) begin
         if (rst) begin
             byte_index         <= 0;
-            is_add_order       <= 0;
+            `is_order          <= 0;
+            // is_add_order       <= 0;
 
             `ITCH_RESET_LOGIC
 
@@ -121,23 +123,30 @@ module add_order_decoder (
             // add_stock_symbol   <= 0;
 
         end else if (valid_in && decoder_enabled) begin
-            add_internal_valid <= 0;
-            add_packet_invalid <= 0;
 
-            if (byte_index == 0) begin
-                is_add_order <= (byte_in == MSG_TYPE);
-                if (byte_in == MSG_TYPE)
-                    byte_index <= 1;
-                else begin
-                    suppress_count <= itch_length(byte_in) - 2;
-                    is_add_order   <= 0;
-                    byte_index     <= 0;
-                end
-            end else begin
-                byte_index <= byte_index + 1;
-            end
+            `ITCH_CORE_DECODE(MSG_TYPE, MSG_LENGTH)
+            `internal_valid <= 0;
+            `packet_invalid <= 0;
 
-            if (is_add_order) begin
+
+            // add_internal_valid <= 0;
+            // add_packet_invalid <= 0;
+
+            // if (byte_index == 0) begin
+            //     is_add_order <= (byte_in == MSG_TYPE);
+            //     if (byte_in == MSG_TYPE)
+            //         byte_index <= 1;
+            //     else begin
+            //         suppress_count <= itch_length(byte_in) - 2;
+            //         is_add_order   <= 0;
+            //         byte_index     <= 0;
+            //     end
+            // end else begin
+            //     byte_index <= byte_index + 1;
+            // end
+
+            // if (is_add_order) begin
+            if (`is_order) begin
                 case (byte_index)
                     1:  add_order_ref[63:56]     <= byte_in;
                     2:  add_order_ref[55:48]     <= byte_in;
@@ -167,18 +176,27 @@ module add_order_decoder (
                 endcase
 
                 if (byte_index == MSG_LENGTH - 1)
-                    add_internal_valid <= 1;
+                    `internal_valid <= 1;
+                    // add_internal_valid <= 1;
             end
 
             if (byte_index >= MSG_LENGTH && is_add_order)
-                add_packet_invalid <= 1;
+                // add_packet_invalid <= 1;
+                `packet_invalid <= 1;
         end
 
-        if (is_add_order && (
+        if (`is_order && (
             (valid_in == 0 && byte_index > 0 && byte_index < MSG_LENGTH) ||
             (byte_index >= MSG_LENGTH)
         ))
-            add_packet_invalid <= 1;
+            `packet_invalid <= 1;
+
+
+        // if (is_add_order && (
+        //     (valid_in == 0 && byte_index > 0 && byte_index < MSG_LENGTH) ||
+        //     (byte_index >= MSG_LENGTH)
+        // ))
+        //     add_packet_invalid <= 1;
 
         // --- Reset or prepare next ---
         if (byte_index == MSG_LENGTH) begin

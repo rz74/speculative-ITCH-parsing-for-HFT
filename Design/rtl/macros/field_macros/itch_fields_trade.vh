@@ -12,6 +12,7 @@
 `define stock_symbol      trade_stock_symbol
 `define price             trade_price
 `define match_id          trade_match_id
+`define is_order          is_trade   //used by ITCH_CORE_DECODE
 
 `define ITCH_RESET_FIELDS            \
     `internal_valid    <= 0;         \
