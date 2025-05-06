@@ -1,7 +1,16 @@
-// ============================================================
+// =============================================
 // itch_suppression.vh
-// Handles suppression count and decoder enable logic
-// ============================================================
+// =============================================
+//
+// Description: Suppression counter and decoder enable signal used when skipping
+//              uninterested ITCH messages.
+// Author: RZ
+// Start Date: 20250505
+// Version: 0.1
+//
+// Changelog
+// =============================================
+// [20250505-1] RZ: Moved suppression logic to macro form for reuse.
 
 logic [5:0] suppress_count;
 wire decoder_enabled = (suppress_count == 0);

@@ -6,7 +6,7 @@
 //              Begins decoding at byte 0 and maps order_ref from byte 1.
 // Author: RZ
 // Start Date: 20250430
-// Version: 0.6
+// Version: 0.7
 //
 // Changelog
 // =============================================
@@ -16,6 +16,7 @@
 // [20250501-3] RZ: Fully speculative decode without waiting for type match.
 // [20250501-4] RZ: Rebased order_ref to start at byte 1 (byte 0 is msg_type).
 // [20250502-1] RZ: Added self disable and zeroing of signals after message parsing completion.
+// [20250505-1] RZ: Updated to use macros
 // =============================================
 
 // ------------------------------------------------------------------------------------------------
@@ -74,53 +75,15 @@ module add_order_decoder (
     `include "macros/itch_reset.vh"
     `include "macros/itch_core_decode.vh"
 
-
-    // function automatic logic [5:0] itch_length(input logic [7:0] msg_type);
-    //     case (msg_type)
-    //         "A": return 36;
-    //         "X": return 23;
-    //         "U": return 27;
-    //         "D": return 9;
-    //         "E": return 30;
-    //         "P": return 40;
-    //         default: return 2;
-    //     endcase
-    // endfunction
-
-    // logic [5:0] suppress_count;
     logic [5:0] byte_index;
     logic       is_add_order;
     
-    
-
-    
-    // wire decoder_enabled = (suppress_count == 0);  
-
-    // // Suppression logic
-    // always_ff @(posedge clk) begin
-    //     if (rst) begin
-    //         suppress_count <= 0;
-    //     end else if (suppress_count != 0) begin
-    //         suppress_count <= suppress_count - 1;
-    //     end
-    // end
-
     // Main decode logic
     always_ff @(posedge clk) begin
         if (rst) begin
             byte_index         <= 0;
             `is_order          <= 0;
-            // is_add_order       <= 0;
-
             `ITCH_RESET_LOGIC
-
-            // add_internal_valid <= 0;
-            // add_packet_invalid <= 0;
-            // add_order_ref      <= 0;
-            // add_side           <= 0;
-            // add_shares         <= 0;
-            // add_price          <= 0;
-            // add_stock_symbol   <= 0;
 
         end else if (valid_in && decoder_enabled) begin
 
@@ -128,24 +91,6 @@ module add_order_decoder (
             `internal_valid <= 0;
             `packet_invalid <= 0;
 
-
-            // add_internal_valid <= 0;
-            // add_packet_invalid <= 0;
-
-            // if (byte_index == 0) begin
-            //     is_add_order <= (byte_in == MSG_TYPE);
-            //     if (byte_in == MSG_TYPE)
-            //         byte_index <= 1;
-            //     else begin
-            //         suppress_count <= itch_length(byte_in) - 2;
-            //         is_add_order   <= 0;
-            //         byte_index     <= 0;
-            //     end
-            // end else begin
-            //     byte_index <= byte_index + 1;
-            // end
-
-            // if (is_add_order) begin
             if (`is_order) begin
                 case (byte_index)
                     1:  add_order_ref[63:56]     <= byte_in;
@@ -177,11 +122,11 @@ module add_order_decoder (
 
                 if (byte_index == MSG_LENGTH - 1)
                     `internal_valid <= 1;
-                    // add_internal_valid <= 1;
+                    
             end
 
             if (byte_index >= MSG_LENGTH && is_add_order)
-                // add_packet_invalid <= 1;
+             
                 `packet_invalid <= 1;
         end
 
@@ -191,35 +136,6 @@ module add_order_decoder (
         ))
             `packet_invalid <= 1;
 
-
-        // if (is_add_order && (
-        //     (valid_in == 0 && byte_index > 0 && byte_index < MSG_LENGTH) ||
-        //     (byte_index >= MSG_LENGTH)
-        // ))
-        //     add_packet_invalid <= 1;
-
-        // --- Reset or prepare next ---
-        // if (byte_index == MSG_LENGTH) begin
-        //     add_internal_valid <= 0;
-        //     add_packet_invalid <= 0;
-        //     add_order_ref      <= 0;
-        //     add_side           <= 0;
-        //     add_shares         <= 0;
-        //     add_price          <= 0;
-        //     add_stock_symbol   <= 0;
-
-        //     if (valid_in && byte_in == MSG_TYPE) begin
-        //         is_add_order <= 1;
-        //         byte_index   <= 1;
-        //     end else if (valid_in) begin
-        //         is_add_order   <= 0;
-        //         byte_index     <= 0;
-        //         suppress_count <= itch_length(byte_in) - 2;
-        //     end else begin
-        //         is_add_order <= 0;
-        //         byte_index   <= 0;
-        //     end
-        // end
         `ITCH_RECHECK_OR_SUPPRESS(MSG_TYPE, MSG_LENGTH)
 
     end

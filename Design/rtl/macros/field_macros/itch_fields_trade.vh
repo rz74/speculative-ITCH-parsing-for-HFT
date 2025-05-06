@@ -1,7 +1,15 @@
-// ============================================================
+// =============================================
 // itch_fields_trade.vh
-// Signal mapping and field reset for Trade decoder
-// ============================================================
+// =============================================
+//
+// Description: Signal name indirection and reset assignment macro for Trade decoder.
+// Author: RZ
+// Start Date: 20250505
+// Version: 0.1
+//
+// Changelog
+// =============================================
+// [20250505-1] RZ: Initial field mapping for trade_decoder.
 
 `define internal_valid    trade_internal_valid
 `define packet_invalid    trade_packet_invalid

@@ -1,7 +1,15 @@
-// ============================================================
+// =============================================
 // itch_fields_executed.vh
-// Signal mapping and field reset for Executed Order decoder
-// ============================================================
+// =============================================
+//
+// Description: Signal name indirection and reset assignment macro for Executed Order decoder.
+// Author: RZ
+// Start Date: 20250505
+// Version: 0.1
+//
+// Changelog
+// =============================================
+// [20250505-1] RZ: Initial field mapping for executed_order_decoder.
 
 `define internal_valid   exec_internal_valid
 `define packet_invalid   exec_packet_invalid

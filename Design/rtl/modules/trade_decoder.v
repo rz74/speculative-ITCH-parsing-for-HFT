@@ -7,13 +7,14 @@
 //
 // Author: RZ
 // Start Date: 20250501
-// Version: 0.2
+// Version: 0.4
 //
 // Changelog
 // =============================================
 // [20250501-1] RZ: Initial implementation with symbol and price extraction.
 // [20250501-2] RZ: Added self disable and zeroing of signals after message parsing completion.
 // [20250502-1] RZ: Updated msg structure
+// [20250505-1] RZ: Updated to use macros
 // =============================================
 // ------------------------------------------------------------------------------------------------
 // Protocol Version Note:
@@ -90,33 +91,8 @@ module trade_decoder (
     `include "macros/itch_reset.vh"
     `include "macros/itch_core_decode.vh"
 
-
-    // function automatic logic [5:0] itch_length(input logic [7:0] msg_type);
-    //     case (msg_type)
-    //         "A": return 36;
-    //         "X": return 23;
-    //         "U": return 27;
-    //         "D": return 9;
-    //         "E": return 30;
-    //         "P": return 40;
-    //         default: return 2;
-    //     endcase
-    // endfunction
-
-    // logic [5:0] suppress_count;
     logic [5:0] byte_index;
     logic       is_trade;
-
-    // wire decoder_enabled = (suppress_count == 0);
-
-    // Suppression logic
-    // always_ff @(posedge clk) begin
-    //     if (rst) begin
-    //         suppress_count <= 0;
-    //     end else if (suppress_count != 0) begin
-    //         suppress_count <= suppress_count - 1;
-    //     end
-    // end
 
     // Main decode logic
     always_ff @(posedge clk) begin
@@ -126,39 +102,12 @@ module trade_decoder (
             
             `ITCH_RESET_LOGIC
 
-            // is_trade              <= 0;
-            // trade_internal_valid  <= 0;
-            // trade_packet_invalid  <= 0;
-            // trade_timestamp       <= 0;
-            // trade_order_ref       <= 0;
-            // trade_side            <= 0;
-            // trade_shares          <= 0;
-            // trade_stock_symbol    <= 0;
-            // trade_price           <= 0;
-            // trade_match_id        <= 0;
         end else if (valid_in && decoder_enabled) begin
 
             `ITCH_CORE_DECODE(MSG_TYPE, MSG_LENGTH)
             `internal_valid <= 0;
             `packet_invalid <= 0;
 
-            // trade_internal_valid <= 0;
-            // trade_packet_invalid <= 0;
-
-            // if (byte_index == 0) begin
-            //     is_trade <= (byte_in == MSG_TYPE);
-            //     if (byte_in == MSG_TYPE)
-            //         byte_index <= 1;
-            //     else begin
-            //         suppress_count <= itch_length(byte_in) - 2;
-            //         is_trade       <= 0;
-            //         byte_index     <= 0;
-            //     end
-            // end else begin
-            //     byte_index <= byte_index + 1;
-            // end
-
-            // if (is_trade) begin
             if (`is_order) begin
                 case (byte_index)
                     1:  trade_timestamp[47:40] <= byte_in;
@@ -211,11 +160,11 @@ module trade_decoder (
 
                 if (byte_index == MSG_LENGTH - 1)
                     `internal_valid <= 1;
-                    // trade_internal_valid <= 1;
+                    
             end
 
             if (byte_index >= MSG_LENGTH && is_trade)
-                // trade_packet_invalid <= 1;
+               
                 `packet_invalid <= 1;
         end
 
@@ -224,36 +173,6 @@ module trade_decoder (
             (byte_index >= MSG_LENGTH)
         ))
             `packet_invalid <= 1;
-
-        // if (is_trade && (
-        //     (valid_in == 0 && byte_index > 0 && byte_index < MSG_LENGTH) ||
-        //     (byte_index >= MSG_LENGTH)
-        // ))
-        //     trade_packet_invalid <= 1;
-
-        // if (byte_index == MSG_LENGTH) begin
-        //     trade_internal_valid <= 0;
-        //     trade_packet_invalid <= 0;
-        //     trade_timestamp      <= 0;
-        //     trade_order_ref      <= 0;
-        //     trade_side           <= 0;
-        //     trade_shares         <= 0;
-        //     trade_stock_symbol   <= 0;
-        //     trade_price          <= 0;
-        //     trade_match_id       <= 0;
-
-        //     if (valid_in && byte_in == MSG_TYPE) begin
-        //         is_trade   <= 1;
-        //         byte_index <= 1;
-        //     end else if (valid_in) begin
-        //         is_trade       <= 0;
-        //         byte_index     <= 0;
-        //         suppress_count <= itch_length(byte_in) - 2;
-        //     end else begin
-        //         is_trade   <= 0;
-        //         byte_index <= 0;
-        //     end
-        // end
 
         `ITCH_RECHECK_OR_SUPPRESS(MSG_TYPE, MSG_LENGTH)
     end

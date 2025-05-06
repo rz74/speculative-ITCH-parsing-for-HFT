@@ -1,7 +1,15 @@
-// ============================================================
+// =============================================
 // itch_fields_delete.vh
-// Signal mapping and field reset for Delete Order decoder
-// ============================================================
+// =============================================
+//
+// Description: Signal name indirection and reset assignment macro for Delete Order decoder.
+// Author: RZ
+// Start Date: 20250505
+// Version: 0.1
+//
+// Changelog
+// =============================================
+// [20250505-1] RZ: Initial field mapping for delete_order_decoder.
 
 `define internal_valid   delete_internal_valid
 `define packet_invalid   delete_packet_invalid

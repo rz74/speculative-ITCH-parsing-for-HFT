@@ -1,7 +1,15 @@
-// ============================================================
+// =============================================
 // itch_fields_replace.vh
-// Signal mapping and field reset for Replace Order decoder
-// ============================================================
+// =============================================
+//
+// Description: Signal name indirection and reset assignment macro for Replace Order decoder.
+// Author: RZ
+// Start Date: 20250505
+// Version: 0.1
+//
+// Changelog
+// =============================================
+// [20250505-1] RZ: Initial field mapping for replace_order_decoder.
 
 `define internal_valid    replace_internal_valid
 `define packet_invalid    replace_packet_invalid
@@ -9,7 +17,7 @@
 `define new_order_ref     replace_new_order_ref
 `define shares            replace_shares
 `define price             replace_price
-`define is_order          is_replace_order   // NEW: used by ITCH_CORE_DECODE
+`define is_order          is_replace_order    
 
 `define ITCH_RESET_FIELDS          \
     `internal_valid    <= 0;       \

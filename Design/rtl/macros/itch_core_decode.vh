@@ -1,7 +1,17 @@
-// ============================================================
+// =============================================
 // itch_core_decode.vh
-// Core decoding logic for message type match and byte tracking
-// ============================================================
+// =============================================
+//
+// Description: Core speculative decode macro for byte_index advancement,
+//              type match, and suppression fallback. Includes post-boundary
+//              recheck logic via ITCH_RECHECK_OR_SUPPRESS.
+// Author: RZ
+// Start Date: 20250505
+// Version: 0.1
+//
+// Changelog
+// =============================================
+// [20250505-1] RZ: Introduced ITCH_CORE_DECODE and ITCH_RECHECK_OR_SUPPRESS macros.
 
 `define ITCH_CORE_DECODE(MSG_TYPE, MSG_LENGTH)              \
     if (byte_index == 0) begin                              \

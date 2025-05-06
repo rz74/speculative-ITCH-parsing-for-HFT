@@ -5,7 +5,7 @@
 // Description: Module to decode Cancel Order ('X') messages from ITCH payloads.
 // Author: RZ
 // Start Date: 04172025
-// Version: 0.5
+// Version: 0.6
 // Changelog
 // =============================================
 // [20250427-1] RZ: Initial version created for Cancel Order payload decoding.
@@ -13,7 +13,7 @@
 // [20250428-2] RZ: Added valid_flag signal 
 // [20250501-1] RZ: Initial implementation based on add_order_decoder structure with new arch.
 // [20250502-1] RZ: Added self disable and zeroing of signals after message parsing completion.
-// 
+// [20250505-1] RZ: Updated to use macros
 // =============================================
 // ------------------------------------------------------------------------------------------------
 // Architecture Notes:
@@ -63,64 +63,19 @@ module cancel_order_decoder (
     `include "macros/itch_reset.vh"
     `include "macros/itch_core_decode.vh"
 
-
-    // // ITCH message length mapping
-    // function automatic logic [5:0] itch_length(input logic [7:0] msg_type);
-    //     case (msg_type)
-    //         "A": return 36;
-    //         "X": return 23;
-    //         "U": return 27;
-    //         "D": return 9;
-    //         "E": return 30;
-    //         "P": return 40;
-    //         default: return 2;
-    //     endcase
-    // endfunction
-
-    // logic [5:0] suppress_count;
     logic [5:0] byte_index;
     logic       is_cancel_order;
-
-    // wire decoder_enabled = (suppress_count == 0);
-
-    // // Suppression counter
-    // always_ff @(posedge clk) begin
-    //     if (rst) begin
-    //         suppress_count <= 0;
-    //     end else if (suppress_count != 0) begin
-    //         suppress_count <= suppress_count - 1;
-    //     end
-    // end
 
     always_ff @(posedge clk) begin
         if (rst) begin
             byte_index              <= 0;
-            // is_cancel_order         <= 0;
             `is_order         <= 0;
             `ITCH_RESET_LOGIC
-            // cancel_internal_valid   <= 0;
-            // cancel_packet_invalid   <= 0;
-            // cancel_order_ref        <= 0;
-            // cancel_canceled_shares  <= 0;
+
         end else if (valid_in && decoder_enabled) begin
                 `ITCH_CORE_DECODE(MSG_TYPE, MSG_LENGTH)
                 `internal_valid <= 0;
                 `packet_invalid <= 0;
-            // cancel_internal_valid <= 0;
-            // cancel_packet_invalid <= 0;
-
-            // if (byte_index == 0) begin
-            //     is_cancel_order <= (byte_in == MSG_TYPE);
-            //     if (byte_in == MSG_TYPE)
-            //         byte_index <= 1;
-            //     else begin
-            //         suppress_count     <= itch_length(byte_in) - 2;
-            //         is_cancel_order    <= 0;
-            //         byte_index         <= 0;
-            //     end
-            // end else begin
-            //     byte_index <= byte_index + 1;
-            // end
 
             if (is_cancel_order) begin
                 case (byte_index)
@@ -139,12 +94,12 @@ module cancel_order_decoder (
                 endcase
 
                 if (byte_index == MSG_LENGTH - 1)
-                    // cancel_internal_valid <= 1;
+                   
                     `internal_valid <= 1;
             end
 
             if (byte_index >= MSG_LENGTH && is_cancel_order)
-                // cancel_packet_invalid <= 1;
+                
                 `packet_invalid <= 1;
         end
 
@@ -154,32 +109,6 @@ module cancel_order_decoder (
         ))
             `packet_invalid <= 1;
 
-        // // Defensive invalid packet catch
-        // if (is_cancel_order && (
-        //     (valid_in == 0 && byte_index > 0 && byte_index < MSG_LENGTH) ||
-        //     (byte_index >= MSG_LENGTH)
-        // ))
-        //     cancel_packet_invalid <= 1;
-
-        // --- Clear or prepare for next ---
-        // if (byte_index == MSG_LENGTH) begin
-        //     cancel_internal_valid   <= 0;
-        //     cancel_packet_invalid   <= 0;
-        //     cancel_order_ref        <= 0;
-        //     cancel_canceled_shares  <= 0;
-
-        //     if (valid_in && byte_in == MSG_TYPE) begin
-        //         is_cancel_order <= 1;
-        //         byte_index      <= 1;
-        //     end else if (valid_in) begin
-        //         is_cancel_order <= 0;
-        //         byte_index      <= 0;
-        //         suppress_count  <= itch_length(byte_in) - 2;
-        //     end else begin
-        //         is_cancel_order <= 0;
-        //         byte_index      <= 0;
-        //     end
-        // end
         `ITCH_RECHECK_OR_SUPPRESS(MSG_TYPE, MSG_LENGTH)
     end
 

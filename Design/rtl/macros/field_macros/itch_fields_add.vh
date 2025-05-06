@@ -1,7 +1,15 @@
-// ============================================================
+// =============================================
 // itch_fields_add.vh
-// Signal mapping and field reset for Add Order decoder
-// ============================================================
+// =============================================
+//
+// Description: Signal name indirection and reset assignment macro for Add Order decoder.
+// Author: RZ
+// Start Date: 20250505
+// Version: 0.1
+//
+// Changelog
+// =============================================
+// [20250505-1] RZ: Initial field mapping for add_order_decoder.
 
 `define internal_valid   add_internal_valid
 `define packet_invalid   add_packet_invalid
