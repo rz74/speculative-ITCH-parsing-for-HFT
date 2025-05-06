@@ -1,9 +1,10 @@
-
 // =====================================================
 // integrated.v
 // =====================================================
 // Description: Integrated ITCH parser with Add and Cancel decoders
 // =====================================================
+
+
 
 module integrated (
     input  logic        clk,
@@ -17,11 +18,8 @@ module integrated (
     output logic        replace_internal_valid,
     output logic        exec_internal_valid,
     output logic        trade_internal_valid
+    );
 
-
-);
-
-    
     logic        add_packet_invalid;
     logic [63:0] add_order_ref;
     logic        add_side;
@@ -54,9 +52,6 @@ module integrated (
     logic [63:0] trade_match_id;
     logic [31:0] trade_price;
     logic [63:0] trade_stock_symbol;
- 
-
-
 
     add_order_decoder u_add (
         .clk(clk),
@@ -128,16 +123,15 @@ module integrated (
         .trade_shares       (trade_shares),
         .trade_price        (trade_price),
         .trade_match_id     (trade_match_id),
-        .trade_stock_symbol       (trade_stock_symbol)
+        .trade_stock_symbol (trade_stock_symbol)
     );
 
-
-            // ======================= Waveform Dump =======================
-            `ifdef COCOTB_SIM
-            initial begin
-                $dumpfile("dump.vcd");
-                $dumpvars(0, integrated);
-            end
-            `endif
+    // ======================= Waveform Dump =======================
+    `ifdef COCOTB_SIM
+    initial begin
+        $dumpfile("dump.vcd");
+        $dumpvars(0, integrated);
+    end
+    `endif
 
 endmodule

@@ -32,22 +32,22 @@
 # Author: RZ
  
 # =============================================
- TOPLEVEL_LANG = verilog
+TOPLEVEL_LANG = verilog
 
 VERILOG_SOURCES = \
-    ../rtl/add_order_decoder.v \
-    ../rtl/cancel_order_decoder.v \
-    ../rtl/delete_order_decoder.v \
-    ../rtl/replace_order_decoder.v \
-    ../rtl/executed_order_decoder.v \
-    ../rtl/trade_decoder.v \
-    ../rtl/decoder_watchdog.v \
+    ../rtl/modules/add_order_decoder.v \
+    ../rtl/modules/cancel_order_decoder.v \
+    ../rtl/modules/delete_order_decoder.v \
+    ../rtl/modules/replace_order_decoder.v \
+    ../rtl/modules/executed_order_decoder.v \
+    ../rtl/modules/trade_decoder.v \
     ../rtl/integrated.v
 
 TOPLEVEL = integrated
 SIM = icarus
 
-# Correct include path for itch_utils.vh
+# =============================================
+# Simulation Options
 COMPILE_ARGS += -g2012 -DCOCOTB_SIM -I../rtl
 EXTRA_ARGS ?=
 
