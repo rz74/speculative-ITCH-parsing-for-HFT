@@ -231,29 +231,31 @@ module trade_decoder (
         // ))
         //     trade_packet_invalid <= 1;
 
-        if (byte_index == MSG_LENGTH) begin
-            trade_internal_valid <= 0;
-            trade_packet_invalid <= 0;
-            trade_timestamp      <= 0;
-            trade_order_ref      <= 0;
-            trade_side           <= 0;
-            trade_shares         <= 0;
-            trade_stock_symbol   <= 0;
-            trade_price          <= 0;
-            trade_match_id       <= 0;
+        // if (byte_index == MSG_LENGTH) begin
+        //     trade_internal_valid <= 0;
+        //     trade_packet_invalid <= 0;
+        //     trade_timestamp      <= 0;
+        //     trade_order_ref      <= 0;
+        //     trade_side           <= 0;
+        //     trade_shares         <= 0;
+        //     trade_stock_symbol   <= 0;
+        //     trade_price          <= 0;
+        //     trade_match_id       <= 0;
 
-            if (valid_in && byte_in == MSG_TYPE) begin
-                is_trade   <= 1;
-                byte_index <= 1;
-            end else if (valid_in) begin
-                is_trade       <= 0;
-                byte_index     <= 0;
-                suppress_count <= itch_length(byte_in) - 2;
-            end else begin
-                is_trade   <= 0;
-                byte_index <= 0;
-            end
-        end
+        //     if (valid_in && byte_in == MSG_TYPE) begin
+        //         is_trade   <= 1;
+        //         byte_index <= 1;
+        //     end else if (valid_in) begin
+        //         is_trade       <= 0;
+        //         byte_index     <= 0;
+        //         suppress_count <= itch_length(byte_in) - 2;
+        //     end else begin
+        //         is_trade   <= 0;
+        //         byte_index <= 0;
+        //     end
+        // end
+
+        `ITCH_RECHECK_OR_SUPPRESS(MSG_TYPE, MSG_LENGTH)
     end
 
 endmodule

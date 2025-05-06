@@ -173,26 +173,28 @@ module executed_order_decoder (
         // ))
         //     exec_packet_invalid <= 1;
 
-        if (byte_index == MSG_LENGTH) begin
-            exec_internal_valid <= 0;
-            exec_packet_invalid <= 0;
-            exec_order_ref      <= 0;
-            exec_shares         <= 0;
-            exec_match_id       <= 0;
-            exec_timestamp      <= 0;
+        // if (byte_index == MSG_LENGTH) begin
+        //     exec_internal_valid <= 0;
+        //     exec_packet_invalid <= 0;
+        //     exec_order_ref      <= 0;
+        //     exec_shares         <= 0;
+        //     exec_match_id       <= 0;
+        //     exec_timestamp      <= 0;
 
-            if (valid_in && byte_in == MSG_TYPE) begin
-                is_exec_order <= 1;
-                byte_index    <= 1;
-            end else if (valid_in) begin
-                is_exec_order   <= 0;
-                byte_index      <= 0;
-                suppress_count  <= itch_length(byte_in) - 2;
-            end else begin
-                is_exec_order <= 0;
-                byte_index    <= 0;
-            end
-        end
+        //     if (valid_in && byte_in == MSG_TYPE) begin
+        //         is_exec_order <= 1;
+        //         byte_index    <= 1;
+        //     end else if (valid_in) begin
+        //         is_exec_order   <= 0;
+        //         byte_index      <= 0;
+        //         suppress_count  <= itch_length(byte_in) - 2;
+        //     end else begin
+        //         is_exec_order <= 0;
+        //         byte_index    <= 0;
+        //     end
+        // end
+
+        `ITCH_RECHECK_OR_SUPPRESS(MSG_TYPE, MSG_LENGTH)
     end
 
 endmodule
