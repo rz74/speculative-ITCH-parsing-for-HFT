@@ -17,7 +17,17 @@ module integrated (
     output logic        delete_internal_valid,
     output logic        replace_internal_valid,
     output logic        exec_internal_valid,
-    output logic        trade_internal_valid
+    output logic        trade_internal_valid,
+
+    output logic [3:0] add_parsed_type,
+    output logic [3:0] cancel_parsed_type,
+    output logic [3:0] delete_parsed_type,
+    output logic [3:0] replace_parsed_type,
+    output logic [3:0] exec_parsed_type,
+    output logic [3:0] trade_parsed_type
+
+
+    
     );
 
     logic        add_packet_invalid;
@@ -64,6 +74,7 @@ module integrated (
         .add_side(add_side),
         .add_shares(add_shares),
         .add_price(add_price),
+        .add_parsed_type(add_parsed_type),
         .add_stock_symbol(add_stock_symbol)
     );
 
@@ -75,6 +86,7 @@ module integrated (
         .cancel_internal_valid(cancel_internal_valid),
         .cancel_packet_invalid(cancel_packet_invalid),
         .cancel_order_ref(cancel_order_ref),
+        .cancel_parsed_type(cancel_parsed_type),
         .cancel_canceled_shares(cancel_canceled_shares)
     );
 
@@ -84,6 +96,7 @@ module integrated (
         .byte_in               (byte_in),
         .valid_in              (valid_in),
         .delete_internal_valid(delete_internal_valid),
+        .delete_parsed_type(delete_parsed_type),
         .delete_order_ref      (delete_order_ref)
     );
 
@@ -96,6 +109,7 @@ module integrated (
         .replace_old_order_ref (replace_old_order_ref),
         .replace_new_order_ref (replace_new_order_ref),
         .replace_shares        (replace_shares),
+        .replace_parsed_type(replace_parsed_type),
         .replace_price         (replace_price)
     );
 
@@ -108,6 +122,7 @@ module integrated (
         .exec_order_ref      (exec_order_ref),
         .exec_shares         (exec_shares),
         .exec_match_id       (exec_match_id),
+        .exec_parsed_type(exec_parsed_type),
         .exec_timestamp      (exec_timestamp)
     );
 
@@ -123,6 +138,7 @@ module integrated (
         .trade_shares       (trade_shares),
         .trade_price        (trade_price),
         .trade_match_id     (trade_match_id),
+        .trade_parsed_type(trade_parsed_type),
         .trade_stock_symbol (trade_stock_symbol)
     );
 

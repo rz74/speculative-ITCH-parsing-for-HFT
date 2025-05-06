@@ -5,7 +5,7 @@
 // Description: Module to decode Cancel Order ('X') messages from ITCH payloads.
 // Author: RZ
 // Start Date: 04172025
-// Version: 0.6
+// Version: 0.7
 // Changelog
 // =============================================
 // [20250427-1] RZ: Initial version created for Cancel Order payload decoding.
@@ -14,6 +14,7 @@
 // [20250501-1] RZ: Initial implementation based on add_order_decoder structure with new arch.
 // [20250502-1] RZ: Added self disable and zeroing of signals after message parsing completion.
 // [20250505-1] RZ: Updated to use macros
+// [20250506-1] RZ: Added parsed type
 // =============================================
 // ------------------------------------------------------------------------------------------------
 // Architecture Notes:
@@ -46,6 +47,8 @@ module cancel_order_decoder (
     input  logic        rst,
     input  logic [7:0]  byte_in,
     input  logic        valid_in,
+
+    output logic [3:0] cancel_parsed_type,
 
     output logic        cancel_internal_valid,
     output logic        cancel_packet_invalid,
@@ -96,6 +99,7 @@ module cancel_order_decoder (
                 if (byte_index == MSG_LENGTH - 1)
                    
                     `internal_valid <= 1;
+                    `parsed_type    <= 4'd1;
             end
 
             if (byte_index >= MSG_LENGTH && is_cancel_order)
