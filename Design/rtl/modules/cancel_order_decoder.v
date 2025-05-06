@@ -58,6 +58,7 @@ module cancel_order_decoder (
     parameter MSG_LENGTH = 23;
 
     `include "macros/itch_len.vh"
+    `include "macros/itch_suppression.vh"
 
     // // ITCH message length mapping
     // function automatic logic [5:0] itch_length(input logic [7:0] msg_type);
@@ -72,20 +73,20 @@ module cancel_order_decoder (
     //     endcase
     // endfunction
 
-    logic [5:0] suppress_count;
+    // logic [5:0] suppress_count;
     logic [5:0] byte_index;
     logic       is_cancel_order;
 
-    wire decoder_enabled = (suppress_count == 0);
+    // wire decoder_enabled = (suppress_count == 0);
 
-    // Suppression counter
-    always_ff @(posedge clk) begin
-        if (rst) begin
-            suppress_count <= 0;
-        end else if (suppress_count != 0) begin
-            suppress_count <= suppress_count - 1;
-        end
-    end
+    // // Suppression counter
+    // always_ff @(posedge clk) begin
+    //     if (rst) begin
+    //         suppress_count <= 0;
+    //     end else if (suppress_count != 0) begin
+    //         suppress_count <= suppress_count - 1;
+    //     end
+    // end
 
     always_ff @(posedge clk) begin
         if (rst) begin
