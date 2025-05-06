@@ -64,6 +64,9 @@ module delete_order_decoder (
 
     `include "macros/itch_len.vh"
     `include "macros/itch_suppression.vh"
+    `include "macros/field_macros/itch_fields_delete.vh"
+    `include "macros/itch_reset.vh"
+
 
     // function automatic logic [5:0] itch_length(input logic [7:0] msg_type);
     //     case (msg_type)
@@ -97,9 +100,10 @@ module delete_order_decoder (
         if (rst) begin
             byte_index            <= 0;
             is_delete_order       <= 0;
-            delete_internal_valid <= 0;
-            delete_packet_invalid <= 0;
-            delete_order_ref      <= 0;
+            `ITCH_RESET_LOGIC
+            // delete_internal_valid <= 0;
+            // delete_packet_invalid <= 0;
+            // delete_order_ref      <= 0;
         end else if (valid_in && decoder_enabled) begin
             delete_internal_valid <= 0;
             delete_packet_invalid <= 0;

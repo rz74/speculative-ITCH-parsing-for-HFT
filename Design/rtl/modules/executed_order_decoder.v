@@ -51,6 +51,9 @@ module executed_order_decoder (
 
     `include "macros/itch_len.vh"
     `include "macros/itch_suppression.vh"
+    `include "macros/field_macros/itch_fields_executed.vh"
+    `include "macros/itch_reset.vh"
+
 
     // function automatic logic [5:0] itch_length(input logic [7:0] msg_type);
     //     case (msg_type)
@@ -84,12 +87,13 @@ module executed_order_decoder (
         if (rst) begin
             byte_index          <= 0;
             is_exec_order       <= 0;
-            exec_internal_valid <= 0;
-            exec_packet_invalid <= 0;
-            exec_order_ref      <= 0;
-            exec_shares         <= 0;
-            exec_match_id       <= 0;
-            exec_timestamp      <= 0;
+            `ITCH_RESET_LOGIC
+            // exec_internal_valid <= 0;
+            // exec_packet_invalid <= 0;
+            // exec_order_ref      <= 0;
+            // exec_shares         <= 0;
+            // exec_match_id       <= 0;
+            // exec_timestamp      <= 0;
         end else if (valid_in && decoder_enabled) begin
             exec_internal_valid <= 0;
             exec_packet_invalid <= 0;

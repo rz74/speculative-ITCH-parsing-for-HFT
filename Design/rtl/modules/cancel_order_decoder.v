@@ -59,6 +59,9 @@ module cancel_order_decoder (
 
     `include "macros/itch_len.vh"
     `include "macros/itch_suppression.vh"
+    `include "macros/field_macros/itch_fields_cancel.vh"
+    `include "macros/itch_reset.vh"
+
 
     // // ITCH message length mapping
     // function automatic logic [5:0] itch_length(input logic [7:0] msg_type);
@@ -92,10 +95,11 @@ module cancel_order_decoder (
         if (rst) begin
             byte_index              <= 0;
             is_cancel_order         <= 0;
-            cancel_internal_valid   <= 0;
-            cancel_packet_invalid   <= 0;
-            cancel_order_ref        <= 0;
-            cancel_canceled_shares  <= 0;
+            `ITCH_RESET_LOGIC
+            // cancel_internal_valid   <= 0;
+            // cancel_packet_invalid   <= 0;
+            // cancel_order_ref        <= 0;
+            // cancel_canceled_shares  <= 0;
         end else if (valid_in && decoder_enabled) begin
             cancel_internal_valid <= 0;
             cancel_packet_invalid <= 0;

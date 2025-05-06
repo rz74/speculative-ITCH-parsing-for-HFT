@@ -86,6 +86,9 @@ module trade_decoder (
 
     `include "macros/itch_len.vh"
     `include "macros/itch_suppression.vh"
+    `include "macros/field_macros/itch_fields_trade.vh"
+    `include "macros/itch_reset.vh"
+
 
     // function automatic logic [5:0] itch_length(input logic [7:0] msg_type);
     //     case (msg_type)
@@ -119,15 +122,16 @@ module trade_decoder (
         if (rst) begin
             byte_index            <= 0;
             is_trade              <= 0;
-            trade_internal_valid  <= 0;
-            trade_packet_invalid  <= 0;
-            trade_timestamp       <= 0;
-            trade_order_ref       <= 0;
-            trade_side            <= 0;
-            trade_shares          <= 0;
-            trade_stock_symbol    <= 0;
-            trade_price           <= 0;
-            trade_match_id        <= 0;
+            `ITCH_RESET_LOGIC
+            // trade_internal_valid  <= 0;
+            // trade_packet_invalid  <= 0;
+            // trade_timestamp       <= 0;
+            // trade_order_ref       <= 0;
+            // trade_side            <= 0;
+            // trade_shares          <= 0;
+            // trade_stock_symbol    <= 0;
+            // trade_price           <= 0;
+            // trade_match_id        <= 0;
         end else if (valid_in && decoder_enabled) begin
             trade_internal_valid <= 0;
             trade_packet_invalid <= 0;

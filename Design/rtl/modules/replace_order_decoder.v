@@ -77,6 +77,9 @@ module replace_order_decoder (
 
     `include "macros/itch_len.vh"
     `include "macros/itch_suppression.vh"
+    `include "macros/field_macros/itch_fields_replace.vh"
+    `include "macros/itch_reset.vh"
+
 
     // function automatic logic [5:0] itch_length(input logic [7:0] msg_type);
     //     case (msg_type)
@@ -110,12 +113,13 @@ module replace_order_decoder (
         if (rst) begin
             byte_index              <= 0;
             is_replace_order        <= 0;
-            replace_internal_valid  <= 0;
-            replace_packet_invalid  <= 0;
-            replace_old_order_ref   <= 0;
-            replace_new_order_ref   <= 0;
-            replace_shares          <= 0;
-            replace_price           <= 0;
+            `ITCH_RESET_LOGIC
+            // replace_internal_valid  <= 0;
+            // replace_packet_invalid  <= 0;
+            // replace_old_order_ref   <= 0;
+            // replace_new_order_ref   <= 0;
+            // replace_shares          <= 0;
+            // replace_price           <= 0;
         end else if (valid_in && decoder_enabled) begin
             replace_internal_valid <= 0;
             replace_packet_invalid <= 0;
