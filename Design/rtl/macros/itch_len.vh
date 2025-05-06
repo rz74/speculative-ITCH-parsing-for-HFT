@@ -10,7 +10,7 @@ function automatic logic [5:0] itch_length(input logic [7:0] msg_type);
         "U": return 27;  // Replace Order
         "D": return 9;   // Delete Order
         "E": return 30;  // Executed Order
-        "P": return 44;  // Trade
+        "P": return 40;  // Trade
         default: return 2; // Catch-all / suppression fallback
     endcase
 endfunction

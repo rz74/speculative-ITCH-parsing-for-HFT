@@ -1,6 +1,6 @@
 <testsuites name="results">
   <testsuite name="all" package="all">
-    <property name="random_seed" value="1746493201" />
-    <testcase name="test_full_permutations" classname="test_integrated" file="/mnt/c/Users/HYRui/Downloads/Git/speculative-ITCH-parsing-for-HFT/Design/sim/test_integrated.py" lineno="16" time="82.22412157058716" sim_time_ns="1188220.001" ratio_time="14450.990515963684" />
+    <property name="random_seed" value="1746494636" />
+    <testcase name="test_full_permutations" classname="test_integrated" file="/mnt/c/Users/HYRui/Downloads/Git/speculative-ITCH-parsing-for-HFT/Design/sim/test_integrated.py" lineno="16" time="85.9981906414032" sim_time_ns="1188220.001" ratio_time="13816.80233197767" />
   </testsuite>
 </testsuites>

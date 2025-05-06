@@ -57,18 +57,20 @@ module cancel_order_decoder (
     parameter MSG_TYPE   = 8'h58;   // ASCII 'X'
     parameter MSG_LENGTH = 23;
 
-    // ITCH message length mapping
-    function automatic logic [5:0] itch_length(input logic [7:0] msg_type);
-        case (msg_type)
-            "A": return 36;
-            "X": return 23;
-            "U": return 27;
-            "D": return 9;
-            "E": return 30;
-            "P": return 40;
-            default: return 2;
-        endcase
-    endfunction
+    `include "macros/itch_len.vh"
+
+    // // ITCH message length mapping
+    // function automatic logic [5:0] itch_length(input logic [7:0] msg_type);
+    //     case (msg_type)
+    //         "A": return 36;
+    //         "X": return 23;
+    //         "U": return 27;
+    //         "D": return 9;
+    //         "E": return 30;
+    //         "P": return 40;
+    //         default: return 2;
+    //     endcase
+    // endfunction
 
     logic [5:0] suppress_count;
     logic [5:0] byte_index;
