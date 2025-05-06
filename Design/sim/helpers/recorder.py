@@ -71,6 +71,14 @@ async def record_all_internal_valids(dut, total_cycles=300):
             "trade_price":              hex(getattr(dut, 'trade_price', 0).value.integer)           if hasattr(dut, 'trade_price') else 0,
             "trade_match_id":           hex(getattr(dut, 'trade_match_id', 0).value.integer)        if hasattr(dut, 'trade_match_id') else 0,
 
+            "add_parsed_type":      hex(getattr(dut, 'add_parsed_type', 0).value.integer)       if hasattr(dut, 'add_parsed_type') else "",
+            "cancel_parsed_type":   hex(getattr(dut, 'cancel_parsed_type', 0).value.integer)    if hasattr(dut, 'cancel_parsed_type') else "",
+            "delete_parsed_type":   hex(getattr(dut, 'delete_parsed_type', 0).value.integer)    if hasattr(dut, 'delete_parsed_type') else "",
+            "replace_parsed_type":  hex(getattr(dut, 'replace_parsed_type', 0).value.integer)   if hasattr(dut, 'replace_parsed_type') else "",
+            "exec_parsed_type":     hex(getattr(dut, 'exec_parsed_type', 0).value.integer)      if hasattr(dut, 'exec_parsed_type') else "",
+            "trade_parsed_type":    hex(getattr(dut, 'trade_parsed_type', 0).value.integer)     if hasattr(dut, 'trade_parsed_type') else "",
+
+
 
         }
 

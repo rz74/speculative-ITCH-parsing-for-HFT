@@ -48,6 +48,14 @@ SIM_HEADERS = [
     "trade_shares",
     "trade_stock_symbol",
     "trade_price",
-    "trade_match_id"
+    "trade_match_id",
+
+    "add_parsed_type",
+    "cancel_parsed_type",
+    "delete_parsed_type",
+    "replace_parsed_type",
+    "exec_parsed_type",
+    "trade_parsed_type"
+
 
 ]
