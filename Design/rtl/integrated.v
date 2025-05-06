@@ -19,12 +19,12 @@ module integrated (
     output logic        exec_internal_valid,
     output logic        trade_internal_valid,
 
-    output logic [7:0] add_parsed_type,
-    output logic [7:0] cancel_parsed_type,
-    output logic [7:0] delete_parsed_type,
-    output logic [7:0] replace_parsed_type,
-    output logic [7:0] exec_parsed_type,
-    output logic [7:0] trade_parsed_type
+    output logic [3:0] add_parsed_type,
+    output logic [3:0] cancel_parsed_type,
+    output logic [3:0] delete_parsed_type,
+    output logic [3:0] replace_parsed_type,
+    output logic [3:0] exec_parsed_type,
+    output logic [3:0] trade_parsed_type
 
 
     

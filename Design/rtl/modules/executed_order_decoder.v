@@ -39,7 +39,7 @@ module executed_order_decoder (
     input  logic [7:0]  byte_in,
     input  logic        valid_in,
 
-    output logic [7:0] exec_parsed_type,
+    output logic [3:0] exec_parsed_type,
 
 
     output logic        exec_internal_valid,
@@ -112,7 +112,7 @@ module executed_order_decoder (
                 if (byte_index == MSG_LENGTH - 1)
                
                     `internal_valid <= 1;
-                    `parsed_type    <= 8'h45;
+                    `parsed_type    <= 4'd3;
             end
 
             if (byte_index >= MSG_LENGTH && is_exec_order)

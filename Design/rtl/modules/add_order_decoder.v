@@ -57,7 +57,7 @@ module add_order_decoder (
     input  logic [7:0]  byte_in,
     input  logic        valid_in,
 
-    output logic [7:0]  add_parsed_type,
+    output logic [3:0]  add_parsed_type,
 
     output logic        add_internal_valid,
     output logic        add_packet_invalid,
@@ -125,7 +125,7 @@ module add_order_decoder (
 
                 if (byte_index == MSG_LENGTH - 1)
                     `internal_valid <= 1;
-                    `parsed_type    <= 8'h41; 
+                    `parsed_type    <= 4'd0; 
                     
             end
 

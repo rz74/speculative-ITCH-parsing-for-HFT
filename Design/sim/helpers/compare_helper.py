@@ -139,7 +139,7 @@ def generate_expected_events_from_schedule(schedule):
         row["cycle"] = expected_valid_cycle
 
         if msg_type == "add":
-            row["add_parsed_type"] = hex(ord("A"))
+            row["add_parsed_type"] = hex(0)
             row["add_internal_valid"] = 1
             row["add_order_ref"] = hex(int.from_bytes(payload[1:9], byteorder='big'))
             row["add_side"] = hex(0) if payload[9] == ord('B') else hex(1)
@@ -147,18 +147,18 @@ def generate_expected_events_from_schedule(schedule):
             row["add_price"] = hex(int.from_bytes(payload[22:26], byteorder='big'))
 
         elif msg_type == "cancel":
-            row["cancel_parsed_type"] = hex(ord("X"))
+            row["cancel_parsed_type"] = hex(1)
             row["cancel_internal_valid"] = 1
             row["cancel_order_ref"] = hex(int.from_bytes(payload[1:9], byteorder='big'))
             row["cancel_shares"] = hex(int.from_bytes(payload[9:13], byteorder='big'))
 
         elif msg_type == "delete":
-            row["delete_parsed_type"] = hex(ord("D"))
+            row["delete_parsed_type"] = hex(2)
             row["delete_internal_valid"] = 1
             row["delete_order_ref"] = hex(int.from_bytes(payload[1:9], byteorder='big'))
 
         elif msg_type == "replace":
-            row["replace_parsed_type"] = hex(ord("U"))
+            row["replace_parsed_type"] = hex(4)
             row["replace_internal_valid"] = 1
             row["replace_old_order_ref"] = hex(int.from_bytes(payload[1:9], byteorder='big'))
             row["replace_new_order_ref"] = hex(int.from_bytes(payload[9:17], byteorder='big'))
@@ -166,7 +166,7 @@ def generate_expected_events_from_schedule(schedule):
             row["replace_price"] = hex(int.from_bytes(payload[21:25], byteorder='big'))
 
         elif msg_type == "executed":
-            row["exec_parsed_type"] = hex(ord("E"))
+            row["exec_parsed_type"] = hex(3)
             row["executed_internal_valid"] = 1
             row["exec_timestamp"] = hex(int.from_bytes(payload[1:7], byteorder='big'))
             row["exec_order_ref"] = hex(int.from_bytes(payload[7:15], byteorder='big'))
@@ -174,7 +174,7 @@ def generate_expected_events_from_schedule(schedule):
             row["exec_match_id"] = hex(int.from_bytes(payload[19:27], byteorder='big'))
 
         elif msg_type == "trade":
-            row["trade_parsed_type"] = hex(ord("P"))
+            row["trade_parsed_type"] = hex(5)
             row["trade_internal_valid"] = 1
             row["trade_timestamp"] = hex(int.from_bytes(payload[1:7], byteorder='big'))
             row["trade_order_ref"] = hex(int.from_bytes(payload[7:15], byteorder='big'))
