@@ -7,7 +7,7 @@
 //
 // Author: RZ
 // Start Date: 20250501
-// Version: 0.4
+// Version: 0.5
 //
 // Changelog
 // =============================================
@@ -15,6 +15,7 @@
 // [20250502-1] RZ: Added self disable and zeroing of signals after message parsing completion.
 // [20250504-1] RZ: Fixed timestamp width to 48-bit and corrected field byte ranges.
 // [20250505-1] RZ: Updated to use macros
+// [20250506-1] RZ: Added parsed type
 // =============================================
 
 // ------------------------------------------------------------------------------------------------
@@ -37,6 +38,9 @@ module executed_order_decoder (
     input  logic        rst,
     input  logic [7:0]  byte_in,
     input  logic        valid_in,
+
+    output logic [7:0] exec_parsed_type,
+
 
     output logic        exec_internal_valid,
     output logic        exec_packet_invalid,
@@ -108,6 +112,7 @@ module executed_order_decoder (
                 if (byte_index == MSG_LENGTH - 1)
                
                     `internal_valid <= 1;
+                    `parsed_type    <= 8'h45;
             end
 
             if (byte_index >= MSG_LENGTH && is_exec_order)

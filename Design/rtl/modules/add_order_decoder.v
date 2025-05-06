@@ -6,7 +6,7 @@
 //              Begins decoding at byte 0 and maps order_ref from byte 1.
 // Author: RZ
 // Start Date: 20250430
-// Version: 0.7
+// Version: 0.8
 //
 // Changelog
 // =============================================
@@ -17,6 +17,7 @@
 // [20250501-4] RZ: Rebased order_ref to start at byte 1 (byte 0 is msg_type).
 // [20250502-1] RZ: Added self disable and zeroing of signals after message parsing completion.
 // [20250505-1] RZ: Updated to use macros
+// [20250506-1] RZ: Added parsed type output
 // =============================================
 
 // ------------------------------------------------------------------------------------------------
@@ -55,6 +56,8 @@ module add_order_decoder (
     input  logic        rst,
     input  logic [7:0]  byte_in,
     input  logic        valid_in,
+
+    output logic [7:0]  add_parsed_type,
 
     output logic        add_internal_valid,
     output logic        add_packet_invalid,
@@ -122,6 +125,7 @@ module add_order_decoder (
 
                 if (byte_index == MSG_LENGTH - 1)
                     `internal_valid <= 1;
+                    `parsed_type    <= 8'h41; 
                     
             end
 
