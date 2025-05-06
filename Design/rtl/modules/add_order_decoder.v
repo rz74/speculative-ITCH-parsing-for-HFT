@@ -70,6 +70,9 @@ module add_order_decoder (
 
     `include "macros/itch_len.vh"
     `include "macros/itch_suppression.vh"
+    `include "macros/field_macros/itch_fields_add.vh"
+    `include "macros/itch_reset.vh"
+
 
     // function automatic logic [5:0] itch_length(input logic [7:0] msg_type);
     //     case (msg_type)
@@ -106,13 +109,17 @@ module add_order_decoder (
         if (rst) begin
             byte_index         <= 0;
             is_add_order       <= 0;
-            add_internal_valid <= 0;
-            add_packet_invalid <= 0;
-            add_order_ref      <= 0;
-            add_side           <= 0;
-            add_shares         <= 0;
-            add_price          <= 0;
-            add_stock_symbol   <= 0;
+
+            `ITCH_RESET_LOGIC
+
+            // add_internal_valid <= 0;
+            // add_packet_invalid <= 0;
+            // add_order_ref      <= 0;
+            // add_side           <= 0;
+            // add_shares         <= 0;
+            // add_price          <= 0;
+            // add_stock_symbol   <= 0;
+
         end else if (valid_in && decoder_enabled) begin
             add_internal_valid <= 0;
             add_packet_invalid <= 0;
