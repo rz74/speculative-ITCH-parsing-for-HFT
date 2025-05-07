@@ -127,6 +127,7 @@ module executed_order_decoder (
             `packet_invalid <= 1;
 
         `ITCH_RECHECK_OR_SUPPRESS(MSG_TYPE, MSG_LENGTH)
+        `include "macros/itch_abort_on_valid_drop.vh"
     end
 
 endmodule

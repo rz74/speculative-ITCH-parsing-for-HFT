@@ -91,6 +91,18 @@ parser_reg: killwave
 	gtkwave vcd/parser_dump_$${TIMESTAMP}.vcd &
 
 # =============================================
+# Valid Drop Abort Test
+# =============================================
+
+valid_drop: killwave
+	@mkdir -p vcd
+	TIMESTAMP=$$(date +%m%d%Y_%H%M%S); \
+	$(MAKE) MODULE=test_valid_drop_abort TOPLEVEL=test_wrapper COMPILE_ARGS="$(COMPILE_ARGS)"; \
+	mv dump.vcd vcd/valid_drop_dump_$${TIMESTAMP}.vcd; \
+	gtkwave vcd/valid_drop_dump_$${TIMESTAMP}.vcd &
+
+
+# =============================================
 # Cleanup
 # =============================================
 cleanall:
