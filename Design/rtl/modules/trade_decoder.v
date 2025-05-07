@@ -77,7 +77,7 @@ module trade_decoder (
 
     output logic [47:0] trade_timestamp,
     output logic [63:0] trade_order_ref,
-    output logic [7:0]  trade_side,
+    output logic        trade_side,
     output logic [31:0] trade_shares,
     output logic [63:0] trade_stock_symbol,
     output logic [31:0] trade_price,

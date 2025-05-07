@@ -59,3 +59,17 @@ SIM_HEADERS = [
 
 
 ]
+
+PARSER_HEADERS = [
+    "cycle",
+    "parsed_valid",
+    "parsed_type",
+    "order_ref",
+    "side",
+    "shares",
+    "price",
+    "timestamp",
+    "stock_symbol",
+    "match_id"
+]
+

@@ -36,7 +36,7 @@ def compare_against_expected(recorded_log, expected_events):
                     f"Mismatch at cycle {cycle} for '{key}': expected {expected_val}, got {actual_val}"
                 )
 
-def generate_expected_events_with_fields(message_plan, mode='set'):
+def generate_expected_events_with_fields(message_plan, mode='set', parser_mode=False):
 
     """
     Generates a list of expected output events per message with matching SIM_HEADERS:
@@ -54,8 +54,23 @@ def generate_expected_events_with_fields(message_plan, mode='set'):
         msg_len = MSG_LENGTHS[msg_type]
         expected_valid_cycle = current_cycle + msg_len + RESET_CYCLES
 
-        row = {key: "" for key in SIM_HEADERS}
+        if parser_mode:
+            from ITCH_config import PARSER_HEADERS
+            row = {key: "" for key in PARSER_HEADERS}
+        else:
+            row = {key: "" for key in SIM_HEADERS}
         row["cycle"] = expected_valid_cycle
+
+        if parser_mode:
+            row["parsed_valid"] = 1
+            row["parsed_type"] = hex({
+                "add": 0,
+                "cancel": 1,
+                "delete": 2,
+                "executed": 3,
+                "replace": 4,
+                "trade": 5
+            }[msg_type])
 
         if msg_type == "add":
             payload = generate_add_order_payload(mode)
@@ -123,10 +138,10 @@ from helpers.payload_generator_helper import (
     generate_trade_payload,
 )
 
-def generate_expected_events_from_schedule(schedule):
+def generate_expected_events_from_schedule(schedule, parser_mode=False):
     """
     Given the injection schedule (with fixed payloads), decode expected outputs.
-    Returns a list of dicts with unified keys as defined in SIM_HEADERS.
+    Returns a list of dicts with unified keys.
     """
     expected_events = []
 
@@ -135,54 +150,103 @@ def generate_expected_events_from_schedule(schedule):
         payload = item["payload"]
         expected_valid_cycle = item["expected_valid_cycle"]
 
-        row = {key: "" for key in SIM_HEADERS}
-        row["cycle"] = expected_valid_cycle
+        if parser_mode:
+            from ITCH_config import PARSER_HEADERS
+            row = {key: "" for key in PARSER_HEADERS}
+            row["cycle"] = expected_valid_cycle
+            row["parsed_valid"] = 1
+            row["parsed_type"] = hex({
+                "add": 0,
+                "cancel": 1,
+                "delete": 2,
+                "executed": 3,
+                "replace": 4,
+                "trade": 5
+            }[msg_type])
 
-        if msg_type == "add":
-            row["add_parsed_type"] = hex(0)
-            row["add_internal_valid"] = 1
-            row["add_order_ref"] = hex(int.from_bytes(payload[1:9], byteorder='big'))
-            row["add_side"] = hex(0) if payload[9] == ord('B') else hex(1)
-            row["add_shares"] = hex(int.from_bytes(payload[10:14], byteorder='big'))
-            row["add_price"] = hex(int.from_bytes(payload[22:26], byteorder='big'))
+            if msg_type == "add":
+                row["order_ref"] = hex(int.from_bytes(payload[1:9], byteorder='big'))
+                row["side"] = hex(0) if payload[9] == ord('B') else hex(1)
+                row["shares"] = hex(int.from_bytes(payload[10:14], byteorder='big'))
+                row["price"] = hex(int.from_bytes(payload[22:26], byteorder='big'))
 
-        elif msg_type == "cancel":
-            row["cancel_parsed_type"] = hex(1)
-            row["cancel_internal_valid"] = 1
-            row["cancel_order_ref"] = hex(int.from_bytes(payload[1:9], byteorder='big'))
-            row["cancel_shares"] = hex(int.from_bytes(payload[9:13], byteorder='big'))
+            elif msg_type == "cancel":
+                row["order_ref"] = hex(int.from_bytes(payload[1:9], byteorder='big'))
+                row["shares"] = hex(int.from_bytes(payload[9:13], byteorder='big'))
 
-        elif msg_type == "delete":
-            row["delete_parsed_type"] = hex(2)
-            row["delete_internal_valid"] = 1
-            row["delete_order_ref"] = hex(int.from_bytes(payload[1:9], byteorder='big'))
+            elif msg_type == "delete":
+                row["order_ref"] = hex(int.from_bytes(payload[1:9], byteorder='big'))
 
-        elif msg_type == "replace":
-            row["replace_parsed_type"] = hex(4)
-            row["replace_internal_valid"] = 1
-            row["replace_old_order_ref"] = hex(int.from_bytes(payload[1:9], byteorder='big'))
-            row["replace_new_order_ref"] = hex(int.from_bytes(payload[9:17], byteorder='big'))
-            row["replace_shares"] = hex(int.from_bytes(payload[17:21], byteorder='big'))
-            row["replace_price"] = hex(int.from_bytes(payload[21:25], byteorder='big'))
+            elif msg_type == "replace":
+                row["order_ref"] = hex(int.from_bytes(payload[9:17], byteorder='big'))
+                row["shares"] = hex(int.from_bytes(payload[17:21], byteorder='big'))
+                row["price"] = hex(int.from_bytes(payload[21:25], byteorder='big'))
 
-        elif msg_type == "executed":
-            row["exec_parsed_type"] = hex(3)
-            row["executed_internal_valid"] = 1
-            row["exec_timestamp"] = hex(int.from_bytes(payload[1:7], byteorder='big'))
-            row["exec_order_ref"] = hex(int.from_bytes(payload[7:15], byteorder='big'))
-            row["exec_shares"] = hex(int.from_bytes(payload[15:19], byteorder='big'))
-            row["exec_match_id"] = hex(int.from_bytes(payload[19:27], byteorder='big'))
+            elif msg_type == "executed":
+                row["timestamp"] = hex(int.from_bytes(payload[1:7], byteorder='big'))
+                row["order_ref"] = hex(int.from_bytes(payload[7:15], byteorder='big'))
+                row["shares"] = hex(int.from_bytes(payload[15:19], byteorder='big'))
+                row["match_id"] = hex(int.from_bytes(payload[19:27], byteorder='big'))
 
-        elif msg_type == "trade":
-            row["trade_parsed_type"] = hex(5)
-            row["trade_internal_valid"] = 1
-            row["trade_timestamp"] = hex(int.from_bytes(payload[1:7], byteorder='big'))
-            row["trade_order_ref"] = hex(int.from_bytes(payload[7:15], byteorder='big'))
-            row["trade_side"] = hex(0) if payload[15] == ord('B') else hex(1)
-            row["trade_shares"] = hex(int.from_bytes(payload[16:20], byteorder='big'))
-            row["trade_stock_symbol"] = hex(int.from_bytes(payload[20:28], byteorder='big'))
-            row["trade_price"] = hex(int.from_bytes(payload[28:32], byteorder='big'))
-            row["trade_match_id"] = hex(int.from_bytes(payload[32:40], byteorder='big'))
+            elif msg_type == "trade":
+                row["timestamp"] = hex(int.from_bytes(payload[1:7], byteorder='big'))
+                row["order_ref"] = hex(int.from_bytes(payload[7:15], byteorder='big'))
+                row["side"] = hex(0) if payload[15] == ord('B') else hex(1)
+                row["shares"] = hex(int.from_bytes(payload[16:20], byteorder='big'))
+                row["stock_symbol"] = hex(int.from_bytes(payload[20:28], byteorder='big'))
+                row["price"] = hex(int.from_bytes(payload[28:32], byteorder='big'))
+                row["match_id"] = hex(int.from_bytes(payload[32:40], byteorder='big'))
+
+        else:
+            from ITCH_config import SIM_HEADERS
+            row = {key: "" for key in SIM_HEADERS}
+            row["cycle"] = expected_valid_cycle
+
+            if msg_type == "add":
+                row["add_parsed_type"] = hex(0)
+                row["add_internal_valid"] = 1
+                row["add_order_ref"] = hex(int.from_bytes(payload[1:9], byteorder='big'))
+                row["add_side"] = hex(0) if payload[9] == ord('B') else hex(1)
+                row["add_shares"] = hex(int.from_bytes(payload[10:14], byteorder='big'))
+                row["add_price"] = hex(int.from_bytes(payload[22:26], byteorder='big'))
+
+            elif msg_type == "cancel":
+                row["cancel_parsed_type"] = hex(1)
+                row["cancel_internal_valid"] = 1
+                row["cancel_order_ref"] = hex(int.from_bytes(payload[1:9], byteorder='big'))
+                row["cancel_shares"] = hex(int.from_bytes(payload[9:13], byteorder='big'))
+
+            elif msg_type == "delete":
+                row["delete_parsed_type"] = hex(2)
+                row["delete_internal_valid"] = 1
+                row["delete_order_ref"] = hex(int.from_bytes(payload[1:9], byteorder='big'))
+
+            elif msg_type == "replace":
+                row["replace_parsed_type"] = hex(4)
+                row["replace_internal_valid"] = 1
+                row["replace_old_order_ref"] = hex(int.from_bytes(payload[1:9], byteorder='big'))
+                row["replace_new_order_ref"] = hex(int.from_bytes(payload[9:17], byteorder='big'))
+                row["replace_shares"] = hex(int.from_bytes(payload[17:21], byteorder='big'))
+                row["replace_price"] = hex(int.from_bytes(payload[21:25], byteorder='big'))
+
+            elif msg_type == "executed":
+                row["exec_parsed_type"] = hex(3)
+                row["executed_internal_valid"] = 1
+                row["exec_timestamp"] = hex(int.from_bytes(payload[1:7], byteorder='big'))
+                row["exec_order_ref"] = hex(int.from_bytes(payload[7:15], byteorder='big'))
+                row["exec_shares"] = hex(int.from_bytes(payload[15:19], byteorder='big'))
+                row["exec_match_id"] = hex(int.from_bytes(payload[19:27], byteorder='big'))
+
+            elif msg_type == "trade":
+                row["trade_parsed_type"] = hex(5)
+                row["trade_internal_valid"] = 1
+                row["trade_timestamp"] = hex(int.from_bytes(payload[1:7], byteorder='big'))
+                row["trade_order_ref"] = hex(int.from_bytes(payload[7:15], byteorder='big'))
+                row["trade_side"] = hex(0) if payload[15] == ord('B') else hex(1)
+                row["trade_shares"] = hex(int.from_bytes(payload[16:20], byteorder='big'))
+                row["trade_stock_symbol"] = hex(int.from_bytes(payload[20:28], byteorder='big'))
+                row["trade_price"] = hex(int.from_bytes(payload[28:32], byteorder='big'))
+                row["trade_match_id"] = hex(int.from_bytes(payload[32:40], byteorder='big'))
 
         expected_events.append(row)
 
