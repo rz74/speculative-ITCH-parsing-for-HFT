@@ -69,7 +69,7 @@ PARSER_HEADERS = [
     "shares",
     "price",
     "timestamp",
-    "stock_symbol",
-    "match_id"
+    "misc_data"
 ]
+
 

@@ -1,65 +1,9 @@
-// =============================================
-// parser.v
-// =============================================
-//
-// Description: Canonical output wrapper that muxes all decoder outputs
-//              from speculative ITCH message parsing. Assumes only one
-//              decoder asserts *_internal_valid per cycle.
-// Author: RZ
-// Start Date: 20250505
-// Version: 0.2
-//
-// =============================================
-
 module parser (
-    input  logic clk,
-    input  logic rst,
-    input  logic valid_in, 
+    input  logic        clk,
+    input  logic        rst,
+    input  logic [7:0]  byte_in,
+    input  logic        valid_in,
 
-    // Decoder outputs
-    input  logic        add_internal_valid,
-    input  logic        cancel_internal_valid,
-    input  logic        delete_internal_valid,
-    input  logic        replace_internal_valid,
-    input  logic        exec_internal_valid,
-    input  logic        trade_internal_valid,
-
-    input  logic [3:0]  add_parsed_type,
-    input  logic [3:0]  cancel_parsed_type,
-    input  logic [3:0]  delete_parsed_type,
-    input  logic [3:0]  replace_parsed_type,
-    input  logic [3:0]  exec_parsed_type,
-    input  logic [3:0]  trade_parsed_type,
-
-    input  logic [63:0] add_order_ref,
-    input  logic [63:0] cancel_order_ref,
-    input  logic [63:0] delete_order_ref,
-    input  logic [63:0] replace_old_order_ref,
-    input  logic [63:0] replace_new_order_ref,
-    input  logic [63:0] exec_order_ref,
-    input  logic [63:0] trade_order_ref,
-
-    input  logic        add_side,
-    input  logic        trade_side,
-
-    input  logic [31:0] add_shares,
-    input  logic [31:0] cancel_canceled_shares,
-    input  logic [31:0] replace_shares,
-    input  logic [31:0] exec_shares,
-    input  logic [31:0] trade_shares,
-
-    input  logic [31:0] replace_price,
-    input  logic [31:0] add_price,
-    input  logic [31:0] trade_price,
-
-    input  logic [47:0] exec_timestamp,
-    input  logic [47:0] trade_timestamp,
-
-    input  logic [63:0] add_stock_symbol,
-    input  logic [63:0] trade_match_id,
-    input  logic [63:0] exec_match_id,
-
-    // Canonical output interface
     output logic        parsed_valid,
     output logic [3:0]  parsed_type,
     output logic [63:0] order_ref,
@@ -70,13 +14,114 @@ module parser (
     output logic [47:0] timestamp,
     output logic [63:0] misc_data
 );
+// Signals
+    // Internal valid signals
+    logic add_internal_valid, cancel_internal_valid, delete_internal_valid;
+    logic replace_internal_valid, exec_internal_valid, trade_internal_valid;
 
-    // XOR-valid only if one-hot, and valid_in is high
-    assign parsed_valid = valid_in & (
-        add_internal_valid    ^ cancel_internal_valid ^
-        delete_internal_valid ^ replace_internal_valid ^
-        exec_internal_valid   ^ trade_internal_valid);
+    // Output fields
+    logic [3:0]  add_parsed_type, cancel_parsed_type, delete_parsed_type;
+    logic [3:0]  replace_parsed_type, exec_parsed_type, trade_parsed_type;
 
+    logic [63:0] add_order_ref, cancel_order_ref, delete_order_ref;
+    logic [63:0] replace_old_order_ref, replace_new_order_ref;
+    logic [63:0] exec_order_ref, trade_order_ref;
+
+    logic        add_side, trade_side;
+    logic [31:0] add_shares, cancel_canceled_shares;
+    logic [31:0] replace_shares, exec_shares, trade_shares;
+    logic [31:0] add_price, replace_price, trade_price;
+
+    logic [63:0] add_stock_symbol;
+    logic [63:0] exec_match_id, trade_match_id;
+
+    logic [47:0] exec_timestamp, trade_timestamp;
+// End of signals
+    // ==========================
+    // Decoder instantiations
+    // ==========================
+    add_order_decoder add_dec (
+        .clk(clk), .rst(rst), .byte_in(byte_in), .valid_in(valid_in),
+        .add_internal_valid(add_internal_valid),
+        .add_parsed_type(add_parsed_type),
+        .add_order_ref(add_order_ref),
+        .add_side(add_side),
+        .add_shares(add_shares),
+        .add_price(add_price),
+        .add_stock_symbol(add_stock_symbol)
+    );
+
+    cancel_order_decoder cancel_dec (
+        .clk(clk), .rst(rst), .byte_in(byte_in), .valid_in(valid_in),
+        .cancel_internal_valid(cancel_internal_valid),
+        .cancel_parsed_type(cancel_parsed_type),
+        .cancel_order_ref(cancel_order_ref),
+        .cancel_canceled_shares(cancel_canceled_shares)
+    );
+
+    delete_order_decoder delete_dec (
+        .clk(clk), .rst(rst), .byte_in(byte_in), .valid_in(valid_in),
+        .delete_internal_valid(delete_internal_valid),
+        .delete_parsed_type(delete_parsed_type),
+        .delete_order_ref(delete_order_ref)
+    );
+
+    replace_order_decoder replace_dec (
+        .clk(clk), .rst(rst), .byte_in(byte_in), .valid_in(valid_in),
+        .replace_internal_valid(replace_internal_valid),
+        .replace_parsed_type(replace_parsed_type),
+        .replace_old_order_ref(replace_old_order_ref),
+        .replace_new_order_ref(replace_new_order_ref),
+        .replace_shares(replace_shares),
+        .replace_price(replace_price)
+    );
+
+    executed_order_decoder exec_dec (
+        .clk(clk), .rst(rst), .byte_in(byte_in), .valid_in(valid_in),
+        .exec_internal_valid(exec_internal_valid),
+        .exec_parsed_type(exec_parsed_type),
+        .exec_order_ref(exec_order_ref),
+        .exec_shares(exec_shares),
+        .exec_timestamp(exec_timestamp),
+        .exec_match_id(exec_match_id)
+    );
+
+    trade_decoder trade_dec (
+        .clk(clk), .rst(rst), .byte_in(byte_in), .valid_in(valid_in),
+        .trade_internal_valid(trade_internal_valid),
+        .trade_parsed_type(trade_parsed_type),
+        .trade_order_ref(trade_order_ref),
+        .trade_side(trade_side),
+        .trade_shares(trade_shares),
+        .trade_price(trade_price),
+        .trade_match_id(trade_match_id),
+        .trade_timestamp(trade_timestamp)
+    );
+
+    // ==========================
+    // One-hot valid check
+    // ==========================
+    wire onehot_detect = $onehot({
+        add_internal_valid,
+        cancel_internal_valid,
+        delete_internal_valid,
+        replace_internal_valid,
+        exec_internal_valid,
+        trade_internal_valid
+    });
+
+    wire internal_valid_any = add_internal_valid     |
+                              cancel_internal_valid  |
+                              delete_internal_valid  |
+                              replace_internal_valid |
+                              exec_internal_valid    |
+                              trade_internal_valid;
+
+    assign parsed_valid = internal_valid_any && onehot_detect;
+
+    // ==========================
+    // Output Selection
+    // ==========================
     assign parsed_type =
         add_internal_valid     ? add_parsed_type    :
         cancel_internal_valid  ? cancel_parsed_type :
@@ -106,7 +151,7 @@ module parser (
     assign price =
         add_internal_valid     ? add_price         :
         replace_internal_valid ? replace_price     :
-        trade_internal_valid   ? trade_price       : 64'd0;
+        trade_internal_valid   ? trade_price       : 32'd0;
 
     assign new_order_ref =
         replace_internal_valid ? replace_new_order_ref : 64'd0;
@@ -120,13 +165,5 @@ module parser (
         trade_internal_valid   ? trade_match_id        :
         exec_internal_valid    ? exec_match_id         :
         replace_internal_valid ? replace_old_order_ref : 64'd0;
-
-    // ======================= Waveform Dump =======================
-    `ifdef COCOTB_SIM
-    initial begin
-        $dumpfile("dump.vcd");
-        $dumpvars(0, parser);
-    end
-    `endif
 
 endmodule

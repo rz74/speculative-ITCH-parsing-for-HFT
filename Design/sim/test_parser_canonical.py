@@ -17,6 +17,11 @@ async def test_parser_output(dut):
     dut._log.info("Starting parser arbitration test")
 
     cocotb.start_soon(Clock(dut.clk, SIM_CLK_PERIOD_NS, units="ns").start())
+
+    dut.valid_in.value = 0
+    dut.byte_in.value = 0
+
+
     await reset_dut(dut)
 
     result = run_full_payload_workload(MSG_SEQUENCE)

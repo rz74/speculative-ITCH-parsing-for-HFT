@@ -43,6 +43,7 @@ VERILOG_SOURCES = \
     ../rtl/modules/trade_decoder.v \
 	../rtl/parser.v \
 	../rtl/test_wrapper.v \
+	../rtl/parser_latch_stage.v\
     ../rtl/integrated.v
 
 TOPLEVEL = integrated
@@ -82,6 +83,12 @@ parser: killwave
 	mv dump.vcd vcd/parser_dump_$${TIMESTAMP}.vcd; \
 	gtkwave vcd/parser_dump_$${TIMESTAMP}.vcd &
 
+parser_reg: killwave
+	@mkdir -p vcd
+	TIMESTAMP=$$(date +%m%d%Y_%H%M%S); \
+	$(MAKE) MODULE=test_parser_canonical TOPLEVEL=test_wrapper COMPILE_ARGS="$(COMPILE_ARGS)"; \
+	mv dump.vcd vcd/parser_dump_$${TIMESTAMP}.vcd; \
+	gtkwave vcd/parser_dump_$${TIMESTAMP}.vcd &
 
 # =============================================
 # Cleanup
