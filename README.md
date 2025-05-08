@@ -9,17 +9,31 @@ The architecture is designed to minimize latency, maximize throughput, and scale
 
 ---
 
-## 📚 Documentation Index
+## Project Structure
 
-### 🔧 RTL Design
-- [Core Parser Logic](Design/rtl/README_core_logic.md)
-- [Field Macros](Design/rtl/field_macros/README_field_macros.md)
-- [Decoder Modules](Design/rtl/modules/README_decoders.md)
-- [Shared Macros](Design/rtl/macros/README_macros.md)
+- [`rtl/`](Design/rtl/)
+  - [`macros/`](Design/rtl/macros/)
+    - [`field_macros/`](Design/rtl/macros/field_macros/)
+      - ITCH field declarations (e.g., `itch_fields_add.vh`)
+      - [README_field_macros.md](Design/rtl/macros/field_macros/README_field_macros.md)
+    - Shared control macros (`itch_reset.vh`, `itch_core_decode.vh`, etc.)
+    - [README_macros.md](Design/rtl/macros/README_macros.md)
+  - [`modules/`](Design/rtl/modules/)
+    - Individual ITCH message decoders (`*_order_decoder.v`)
+    - [README_decoders.md](Design/rtl/modules/README_decoders.md)
+  - Parser integration files (`parser.v`, `parser_latch_stage.v`, etc.)
+  - [README_core_logic.md](Design/rtl/README_core_logic.md)
 
-### 🧪 Verification Infrastructure
-- [Testbench Architecture](Design/sim/README_testbench.md)
-- [Helper Scripts](Design/sim/helpers/README_helpers.md)
+- [`sim/`](Design/sim/)
+  - [`helpers/`](Design/sim/helpers/)
+    - Simulation drivers, workload generators, and recorders
+    - [README_helpers.md](Design/sim/helpers/README_helpers.md)
+  - Cocotb testbenches (`test_integrated.py`, `test_parser_canonical.py`, `test_valid_drop_abort.py`)
+  - Output logs and waveform automation (e.g., `recorded_log.csv`, `Makefile`)
+  - [README_testbench.md](Design/sim/README_testbench.md)
+
+- [README.md](README.md) ← Main entry point
+
 
 
 ## Architecture Summary
