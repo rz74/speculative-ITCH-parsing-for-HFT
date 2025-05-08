@@ -1,3 +1,24 @@
+// ============================================================
+// parser.v
+// ============================================================
+//
+// Description: Unified parsing core for all ITCH message types.
+//              Wraps individual speculative decoders with arbitration and mux logic.
+//              Produces parsed field outputs and a combined valid + type signal.
+//
+// Author: RZ
+// Start Date: 20250507
+// Version: 0.4
+//
+// Changelog
+// ============================================================
+// [20250507-1] RZ: Built arbitration + mux logic for decoded fields.
+// [20250507-2] RZ: Added one-hot valid check for decoder outputs.
+// [20250507-3] RZ: Added output selection logic for parsed fields.
+// [20250507-4] RZ: Added comments and cleaned up code formatting.
+// ============================================================
+
+
 module parser (
     input  logic        clk,
     input  logic        rst,

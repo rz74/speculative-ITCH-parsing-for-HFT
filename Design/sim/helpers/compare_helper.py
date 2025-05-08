@@ -1,12 +1,20 @@
+# ============================================================
 # compare_helper.py
-# ==========================================================================
+# ============================================================
+#
+# Description: Post-injection signal comparison utility for ITCH decoders.
+#              Aligns recorded simulation logs with expected parsed outputs.
+#              Supports CSV logging, mismatch reporting, and validation.
+# Author: RZ
+# Start Date: 20250505
+# Version: 0.2
+#
+# Changelog
+# ============================================================
+# [20250505-1] RZ: Initial implementation for benchmark signal matching.
+# [20250506-1] RZ: Added support for parser mode and unified key generation.
+# ============================================================
 
-# init
-# added add and cancel
-# updated to use hex
-# updated with delete order
-
-# ==========================================================================
 from helpers.payload_generator_helper import (
     generate_add_order_payload, generate_cancel_order_payload, 
     generate_delete_order_payload, generate_replace_order_payload, 

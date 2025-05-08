@@ -1,4 +1,21 @@
-# helpers/full_workload_helper.py
+# ============================================================
+# full_workload_helper.py
+# ============================================================
+#
+# Description: Generates synthetic ITCH message streams for stress testing.
+#              Combines multiple message types into full workloads.
+#              Supports stream injection with type and length alignment.
+# Author: RZ
+# Start Date: 20250505
+# Version: 0.1
+#
+# Changelog
+# ============================================================
+# [20250505-1] RZ: Created full-stream ITCH generator for benchmarking.
+# [20250506-1] RZ: Added support for multiple message types.
+# [20250506-1] RZ: Implemented cycle-based scheduling for message injection.
+# ============================================================
+
 from sim_config import SIM_CLK_PERIOD_NS, RESET_CYCLES, MSG_MODE
 from ITCH_config import SIM_HEADERS, MSG_LENGTHS
 

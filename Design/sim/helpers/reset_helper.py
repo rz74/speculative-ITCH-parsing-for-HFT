@@ -1,18 +1,21 @@
 # =============================================
+# ============================================================
 # reset_helper.py
-# =============================================
-
-# Description: Clock and reset utilities for cocotb-based verification.
+# ============================================================
+#
+# Description: Provides reset control utilities for simulation setup.
+#              Supports clean module initialization and reset vector assertion.
+#              Used by top-level and module-specific Cocotb testbenches.
 # Author: RZ
-# Start Date: 04172025
-# Version: 0.3
+# Start Date: 05042025
+# Version: 0.4
 
 # Changelog
 # =============================================
-# [20250427-1] RZ: Initial version (see reset_utils.py).
-# [20250428-1] RZ: Added reset_and_test_decoder_behavior for decoder scenarios.
-# [20250429-1] RZ: Adopted into new reset_helper.py from reset_utils.py.
-# [20250429-2] RZ: Added reset_midstream utility for recovery tests.
+# [20250504-1] RZ: Initial version (see reset_utils.py).
+# [20250504-2] RZ: Added reset_and_test_decoder_behavior for decoder scenarios.
+# [20250504-3] RZ: Adopted into new reset_helper.py from reset_utils.py.
+# [20250507-1] RZ: Added reset_midstream utility for recovery tests.
 # =============================================
 
 import cocotb

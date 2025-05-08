@@ -1,5 +1,12 @@
-# Define message lengths for each type of message
-# These lengths are based on the ITCH protocol specification
+# ============================================================
+# ITCH_config.py
+# ============================================================
+#
+# Description: Centralized configuration for ITCH message format and type lengths.
+#              Used by both payload generators and validators.
+#              Supports speculative parsing via static message length lookup.
+# Author: RZ
+# Start Date: 20250505
 MSG_LENGTHS = {
     "add": 36,
     "cancel": 23,

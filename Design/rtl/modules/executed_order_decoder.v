@@ -19,19 +19,21 @@
 // =============================================
 
 // ------------------------------------------------------------------------------------------------
-// Protocol Version Note:
+// ------------------------------------------------------------------------------------------------
+// Architecture Notes:
 // ------------------------------------------------------------------------------------------------
 // The ITCH "Executed Order" ('E') message has a fixed length of 30 bytes and is structured as:
-//   [0]      = Message Type (ASCII 'E')
-//   [1:6]    = Timestamp (48-bit, nanoseconds since midnight)
-//   [7:14]   = Order Reference Number (64-bit)
-//   [15:18]  = Executed Shares (32-bit)
-//   [19:26]  = Match ID (64-bit)
-//   [27:29]  = Reserved bytes (ignored)
+//   [0]     = Message Type (ASCII 'E')
+//   [1:6]   = Timestamp (48-bit)
+//   [7:14]  = Order Reference Number (64-bit)
+//   [15:18] = Executed Shares (32-bit)
+//   [19:26] = Match ID (64-bit)
+//   [27:29] = Reserved (zeroed)
 //
-// This decoder consumes a byte-aligned, per-cycle ITCH stream, beginning speculative parsing
-// at byte 0. Internal signals are zeroed after parsing. Validation logic ensures length compliance.
+// The decoder speculatively begins parsing at byte 0 and asserts `internal_valid`
+// after 30 valid bytes if the message type is 'E'.
 // ------------------------------------------------------------------------------------------------
+
 
 module executed_order_decoder (
     input  logic        clk,

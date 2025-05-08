@@ -23,46 +23,24 @@
 // parser designs. It excludes upstream metadata such as tracking numbers, locate codes, and
 // participant info.
 //
-// The Trade message is exactly 40 bytes and is structured as follows:
-//   [0]      = Message Type (ASCII 'P')
-//   [1:6]    = Timestamp (48-bit, nanoseconds since midnight)
-//   [7:14]   = Order Reference Number (64-bit)
-//   [15]     = Buy/Sell Indicator (ASCII 'B' or 'S')
-//   [16:19]  = Number of Shares (32-bit)
-//   [20:27]  = Stock Symbol (8 ASCII characters, space-padded)
-//   [28:31]  = Price (32-bit, fixed-point with 4 implied decimals)
-//   [32:39]  = Match ID (64-bit)
-//
-// This form omits any reserved bytes. It reflects the stripped-down format used in production
-// ITCH parser modules that operate directly on TCP-processed byte streams.
-// ------------------------------------------------------------------------------------------------
-//
 // ------------------------------------------------------------------------------------------------
 // Architecture Notes:
 // ------------------------------------------------------------------------------------------------
-// The decoder consumes a byte-aligned ITCH byte stream and begins speculative parsing at byte 0.
-// After detecting a 'P' on byte 0, it continues decoding the remaining 39 bytes sequentially.
+// The ITCH "Trade" ('P') message has a fixed length of 40 bytes and is structured as:
+//   [0]     = Message Type (ASCII 'P')
+//   [1:6]   = Timestamp (48-bit)
+//   [7:14]  = Order Reference Number (64-bit)
+//   [15]    = Buy/Sell Indicator ('B' or 'S')
+//   [16:19] = Number of Shares (32-bit)
+//   [20:27] = Stock Symbol (8 ASCII characters, space-padded)
+//   [28:31] = Price (32-bit)
+//   [32:39] = Match ID (64-bit)
 //
-// The decoder asserts `trade_internal_valid` on the final byte (cycle 39) only if the message type
-// matched and all required bytes were seen in order.
-//
-// Inputs:
-//   - clk                 : system clock
-//   - rst                 : synchronous reset
-//   - byte_in[7:0]        : ITCH byte stream (1 byte per cycle)
-//   - valid_in            : asserted high when byte_in is valid
-//
-// Outputs:
-//   - trade_internal_valid: one-cycle pulse when a valid Trade message is fully parsed
-//   - trade_packet_invalid: asserted if message length overruns unexpectedly
-//   - trade_timestamp     : 48-bit timestamp (ns since midnight)
-//   - trade_order_ref     : 64-bit order ID
-//   - trade_side          : 8-bit ASCII side ('B' or 'S') ===> parsed to buy = 0 and sell = 1
-//   - trade_shares        : 32-bit share count
-//   - trade_stock_symbol  : 64-bit symbol (8 ASCII characters)
-//   - trade_price         : 32-bit price (1/10,000 dollar units)
-//   - trade_match_id      : 64-bit match ID
+// The decoder speculatively begins parsing at byte 0 and asserts `internal_valid`
+// after 40 valid bytes if the message type is 'P'.
 // ------------------------------------------------------------------------------------------------
+
+
 
 module trade_decoder (
     input  logic        clk,

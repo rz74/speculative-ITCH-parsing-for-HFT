@@ -1,8 +1,27 @@
-// =====================================================
+// ============================================================
 // integrated.v
-// =====================================================
-// Description: Integrated ITCH parser with Add and Cancel decoders
-// =====================================================
+// ============================================================
+//
+// Description: Top-level ITCH parser integrating all decoder modules.
+//              Instantiates speculative decoders for Add, Cancel, Delete, Replace,
+//              Executed, and Trade messages, with one-byte-per-cycle input interface.
+//              Aggregates all internal valids and decoded field outputs.
+//
+// Author: RZ
+// Start Date: 20250504
+// Version: 0.7
+//
+// Changelog
+// ============================================================
+// [20250504-1] RZ: Initial integration of all speculative decoder modules.
+// [20250504-2] RZ: Added input and output signal declarations.
+// [20250504-3] RZ: Integrated all decoder modules and connected signals.
+// [20250504-4] RZ: Added waveform dump for simulation purposes.
+// [20250505-1] RZ: Added comments and cleaned up code for readability.
+// [20250506-1] RZ: Finalized the module and cleaned up unused signals.
+// [20250507-1] RZ: Added header comments and cleaned up formatting. 
+// ============================================================
+
 
 
 

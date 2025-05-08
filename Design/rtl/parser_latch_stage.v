@@ -1,3 +1,21 @@
+// ============================================================
+// parser_latch_stage.v
+// ============================================================
+//
+// Description: Latch stage for parsed ITCH output fields.
+//              Buffers parser-level outputs to make them stable for downstream modules.
+//              Enabled only when `parsed_valid` is high.
+//
+// Author: RZ
+// Start Date: 20250507
+// Version: 0.1
+//
+// Changelog
+// ============================================================
+// [20250507-1] RZ: Implemented 1-cycle valid-guarded latch stage for parsed outputs.
+// ============================================================
+
+
 module parser_latch_stage (
     input  logic        clk,
     input  logic        rst,

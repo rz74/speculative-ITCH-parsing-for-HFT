@@ -1,3 +1,19 @@
+# ============================================================
+# recorder.py
+# ============================================================
+#
+# Description: Logs signal values on every simulation cycle for debugging.
+#              Supports structured output to list-of-dictionaries format.
+#              Used by all decoder testbenches in benchmarking mode.
+# Author: RZ
+# Start Date: 20250507
+# Version: 0.1
+#
+# Changelog
+# ============================================================
+# [20250507-1] RZ: Implemented signal recorder for full-cycle logging.
+# ============================================================
+
 import cocotb
 from cocotb.triggers import RisingEdge
 from cocotb.utils import get_sim_time

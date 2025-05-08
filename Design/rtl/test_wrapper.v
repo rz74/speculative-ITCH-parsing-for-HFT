@@ -1,3 +1,24 @@
+// ============================================================
+// test_wrapper.v
+// ============================================================
+//
+// Description: RTL-level test wrapper for parser and latch stage.
+//              Drives `byte_in` + `valid_in`, captures and forwards latched output signals.
+//              Intended for waveform inspection and integration verification.
+//
+// Author: RZ
+// Start Date: 20250507
+// Version: 0.4
+//
+// Changelog
+// ============================================================
+// [20250507-1] RZ: Created wrapper for standalone simulation of parser.
+// [20250507-2] RZ: Added latch stage to capture output signals for inspection.
+// [20250507-3] RZ: Added waveform dump functionality for simulation inspection.
+// [20250507-4] RZ: Added comments for clarity and maintainability.
+// ============================================================
+
+
 module test_wrapper;
 
     // Inputs to parser

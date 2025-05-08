@@ -1,3 +1,23 @@
+# ============================================================
+# test_parser_canonical.py
+# ============================================================
+#
+# Description: Cocotb testbench validating speculative parser using parser-level headers.
+#              Performs stream injection, records field-wise parsed outputs, and
+#              compares against scheduled expectations. Generates CSV output logs.
+# Author: RZ
+# Start Date: 20250506
+# Version: 0.4
+#
+# Changelog
+# ============================================================
+# [20250506-1] RZ: Created parser-level output validation testbench with CSV logging.
+# [20250506-2] RZ: Added expected events generation and comparison logic.
+# [20250506-3] RZ: Implemented CSV output for recorded log and expected events.
+# [20250507-1] RZ: Refactored code for clarity and modularity.
+# ============================================================
+
+
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge

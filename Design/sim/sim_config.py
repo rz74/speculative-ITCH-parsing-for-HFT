@@ -1,5 +1,13 @@
+# ============================================================
 # sim_config.py
-# Configuration file for the simulation environment
+# ============================================================
+#
+# Description: Testbench-level configuration parameters and global constants.
+#              Used to control logging verbosity, runtime options, and toggles.
+#              Imported by all helper modules and testbenches.
+# Author: RZ
+# Start Date: 20250505
+# ============================================================
 from helpers.msg_sequence_helper import generate_msg_sequence, generate_permutation_coverage_sequence
 from ITCH_config import MSG_LENGTHS, SIM_HEADERS
 

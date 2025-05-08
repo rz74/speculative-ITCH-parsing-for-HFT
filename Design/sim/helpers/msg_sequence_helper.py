@@ -1,3 +1,20 @@
+# ============================================================
+# msg_sequence_helper.py
+# ============================================================
+#
+# Description: Defines ITCH test message sequences for simulation input.
+#              Provides utilities to construct individual message payloads.
+#              Used by the full workload generator and test drivers.
+# Author: RZ
+# Start Date: 20250505
+# Version: 0.1
+#
+# Changelog
+# ============================================================
+# [20250505-1] RZ: Added ITCH message stream constructor for testing.
+# ============================================================
+
+
 import random
 import itertools
 from ITCH_config import MSG_LENGTHS

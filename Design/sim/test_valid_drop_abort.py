@@ -1,3 +1,20 @@
+# ============================================================
+# test_valid_drop_abort.py
+# ============================================================
+#
+# Description: Unit testbench for decoder resilience to mid-packet `valid_in` drop.
+#              Verifies clean message abortion and correct parsing of subsequent message.
+#              Focused on stability of speculative decoder under stream interruption.
+# Author: RZ
+# Start Date: 20250507
+# Version: 0.1
+#
+# Changelog
+# ============================================================
+# [20250507-1] RZ: Added test for mid-stream valid drop and message recovery.
+# ============================================================
+
+
 import cocotb
 from cocotb.triggers import RisingEdge, Timer
 from cocotb.clock import Clock

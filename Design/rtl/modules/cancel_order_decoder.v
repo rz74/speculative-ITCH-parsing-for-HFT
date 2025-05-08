@@ -20,28 +20,15 @@
 // Architecture Notes:
 // ------------------------------------------------------------------------------------------------
 // The ITCH "Cancel Order" ('X') message has a fixed length of 23 bytes and is structured as:
-//   [0]      = Message Type (ASCII 'X')
-//   [1:8]    = Order Reference Number (64-bit)
-//   [9:12]   = Canceled Shares (32-bit)
-//   [13:22]  = Reserved bytes (ignored)
+//   [0]     = Message Type (ASCII 'X')
+//   [1:8]   = Order Reference Number (64-bit)
+//   [9:12]  = Canceled Shares (32-bit)
+//   [13:22] = Reserved or padding (zeroed)
 //
-// This decoder consumes a byte-aligned, per-cycle stream of ITCH bytes and speculatively 
-// begins parsing at cycle 0. On cycle 0, it captures the message type and immediately decodes
-// byte 1 as `order_ref[63:56]`. Parallel validation confirms whether the message is of type 'X'.
-// The decoder asserts `internal_valid` after 23 valid cycles only if the type matches.
-//
-// Inputs:
-//   - clk            : system clock
-//   - rst            : synchronous reset
-//   - byte_in[7:0]   : ITCH byte stream (1 byte per cycle)
-//   - valid_in       : asserted high when byte_in is valid
-//
-// Outputs:
-//   - internal_valid : one-cycle pulse when a valid Cancel Order message is fully parsed
-//   - packet_invalid : asserted if message length overruns unexpectedly (optional use)
-//   - order_ref      : 64-bit parsed order reference number
-//   - canceled_shares: 32-bit parsed canceled share quantity
+// The decoder speculatively begins parsing at byte 0 and asserts `internal_valid`
+// after 23 valid bytes if the message type is 'X'.
 // ------------------------------------------------------------------------------------------------
+
 module cancel_order_decoder (
     input  logic        clk,
     input  logic        rst,
