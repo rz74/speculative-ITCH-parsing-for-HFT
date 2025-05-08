@@ -3,9 +3,12 @@
 
 ## Overview
 
-This project implements a low-latency, modular, and fully verifiable hardware ITCH message parser using speculative decoding. It supports parallel parsing of all major message types and outputs a canonical-format result with only **one cycle of parsing delay**.
+This project implements a speculative, low-latency ITCH message parser with a robust, gated architecture that achieves canonical-format output with only **one clock cycle of parsing delay**. All message types are parsed in parallel using a fully macro-driven RTL structure, enabling aggressive pipelining and precise control.
 
-The architecture is designed to minimize latency, maximize throughput, and scale across ITCH message types, all while maintaining a reusable and testable design structure.
+The RTL modules are highly modular and reusable, with suppression logic, mid-packet recovery, and arbitration implemented through well-isolated macros. A matching Cocotb testbench framework—also macroized and helper-driven—provides full-cycle logging, field-level validation, and protocol-level benchmarking.
+
+Thanks to this flexible and structured design, the parser architecture can be trivially adapted to support other streaming protocols with raw serial input and canonical parallel output—such as market data feeds, trading logic interfaces, or packetized control streams.
+
 
 ---
 
@@ -32,7 +35,7 @@ The architecture is designed to minimize latency, maximize throughput, and scale
   - Output logs and waveform automation (e.g., `recorded_log.csv`, `Makefile`)
   - [README_testbench.md](Design/sim/README_testbench.md)
 
-- [README.md](README.md) ← Main entry point
+- [README.md](README.md) 
 
 
 
