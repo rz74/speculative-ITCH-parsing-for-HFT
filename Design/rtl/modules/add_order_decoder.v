@@ -1,5 +1,5 @@
 // =============================================
-// add_order_decoder.v
+// add_order_decoder.v 
 // =============================================
 //
 // Description: Zero-wait speculative Add Order decoder for ITCH feed.
@@ -30,27 +30,12 @@
 //   [10:13] = Number of Shares (32-bit)
 //   [14:21] = Stock Symbol (8 ASCII characters, space-padded)
 //   [22:25] = Price (32-bit, fixed-point with 4 implied decimal places)
+//   [26:35] = Reserved or padding (zeroed)
 //
-// This decoder consumes a byte-alWigned, per-cycle stream of ITCH bytes and speculatively 
-// begins parsing at cycle 0. On cycle 0, it captures the message type and immediately decodes
-// byte 1 as `order_ref[63:56]`. Parallel validation confirms whether the message is of type 'A'.
-// The decoder asserts `internal_valid` after 36 valid cycles only if the type matches.
-//
-// Inputs:
-//   - clk           : system clock
-//   - rst           : synchronous reset
-//   - byte_in[7:0]  : ITCH byte stream (1 byte per cycle)
-//   - valid_in      : asserted high when byte_in is valid
-//
-// Outputs:
-//   - internal_valid: one-cycle pulse when a valid Add Order message is fully parsed
-//   - packet_invalid: asserted if message length overruns unexpectedly (optional use)
-//   - order_ref     : 64-bit parsed order reference number
-//   - side          : 1-bit flag, 1 = sell ('S'), 0 = buy ('B')
-//   - shares        : 32-bit parsed number of shares
-//   - price         : 32-bit fixed-point price
-//   - stock_symbol  : 64-bit ASCII stock symbol (left-justified, space-padded)
+// The decoder speculatively begins parsing at byte 0 and asserts `internal_valid`
+// after 36 valid bytes if the message type is 'A'.
 // ------------------------------------------------------------------------------------------------
+
 module add_order_decoder (
     input  logic        clk,
     input  logic        rst,
@@ -141,6 +126,8 @@ module add_order_decoder (
             `packet_invalid <= 1;
 
         `ITCH_RECHECK_OR_SUPPRESS(MSG_TYPE, MSG_LENGTH)
+        `include "macros/itch_abort_on_valid_drop.vh"
+
 
     end
 

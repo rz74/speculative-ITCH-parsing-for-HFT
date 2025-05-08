@@ -1,0 +1,54 @@
+[*]
+[*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
+[*] Wed May  7 18:50:35 2025
+[*]
+[dumpfile] "/mnt/c/Users/HYRui/Downloads/Git/speculative-ITCH-parsing-for-HFT/Design/sim/vcd/valid_drop_dump_05072025_144942.vcd"
+[dumpfile_mtime] "Wed May  7 18:49:50 2025"
+[dumpfile_size] 11483
+[savefile] "/mnt/c/Users/HYRui/Downloads/Git/speculative-ITCH-parsing-for-HFT/Design/sim/vcd/Paser Mid-Packet Valid_in Drop Test.sav"
+[timestart] 0
+[size] 1000 600
+[pos] -1 -1
+*-16.170773 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 214
+[signals_width] 246
+[sst_expanded] 1
+[sst_vpaned_height] 151
+@22
+test_wrapper.byte_in[7:0]
+@28
+test_wrapper.clk
+@22
+test_wrapper.latched_misc_data[63:0]
+test_wrapper.latched_new_order_ref[63:0]
+test_wrapper.latched_order_ref[63:0]
+test_wrapper.latched_price[31:0]
+test_wrapper.latched_shares[31:0]
+@28
+test_wrapper.latched_side
+@22
+test_wrapper.latched_timestamp[47:0]
+test_wrapper.latched_type[3:0]
+@28
+test_wrapper.latched_valid
+@22
+test_wrapper.misc_data[63:0]
+test_wrapper.new_order_ref[63:0]
+test_wrapper.order_ref[63:0]
+test_wrapper.parsed_type[3:0]
+@28
+test_wrapper.parsed_valid
+@22
+test_wrapper.price[31:0]
+@28
+test_wrapper.rst
+@22
+test_wrapper.shares[31:0]
+@28
+test_wrapper.side
+@22
+test_wrapper.timestamp[47:0]
+@28
+test_wrapper.valid_in
+[pattern_trace] 1
+[pattern_trace] 0

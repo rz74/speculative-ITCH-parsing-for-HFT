@@ -1,0 +1,72 @@
+[*]
+[*] GTKWave Analyzer v3.3.104 (w)1999-2020 BSI
+[*] Wed May  7 18:45:57 2025
+[*]
+[dumpfile] "(null)"
+[savefile] "/mnt/c/Users/HYRui/Downloads/Git/speculative-ITCH-parsing-for-HFT/Design/sim/vcd/Paser with Downstream Latches Full Permutation using Random Input Marked.gtkw"
+[timestart] 0
+[size] 1908 999
+[pos] -384 -291
+*-19.000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 214
+[signals_width] 214
+[sst_expanded] 1
+[sst_vpaned_height] 292
+@28
+test_wrapper.rst
+@22
+test_wrapper.byte_in[7:0]
+@200
+-byte_in(ASCII)
+@820
+test_wrapper.byte_in[7:0]
+@28
+test_wrapper.clk
+test_wrapper.valid_in
+@200
+-
+@28
+test_wrapper.parsed_valid
+test_wrapper.latched_valid
+@200
+-
+@22
+test_wrapper.parsed_type[3:0]
+test_wrapper.latched_type[3:0]
+@200
+-
+@22
+test_wrapper.order_ref[63:0]
+test_wrapper.latched_order_ref[63:0]
+@200
+-
+@28
+test_wrapper.side
+test_wrapper.latched_side
+@200
+-
+@22
+test_wrapper.shares[31:0]
+test_wrapper.latched_shares[31:0]
+@200
+-
+@22
+test_wrapper.price[31:0]
+test_wrapper.latched_price[31:0]
+@200
+-
+@22
+test_wrapper.new_order_ref[63:0]
+test_wrapper.latched_order_ref[63:0]
+@200
+-
+@22
+test_wrapper.timestamp[47:0]
+test_wrapper.latched_timestamp[47:0]
+@200
+-
+@22
+test_wrapper.misc_data[63:0]
+test_wrapper.latched_misc_data[63:0]
+[pattern_trace] 1
+[pattern_trace] 0

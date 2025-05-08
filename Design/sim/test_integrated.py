@@ -1,3 +1,25 @@
+# ============================================================
+# test_integrated.py
+# ============================================================
+#
+# Description: Integrated benchmark testbench for full speculative pipeline.
+#              Records decoder validity signals and compares against full ITCH message stream.
+#              Outputs cycle-aligned logs and expected CSV events for validation.
+# Author: RZ
+# Start Date: 20250504
+# Version: 0.6
+#
+# Changelog
+# ============================================================
+# [20250504-1] RZ: Full pipeline testbench with decoder signal logging and CSV comparison.
+# [20250504-2] RZ: Added full ITCH message stream generation and expected events comparison.
+# [20250504-3] RZ: Implemented cycle-aligned logging and CSV output for recorded log and expected events.
+# [20250505-1] RZ: Refactored code for modularity and clarity.
+# [20250505-2] RZ: Improved logging and error handling.
+# [20250507-1] RZ: Added detailed comments and documentation for clarity.
+# ============================================================
+
+
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge

@@ -32,33 +32,17 @@
 // Architecture Notes:
 // ------------------------------------------------------------------------------------------------
 // The ITCH "Replace Order" ('U') message has a fixed length of 27 bytes and is structured as:
-//   [0]      = Message Type (ASCII 'U')
-//   [1:8]    = Original Order Reference Number (64-bit)
-//   [9:16]   = New Order Reference Number (64-bit)
-//   [17:20]  = Updated Shares (32-bit)
-//   [21:24]  = Updated Price (32-bit)
-//   [25:26]  = Reserved bytes (ignored, for alignment)
-
+//   [0]     = Message Type (ASCII 'U')
+//   [1:8]   = Original Order Reference Number (64-bit)
+//   [9:16]  = New Order Reference Number (64-bit)
+//   [17:20] = Updated Shares (32-bit)
+//   [21:24] = Updated Price (32-bit)
+//   [25:26] = Reserved (zeroed)
 //
-// This decoder consumes a byte-aligned, per-cycle stream of ITCH bytes and speculatively 
-// begins parsing at cycle 0. On cycle 0, it captures the message type and immediately decodes
-// byte 1 as `old_order_ref[63:56]`. Parallel validation confirms whether the message is of type 'U'.
-// The decoder asserts `internal_valid` after 25 valid cycles only if the type matches.
-//
-// Inputs:
-//   - clk                 : system clock
-//   - rst                 : synchronous reset
-//   - byte_in[7:0]        : ITCH byte stream (1 byte per cycle)
-//   - valid_in            : asserted high when byte_in is valid
-//
-// Outputs:
-//   - internal_valid      : one-cycle pulse when a valid Replace Order message is fully parsed
-//   - packet_invalid      : asserted if message length overruns unexpectedly
-//   - old_order_ref       : 64-bit original order reference
-//   - new_order_ref       : 64-bit new order reference
-//   - replace_shares      : 32-bit updated shares
-//   - replace_price       : 32-bit updated price
+// The decoder speculatively begins parsing at byte 0 and asserts `internal_valid`
+// after 27 valid bytes if the message type is 'U'.
 // ------------------------------------------------------------------------------------------------
+
 module replace_order_decoder (
     input  logic        clk,
     input  logic        rst,
@@ -149,6 +133,7 @@ module replace_order_decoder (
 
 
         `ITCH_RECHECK_OR_SUPPRESS(MSG_TYPE, MSG_LENGTH)
+        `include "macros/itch_abort_on_valid_drop.vh"
     end
 
 endmodule

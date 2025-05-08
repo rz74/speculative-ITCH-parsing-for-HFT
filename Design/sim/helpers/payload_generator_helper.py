@@ -1,18 +1,20 @@
-# =============================================
+# ============================================================
 # payload_generator_helper.py
-# =============================================
-
-# Description: ITCH-compliant payload generators for valid test inputs.
+# ============================================================
+#
+# Description: Encodes binary payloads for ITCH message types.
+#              Used to translate message fields into byte-aligned streams.
+#              Supports all six decoder types: Add, Cancel, Delete, etc.
 # Author: RZ
-# Start Date: 04172025
+# Start Date: 05032025
 # Version: 0.8
 
 # Changelog
 # =============================================
-# [20250427-1] RZ: Initial Add/Cancel payloads (from payload_generators.py).
-# [20250428-2] RZ: Added Delete/Replace and dummy payload generators.
-# [20250429-1] RZ: Adopted into payload_generator_helper.py from payload_generators.py.
-# [20250429-2] RZ: Added random_valid_payload() for randomized test cases.
+# [20250503-1] RZ: Initial Add/Cancel payloads (from payload_generators.py).
+# [20250503-2] RZ: Added Delete/Replace and dummy payload generators.
+# [20250503-1] RZ: Adopted into payload_generator_helper.py from payload_generators.py.
+# [20250503-2] RZ: Added random_valid_payload() for randomized test cases.
 # [20250504-1] RZ: updated cancel_order_payload to provide unused bytes for testing for real applications
 # [20250504-2] RZ: updated delete_order_payload.
 # [20250504-3] RZ: updated replace_order_payload.
