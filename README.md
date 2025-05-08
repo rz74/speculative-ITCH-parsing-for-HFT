@@ -217,3 +217,9 @@ end
 - Every module includes a title block with:
   - Description, Author, Start Date, Version
   - Detailed changelog entries
+
+## License
+
+This repository is publicly viewable for academic and demonstration purposes only.
+
+All rights are reserved by the author. Reproduction, modification, or redistribution of the source code is not permitted without explicit written consent.
