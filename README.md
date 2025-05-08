@@ -12,14 +12,14 @@ The architecture is designed to minimize latency, maximize throughput, and scale
 ## 📚 Documentation Index
 
 ### 🔧 RTL Design
-- [Core Parser Logic](rtl/README_core_logic.md)
-- [Field Macros](rtl/field_macros/README_field_macros.md)
-- [Decoder Modules](rtl/modules/README_decoders.md)
-- [Shared Macros](rtl/macros/README_macros.md)
+- [Core Parser Logic](Design/rtl/README_core_logic.md)
+- [Field Macros](Design/rtl/field_macros/README_field_macros.md)
+- [Decoder Modules](Design/rtl/modules/README_decoders.md)
+- [Shared Macros](Design/rtl/macros/README_macros.md)
 
 ### 🧪 Verification Infrastructure
-- [Testbench Architecture](sim/README_testbench.md)
-- [Helper Scripts](sim/helpers/README_helpers.md)
+- [Testbench Architecture](Design/sim/README_testbench.md)
+- [Helper Scripts](Design/sim/helpers/README_helpers.md)
 
 
 ## Architecture Summary
