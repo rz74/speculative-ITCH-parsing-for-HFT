@@ -39,10 +39,13 @@ Thanks to this flexible and structured design, the parser architecture can be tr
 
 - [README.md](README.md) 
 
+Waveform Segment
 ![Waveform Segment](Design/sim/vcd/First_Packet_Segment.png)
 
+Back-to-Back Detail
 ![Waveform Segment - Back-to-Back Packets](Design/sim/vcd/Back_to_Back_Packet_Segment.png)
 
+Mid-Packet Valid Drop Detail
 ![Waveform Segment - Mid-Packet Valid Drop](Design/sim/vcd/Waveform_Valid_Drop_Segment.png)
 
 
