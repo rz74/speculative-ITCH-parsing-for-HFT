@@ -31,12 +31,19 @@ Thanks to this flexible and structured design, the parser architecture can be tr
   - [`helpers/`](Design/sim/helpers/)
     - Simulation drivers, workload generators, and recorders
     - [README_helpers.md](Design/sim/helpers/README_helpers.md)
+  - [`vcd`](Design/sim/vcd)
+    - Waveform files and pictures
   - Cocotb testbenches (`test_integrated.py`, `test_parser_canonical.py`, `test_valid_drop_abort.py`)
   - Output logs and waveform automation (e.g., `recorded_log.csv`, `Makefile`)
   - [README_testbench.md](Design/sim/README_testbench.md)
 
 - [README.md](README.md) 
 
+![Waveform Segment](Design/sim/vcd/First_Packet_Segment.png)
+
+![Waveform Segment - Back-to-Back Packets](Design/sim/vcd/Back_to_Back_Packet_Segment.png)
+
+![Waveform Segment - Mid-Packet Valid Drop](Design/sim/vcd/Waveform_Valid_Drop_Segment.png)
 
 
 ## Architecture Summary
