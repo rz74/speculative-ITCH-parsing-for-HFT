@@ -87,7 +87,7 @@ Each decoder then `\`includes its respective macro file and uses:
 - Fields:
   - `order_ref [63:0]`
   - `executed_shares [31:0]`
-  - `match_id [64:0]`
+  - `match_id [63:0]`
 
 ### 6. `itch_fields_trade.vh`
 
