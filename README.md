@@ -1,6 +1,14 @@
 
 # Speculative ITCH Parser
 
+## Author
+
+**Ruixuan Zhang (Rex)**  
+Independent Researcher  
+ruixuan.zhang.ee@gmail.com
+rz0704rz@gmail.com
+
+
 ## Overview
 
 This project implements a speculative, low-latency ITCH message parser with a robust, gated architecture that achieves canonical-format output with only **one clock cycle of parsing delay**. All message types are parsed in parallel using a fully macro-driven RTL structure, enabling aggressive pipelining and precise control.
